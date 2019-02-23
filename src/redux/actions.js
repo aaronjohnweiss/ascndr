@@ -1,8 +1,13 @@
+export const ADD_GYM = 'ADD_GYM'
+
+let gymId = 0
 
 export function addGym(gym) {
-    const action = {
-        type: 'ADD_GYM',
-        gym
+    return {
+        type: ADD_GYM,
+        gym: {
+            ...gym,
+            id: gymId++
+        }
     }
-    return action
 }
