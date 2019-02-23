@@ -5,11 +5,14 @@ class GymPage extends Component {
 
     render() {
         const { gyms, match } = this.props
-        const { id } = match.params
+        const id = Number(match.params.id)
 
-        const gym = gyms.find(gym => gym.id === parseInt(id))
+        const gym = gyms.find(gym => gym.id === id)
 
         if (!gym) return 'Uh oh'
+
+        // Filter to only routes for this gym
+        const routes = this.props.routes.filter(route => route.gymId === id)
 
         return (
             <div>
@@ -17,6 +20,9 @@ class GymPage extends Component {
                 <p>Location: {gym.location}</p>
                 <p>Height: {gym.height} ft</p>
                 <h3>Routes</h3>
+                {routes.map(route => (
+                    <p>{route.name}</p>
+                ))}
             </div>
 
         )
@@ -25,7 +31,8 @@ class GymPage extends Component {
 
 const mapStateToProps = state => {
     return {
-        gyms: state.gyms
+        gyms: state.gyms,
+        routes: state.routes
     }
 }
 

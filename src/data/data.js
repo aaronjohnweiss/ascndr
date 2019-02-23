@@ -4,4 +4,8 @@ const gyms = [
     { id: 102, name: 'Garden State Rocks', location: 'Morganville, NJ', height: 28 }
 ]
 
-export default gyms
+const routes = [
+    { id: 100, name: 'Jamwise Camgee', grade: '5.10', gymId: 101, color: 'Pink' }
+]
+
+export { gyms, routes }

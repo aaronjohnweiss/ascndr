@@ -1,8 +1,8 @@
 import { combineReducers } from 'redux'
-import data from '../data/data'
+import { gyms as initialGyms, routes as initialRoutes } from '../data/data'
 import { ADD_GYM, ADD_ROUTE } from './actions'
 
-function gyms(state = data, action) {
+function gyms(state = initialGyms, action) {
     switch (action.type) {
         case ADD_GYM:
             return [...state, action.gym]
@@ -11,7 +11,7 @@ function gyms(state = data, action) {
     }
 }
 
-function routes(state = data, action) {
+function routes(state = initialRoutes, action) {
     switch (action.type) {
         case ADD_ROUTE:
             return [...state, action.route]
