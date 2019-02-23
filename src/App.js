@@ -1,5 +1,4 @@
 import React, { Component } from 'react'
-import './App.css'
 import GymIndex from './containers/GymIndex'
 import { BrowserRouter as Router, Redirect, Route } from 'react-router-dom'
 import GymPage from './containers/GymPage'
@@ -10,7 +9,7 @@ export default class App extends Component {
         return (
             <Router>
                 <div className="App">
-                    <div className="alert alert-primary" role="alert">
+                    <div className='alert alert-primary text-center' role='alert'>
                         ASCNDr
                     </div>
 

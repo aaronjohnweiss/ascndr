@@ -5,6 +5,8 @@ import Button from 'react-bootstrap/Button'
 import NewEntityModal from '../components/NewEntityModal'
 import { Link } from 'react-router-dom'
 import { gymFields } from '../templates/gymFields'
+import Gym from '../components/Gym'
+import Col from 'react-bootstrap/Col'
 
 class GymIndex extends Component {
     constructor(props) {
@@ -31,16 +33,18 @@ class GymIndex extends Component {
     render() {
         return (
             <Fragment>
-                {this.props.gyms.map(({ id, name }) => <Link key={id} to={`/gyms/${id}`}
-                                                             style={{ display: 'block' }}>{name}</Link>)}
-                <Button variant='primary' onClick={this.showModal.bind(this)}>
-                    Add Gym
-                </Button>
+                <Col>
+                    {this.props.gyms.map((gym) => <Gym {...gym} />)}
+                    <br/>
+                    <Button variant='primary' block={true} onClick={this.showModal.bind(this)}>
+                        Add Gym
+                    </Button>
 
                 <NewEntityModal show={this.state.showModal}
                                 handleClose={this.hideModal.bind(this)}
                                 handleSubmit={this.handleNewGym.bind(this)}
                                 fields={gymFields}/>
+                </Col>
             </Fragment>
         )
     }
