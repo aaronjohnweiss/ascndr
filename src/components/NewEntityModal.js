@@ -1,9 +1,9 @@
-import React, { Component } from 'react'
+import React, { Component, Fragment } from 'react'
 import Modal from 'react-bootstrap/es/Modal'
 import Button from 'react-bootstrap/es/Button'
 import Form from 'react-bootstrap/Form'
 
-export default class NewGymModal extends Component {
+export default class NewEntityModal extends Component {
     constructor(props) {
         super(props)
 
@@ -18,10 +18,14 @@ export default class NewGymModal extends Component {
         this.setState({ [id]: evt.target.value })
     }
 
-    render() {
-        const { handleClose, handleSubmit } = this.props
+    onNumberChange = (id) => (evt) => {
+        this.setState({ [id]: Number(evt.target.value) })
+    }
 
-        return <Modal show={this.props.show} onHide={handleClose}>
+    render() {
+        const { handleClose, handleSubmit, show, fields } = this.props
+
+        return <Modal show={show} onHide={handleClose}>
             <Form>
                 <Modal.Header closeButton>
                     <Modal.Title>
@@ -29,12 +33,17 @@ export default class NewGymModal extends Component {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form.Label>Gym Name</Form.Label>
-                    <Form.Control placeholder='Name..' onChange={this.onChange('name').bind(this)}/>
-                    <Form.Label>Gym Location</Form.Label>
-                    <Form.Control type='text' placeholder='Location..' onChange={this.onChange('location').bind(this)}/>
-                    <Form.Label>Average Wall Height (feet)</Form.Label>
-                    <Form.Control type='number' placeholder='Height..' onChange={this.onChange('height').bind(this)}/>
+                    {fields.map(({ title, placeholder, name, options }) => {
+                        const onChange = (options && options.type === 'number' ? this.onNumberChange : this.onChange)
+                        return (
+                            <Fragment>
+                                <Form.Label>{title}</Form.Label>
+                                <Form.Control placeholder={placeholder}
+                                              onChange={onChange(name).bind(this)}
+                                              {...options} />
+                            </Fragment>
+                        )
+                    })}
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose}>
