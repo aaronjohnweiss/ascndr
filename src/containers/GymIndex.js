@@ -1,9 +1,9 @@
 import React, { Component, Fragment } from 'react'
-import Gym from '../components/Gym'
 import { connect } from 'react-redux'
 import { addGym } from '../redux/actions'
 import Button from 'react-bootstrap/Button'
 import NewGymModal from '../components/NewGymModal'
+import { Link } from 'react-router-dom'
 
 class GymIndex extends Component {
     constructor(props) {
@@ -30,7 +30,8 @@ class GymIndex extends Component {
     render() {
         return (
             <Fragment>
-                {this.props.gyms.map((gym, index) => <Gym key={gym.id} name={gym.name}/>)}
+                {this.props.gyms.map(({ id, name }) => <Link key={id} to={`/gyms/${id}`}
+                                                             style={{ display: 'block' }}>{name}</Link>)}
                 <Button variant='primary' onClick={this.showModal.bind(this)}>
                     Add Gym
                 </Button>
