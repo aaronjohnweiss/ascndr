@@ -13,6 +13,7 @@ class GymPage extends Component {
 
         // Filter to only routes for this gym
         const routes = this.props.routes.filter(route => route.gymId === id)
+        const sessions = this.props.sessions.filter(session => session.gymId === id)
 
         return (
             <div>
@@ -21,7 +22,11 @@ class GymPage extends Component {
                 <p>Height: {gym.height} ft</p>
                 <h3>Routes</h3>
                 {routes.map(route => (
-                    <p>{route.name}</p>
+                    <p key={route.id}>{route.name}</p>
+                ))}
+                <h3>Sessions</h3>
+                {sessions.map(session => (
+                    <p key={session.id}>{new Date(session.startTime).toDateString()}</p>
                 ))}
             </div>
 
@@ -32,7 +37,8 @@ class GymPage extends Component {
 const mapStateToProps = state => {
     return {
         gyms: state.gyms,
-        routes: state.routes
+        routes: state.routes,
+        sessions: state.sessions
     }
 }
 

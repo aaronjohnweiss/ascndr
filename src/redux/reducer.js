@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux'
-import { gyms as initialGyms, routes as initialRoutes } from '../data/data'
+import { gyms as initialGyms, routes as initialRoutes, sessions as initialSessions } from '../data/data'
 import { ADD_GYM, ADD_ROUTE } from './actions'
 
 function gyms(state = initialGyms, action) {
@@ -20,8 +20,15 @@ function routes(state = initialRoutes, action) {
     }
 }
 
+function sessions(state = initialSessions, action) {
+    switch (action.type) {
+        default:
+            return state
+    }
+}
+
 const rootReducer = combineReducers({
-    gyms, routes
+    gyms, routes, sessions
 })
 
 export default rootReducer

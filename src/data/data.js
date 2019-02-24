@@ -5,7 +5,31 @@ const gyms = [
 ]
 
 const routes = [
-    { id: 100, name: 'Jamwise Camgee', grade: '5.10', gymId: 101, color: 'Pink' }
+    {
+        id: 100,
+        gymId: 101,
+        name: 'Jamwise Camgee',
+        description: 'Fun problem on the slab',
+        grade: '5.10',
+        color: 'Pink',
+        picture: 'https://drive.google.com/uc?export=view&id=1sh2GVAumt2fzkLT-mV-Rei8zn3e4qv6g'
+    }
 ]
 
-export { gyms, routes }
+const sessions = [
+    {
+        id: 100,
+        gymId: 101,
+        startTime: Date.now() - 5000,
+        endTime: Date.now(),
+        routeIds: [
+            {
+                id: 100,
+                times: 2
+            }
+        ],
+        notes: 'I did a good job.'
+    }
+]
+
+export { gyms, routes, sessions }
