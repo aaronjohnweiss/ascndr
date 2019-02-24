@@ -7,11 +7,11 @@ export default class NewEntityModal extends Component {
     constructor(props) {
         super(props)
 
-        this.state = {
-            name: '',
-            location: '',
-            height: 0
-        }
+        this.state = {}
+
+        props.fields.forEach(field => {
+            this.state[field.name] = ''
+        })
     }
 
     onChange = (id) => (evt) => {
@@ -29,14 +29,14 @@ export default class NewEntityModal extends Component {
             <Form>
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        Add New Gym
+                        Add New
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {fields.map(({ title, placeholder, name, options }) => {
+                    {fields.map(({ title, placeholder, name, options }, index) => {
                         const onChange = (options && options.type === 'number' ? this.onNumberChange : this.onChange)
                         return (
-                            <Fragment>
+                            <Fragment key={index}>
                                 <Form.Label>{title}</Form.Label>
                                 <Form.Control placeholder={placeholder}
                                               onChange={onChange(name).bind(this)}
