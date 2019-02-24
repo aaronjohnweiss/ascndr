@@ -1,5 +1,6 @@
 export const ADD_GYM = 'ADD_GYM'
 export const ADD_ROUTE = 'ADD_ROUTE'
+export const ADD_SESSION = 'ADD_SESSION'
 
 let gymId = 0
 
@@ -21,6 +22,18 @@ export function addRoute(route) {
         route: {
             ...route,
             id: routeId++
+        }
+    }
+}
+
+let sessionId = 0
+
+export function addSession(session) {
+    return {
+        type: ADD_SESSION,
+        session: {
+            ...session,
+            id: sessionId++
         }
     }
 }

@@ -5,6 +5,7 @@ import GymPage from './containers/GymPage'
 import { Jumbotron } from 'react-bootstrap'
 import './styles/styles.css'
 import RoutePage from './containers/RoutePage'
+import SessionPage from './containers/SessionPage'
 
 export default class App extends Component {
 
@@ -22,6 +23,7 @@ export default class App extends Component {
                     <Route exact path='/gyms' component={GymIndex}/>
                     <Route exact path='/gyms/:id' component={GymPage}/>
                     <Route exact path='/routes/:id' component={RoutePage}/>
+                    <Route exact path='/sessions/:id' component={SessionPage}/>
                 </div>
             </Router>
         )

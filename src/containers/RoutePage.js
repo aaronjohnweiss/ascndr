@@ -32,7 +32,7 @@ class RoutePage extends Component {
                     <Col md='2'/>
                     <Col md='8'>
                         <h2>{route.name}
-                            <small class='text-muted'>@ <Link to={`/gyms/${gym.id}`}>{gym.name}</Link></small>
+                            <small className='text-muted'> @ <Link to={`/gyms/${gym.id}`}>{gym.name}</Link></small>
                         </h2>
                         <h3>{route.grade}
                             <small>({route.color})</small>

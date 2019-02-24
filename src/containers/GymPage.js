@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Button, Col, Container, ListGroup, Row } from 'react-bootstrap'
 import NewEntityModal from '../components/NewEntityModal'
 import { routeFields } from '../templates/routeFields'
-import { addRoute } from '../redux/actions'
+import { addRoute, addSession } from '../redux/actions'
 import { Link } from 'react-router-dom'
 
 class GymPage extends Component {
@@ -27,6 +27,18 @@ class GymPage extends Component {
         route = { ...route, gymId: Number(this.props.match.params.id) }
         this.props.addRoute(route)
         this.hideModal()
+    }
+
+    createSession() {
+        const { addSession, match } = this.props
+        const gymId = Number(match.params.id)
+
+        const session = {
+            gymId: gymId,
+            startTime: Date.now()
+        }
+
+        addSession(session)
     }
 
     render() {
@@ -74,9 +86,20 @@ class GymPage extends Component {
                                         fields={routeFields}/>
 
                         <h3>Sessions</h3>
-                        {sessions.map(session => (
-                            <p key={session.id}>{new Date(session.startTime).toDateString()}</p>
-                        ))}
+                        <ListGroup>
+                            {sessions.map(session => (
+                                <Link to={`/sessions/${session.id}`} style={{ textDecoration: 'none' }}>
+                                    <ListGroup.Item action key={session.id}>
+                                        {new Date(session.startTime).toDateString()}
+                                    </ListGroup.Item>
+                                </Link>
+                            ))}
+                        </ListGroup>
+                        <br/>
+
+                        <Button variant='primary' block={true} onClick={this.createSession.bind(this)}>
+                            Add Session
+                        </Button>
                     </Col>
                     <Col md='2'/>
                 </Row>
@@ -97,6 +120,9 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
     return {
+        addSession: (session) => {
+            dispatch(addSession(session))
+        },
         addRoute: (route) => {
             dispatch(addRoute(route))
         }
