@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
+import { Col, Container, Row } from 'react-bootstrap'
 
 class GymPage extends Component {
 
@@ -16,19 +17,28 @@ class GymPage extends Component {
         const sessions = this.props.sessions.filter(session => session.gymId === id)
 
         return (
-            <div>
-                <h2>{gym.name}</h2>
-                <p>Location: {gym.location}</p>
-                <p>Height: {gym.height} ft</p>
-                <h3>Routes</h3>
-                {routes.map(route => (
-                    <p key={route.id}>{route.name}</p>
-                ))}
-                <h3>Sessions</h3>
-                {sessions.map(session => (
-                    <p key={session.id}>{new Date(session.startTime).toDateString()}</p>
-                ))}
-            </div>
+            <Container>
+                <Row>
+                    <Col md='2'></Col>
+                    <Col md='8'>
+
+                        <h2>{gym.name}</h2>
+                        <h4>
+                            <small>{gym.location}</small>
+                        </h4>
+                        <p>Average Wall Height: {gym.height} ft</p>
+                        <h3>Routes</h3>
+                        {routes.map(route => (
+                            <p key={route.id}>{route.name}</p>
+                        ))}
+                        <h3>Sessions</h3>
+                        {sessions.map(session => (
+                            <p key={session.id}>{new Date(session.startTime).toDateString()}</p>
+                        ))}
+                    </Col>
+                    <Col md='2'></Col>
+                </Row>
+            </Container>
 
         )
     }
