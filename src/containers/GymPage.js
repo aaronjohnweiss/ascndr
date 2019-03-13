@@ -35,7 +35,9 @@ class GymPage extends Component {
 
         const session = {
             gymId: gymId,
-            startTime: Date.now()
+            startTime: Date.now(),
+            standardRoutes: {},
+            customRoutes: {}
         }
 
         addSession(session)
@@ -67,8 +69,8 @@ class GymPage extends Component {
                         <h3>Routes</h3>
                         <ListGroup>
                             {routes.map(route => (
-                                <Link to={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
-                                    <ListGroup.Item action key={route.id}>
+                                <Link to={`/routes/${route.id}`} style={{ textDecoration: 'none' }} key={route.id}>
+                                    <ListGroup.Item action>
                                         {route.name}
                                     </ListGroup.Item>
                                 </Link>
@@ -88,8 +90,8 @@ class GymPage extends Component {
                         <h3>Sessions</h3>
                         <ListGroup>
                             {sessions.map(session => (
-                                <Link to={`/sessions/${session.id}`} style={{ textDecoration: 'none' }}>
-                                    <ListGroup.Item action key={session.id}>
+                                <Link to={`/sessions/${session.id}`} style={{ textDecoration: 'none' }} key={session.id}>
+                                    <ListGroup.Item action>
                                         {new Date(session.startTime).toDateString()}
                                     </ListGroup.Item>
                                 </Link>

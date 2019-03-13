@@ -33,7 +33,7 @@ class GymIndex extends Component {
         return (
             <Fragment>
                 <Col>
-                    {this.props.gyms.map((gym) => <Gym {...gym} />)}
+                    {this.props.gyms.map((gym) => <Gym {...gym} key={gym.id}/>)}
                     <br/>
                     <Button variant='primary' block={true} onClick={this.showModal.bind(this)}>
                         Add Gym

@@ -14,7 +14,7 @@ export default class App extends Component {
             <Router>
                 <div className="App">
 
-                    <Jumbotron>
+                    <Jumbotron fluid>
                         <Link to='/' style={{ textDecoration: 'none', color: 'white' }}><h1
                             className='text-center'>ASCNDr</h1></Link>
                     </Jumbotron>
