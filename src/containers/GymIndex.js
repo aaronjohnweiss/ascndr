@@ -5,7 +5,6 @@ import Button from 'react-bootstrap/Button'
 import NewEntityModal from '../components/NewEntityModal'
 import { gymFields } from '../templates/gymFields'
 import Gym from '../components/Gym'
-import Col from 'react-bootstrap/Col'
 
 class GymIndex extends Component {
     constructor(props) {
@@ -32,8 +31,7 @@ class GymIndex extends Component {
     render() {
         return (
             <Fragment>
-                <Col>
-                    {this.props.gyms.map((gym) => <Gym {...gym} />)}
+                    {this.props.gyms.map((gym, index) => <Gym key={index} {...gym} />)}
                     <br/>
                     <Button variant='primary' block={true} onClick={this.showModal.bind(this)}>
                         Add Gym
@@ -43,7 +41,6 @@ class GymIndex extends Component {
                                 handleClose={this.hideModal.bind(this)}
                                 handleSubmit={this.handleNewGym.bind(this)}
                                 fields={gymFields}/>
-                </Col>
             </Fragment>
         )
     }

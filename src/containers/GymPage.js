@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { Button, Col, Container, ListGroup, Row } from 'react-bootstrap'
+import { Button, Container, ListGroup } from 'react-bootstrap'
 import NewEntityModal from '../components/NewEntityModal'
 import { routeFields } from '../templates/routeFields'
 import { addRoute, addSession } from '../redux/actions'
@@ -55,54 +55,49 @@ class GymPage extends Component {
 
         return (
             <Container>
-                <Row>
-                    <Col md='2'/>
-                    <Col md='8'>
 
-                        <h2>{gym.name}</h2>
-                        <h4>
-                            <small>{gym.location}</small>
-                        </h4>
-                        <p>Average Wall Height: {gym.height} ft</p>
-                        <h3>Routes</h3>
-                        <ListGroup>
-                            {routes.map(route => (
-                                <Link to={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
-                                    <ListGroup.Item action key={route.id}>
-                                        {route.name}
-                                    </ListGroup.Item>
-                                </Link>
-                            ))}
-                        </ListGroup>
-                        <br/>
+                <h2>{gym.name}</h2>
+                <h4>
+                    <small>{gym.location}</small>
+                </h4>
+                <p>Average Wall Height: {gym.height} ft</p>
+                <h3>Routes</h3>
+                <ListGroup>
+                    {routes.map(route => (
+                        <Link to={`/routes/${route.id}`} style={{ textDecoration: 'none' }}>
+                            <ListGroup.Item action key={route.id}>
+                                {route.name}
+                            </ListGroup.Item>
+                        </Link>
+                    ))}
+                </ListGroup>
+                <br/>
 
-                        <Button variant='primary' block={true} onClick={this.showModal.bind(this)}>
-                            Add Route
-                        </Button>
+                <Button variant='primary' block={true} onClick={this.showModal.bind(this)}>
+                    Add Route
+                </Button>
 
-                        <NewEntityModal show={this.state.showModal}
-                                        handleClose={this.hideModal.bind(this)}
-                                        handleSubmit={this.handleNewRoute.bind(this)}
-                                        fields={routeFields}/>
+                <NewEntityModal show={this.state.showModal}
+                                handleClose={this.hideModal.bind(this)}
+                                handleSubmit={this.handleNewRoute.bind(this)}
+                                fields={routeFields}/>
 
-                        <h3>Sessions</h3>
-                        <ListGroup>
-                            {sessions.map(session => (
-                                <Link to={`/sessions/${session.id}`} style={{ textDecoration: 'none' }}>
-                                    <ListGroup.Item action key={session.id}>
-                                        {new Date(session.startTime).toDateString()}
-                                    </ListGroup.Item>
-                                </Link>
-                            ))}
-                        </ListGroup>
-                        <br/>
+                <h3>Sessions</h3>
+                <ListGroup>
+                    {sessions.map(session => (
+                        <Link to={`/sessions/${session.id}`} style={{ textDecoration: 'none' }}>
+                            <ListGroup.Item action key={session.id}>
+                                {new Date(session.startTime).toDateString()}
+                            </ListGroup.Item>
+                        </Link>
+                    ))}
+                </ListGroup>
+                <br/>
 
-                        <Button variant='primary' block={true} onClick={this.createSession.bind(this)}>
-                            Add Session
-                        </Button>
-                    </Col>
-                    <Col md='2'/>
-                </Row>
+                <Button variant='primary' block={true} onClick={this.createSession.bind(this)}>
+                    Add Session
+                </Button>
+
             </Container>
 
         )
