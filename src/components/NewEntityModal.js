@@ -9,9 +9,9 @@ export default class NewEntityModal extends Component {
 
         this.state = {}
 
-        props.fields.forEach(field => {
+        for (let field of props.fields) {
             this.state[field.name] = ''
-        })
+        }
     }
 
     onChange = (id) => (evt) => {

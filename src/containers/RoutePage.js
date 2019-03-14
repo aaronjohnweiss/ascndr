@@ -5,15 +5,15 @@ import { Link } from 'react-router-dom'
 
 class RoutePage extends Component {
 
-    constructor() {
-        super()
+    constructor(props) {
+        super(props)
         this.state = {
             rotation: 0
         }
     }
 
     handleRotate() {
-        this.setState({ rotation: this.state.rotation += 90 })
+        this.setState({ rotation: this.state.rotation + 90 })
     }
 
     render() {

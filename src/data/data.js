@@ -22,12 +22,12 @@ const sessions = [
         gymId: 101,
         startTime: Date.now() - 5000,
         endTime: Date.now(),
-        routeIds: [
-            {
-                id: 100,
-                times: 2
-            }
-        ],
+        customRoutes: {
+            100: 2
+        },
+        standardRoutes: {
+
+        },
         notes: 'I did a good job.'
     }
 ]

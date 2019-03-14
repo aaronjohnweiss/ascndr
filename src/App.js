@@ -34,7 +34,8 @@ class App extends Component {
 
         return (
             <Router>
-                <div>
+                <div className="App">
+
                     <Jumbotron fluid>
                         <Link to='/' style={{ textDecoration: 'none', color: 'white' }}><h1
                             className='text-center'>ASCNDr</h1></Link>
