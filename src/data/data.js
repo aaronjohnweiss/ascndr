@@ -20,8 +20,8 @@ const sessions = [
     {
         id: 100,
         gymId: 101,
-        startTime: Date.now() - 5000,
-        endTime: Date.now(),
+        startTime: new Date(Date.now() - 5000000),
+        endTime: new Date(),
         customRoutes: {
             100: 2
         },

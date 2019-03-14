@@ -32,22 +32,18 @@ export default class ListModal extends Component {
                         </Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <fieldset>
-                            <Form.Group>
-                                {listContent.map(listItem => (
-                                    <Form.Check
-                                        id={listItem.id}
-                                        key={listItem.id}
-                                    >
-                                        <Form.Check.Input type='radio'
-                                                          name={title}
-                                                          onChange={() => this.onChange(listItem.id)}
-                                        />
-                                        <Form.Check.Label>{listItem.label}</Form.Check.Label>
-                                    </Form.Check>
-                                ))}
-                            </Form.Group>
-                        </fieldset>
+                        {listContent.map(listItem => (
+                            <Form.Check
+                                id={listItem.id}
+                                key={listItem.id}
+                            >
+                                <Form.Check.Input type='radio'
+                                                  name={title}
+                                                  onChange={() => this.onChange(listItem.id)}
+                                />
+                                <Form.Check.Label>{listItem.label}</Form.Check.Label>
+                            </Form.Check>
+                        ))}
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={handleClose}>

@@ -5,6 +5,8 @@ import { updateSession } from '../redux/actions'
 import compareGrades from '../helpers/compareGrades'
 import ListModal from '../components/ListModal'
 import { Link } from 'react-router-dom'
+import ConfirmCancelModal from '../components/ConfirmCancelModal'
+import durationString from '../helpers/durationString'
 
 class SessionPage extends Component {
     constructor(props) {
@@ -13,12 +15,18 @@ class SessionPage extends Component {
         this.state = {
             customRoutes: false,
             standardRoutes: false,
-            session: props.sessions.find(({ id }) => id === Number(props.match.params.id))
+            endSession: false,
         }
 
         this.showModal = this.showModal.bind(this)
         this.hideModal = this.hideModal.bind(this)
         this.renderStandardSubmitButtons = this.renderStandardSubmitButtons.bind(this)
+        this.endSession = this.endSession.bind(this)
+        this.getSession = this.getSession.bind(this)
+    }
+
+    getSession() {
+        return this.props.sessions.find(({ id }) => id === Number(this.props.match.params.id))
     }
 
     showModal(name) {
@@ -45,7 +53,7 @@ class SessionPage extends Component {
     }
 
     addRoute = (name) => (id) => {
-        const session = Object.assign({}, this.state.session)
+        const session = Object.assign({}, this.getSession())
 
         const currentCount = session[name][id] || 0
         session[name][id] = currentCount + 1
@@ -54,8 +62,17 @@ class SessionPage extends Component {
         this.hideModal(name)
     }
 
+    endSession() {
+        const session = Object.assign({}, this.getSession())
+
+        session.endTime = new Date()
+
+        this.props.updateSession(session)
+        this.hideModal('endSession')
+    }
+
     render() {
-        const { session } = this.state
+        const session = this.getSession()
 
         if (!session) return 'Uh oh'
 
@@ -94,15 +111,21 @@ class SessionPage extends Component {
                                          renderSubmitButtons={this.renderStandardSubmitButtons.bind(this)}
         />
 
+        const endSessionModal = <ConfirmCancelModal show={this.state.endSession}
+                                                    handleConfirm={this.endSession}
+                                                    handleCancel={() => this.hideModal('endSession')}
+                                                    title='End session?'/>
+
         return (
             <Container>
                 <Row>
                     <Col md='2'/>
                     <Col md='8'>
-                        {this.state.customRoutes && customModal}
-                        {this.state.standardRoutes && standardModal}
+                        {customModal}
+                        {standardModal}
+                        {endSessionModal}
 
-                        <h2>Session at <Link to={`/gyms/${gym.id}`}>{gym.name}</Link> on {date}</h2>
+                        <h2>Session at <Link to={`/gyms/${gym.id}`}>{gym.name}</Link> on {date} {session.endTime && ` for ${durationString(session)}`}</h2>
                         <h4>
                             <small>{gym.location}</small>
                         </h4>
@@ -134,6 +157,16 @@ class SessionPage extends Component {
                                 </Button>
                             </Col>
                         </Row>
+                        {!session.endTime &&
+                        <Row>
+                            <Col md={12}>
+                                <Button variant='danger' block={true}
+                                        onClick={() => this.showModal('endSession')}>
+                                    End session
+                                </Button>
+                            </Col>
+                        </Row>
+                        }
                     </Col>
                     <Col md='2'/>
                 </Row>

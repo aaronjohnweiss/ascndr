@@ -5,6 +5,7 @@ import NewEntityModal from '../components/NewEntityModal'
 import { routeFields } from '../templates/routeFields'
 import { addRoute, addSession } from '../redux/actions'
 import { Link } from 'react-router-dom'
+import durationString from '../helpers/durationString'
 
 class GymPage extends Component {
     constructor(props) {
@@ -35,7 +36,7 @@ class GymPage extends Component {
 
         const session = {
             gymId: gymId,
-            startTime: Date.now(),
+            startTime: new Date(),
             standardRoutes: {},
             customRoutes: {}
         }
@@ -84,12 +85,13 @@ class GymPage extends Component {
                                 handleSubmit={this.handleNewRoute.bind(this)}
                                 fields={routeFields}/>
 
+                <br/>
                 <h3>Sessions</h3>
                 <ListGroup>
                     {sessions.map(session => (
                         <Link to={`/sessions/${session.id}`} style={{ textDecoration: 'none' }} key={session.id}>
                             <ListGroup.Item action>
-                                {new Date(session.startTime).toDateString()}
+                                {session.startTime.toDateString() + (session.endTime ? `, duration: ${durationString(session)}` : ' (ongoing)')}
                             </ListGroup.Item>
                         </Link>
                     ))}

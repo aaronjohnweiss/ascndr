@@ -30,3 +30,7 @@
 .list-group-item {
     padding: 8px 10px 8px 10px;
 }
+
+.row {
+    margin-bottom: 1em
+}
