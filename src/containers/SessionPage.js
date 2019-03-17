@@ -62,6 +62,17 @@ class SessionPage extends Component {
         this.hideModal(name)
     }
 
+    removeRoute = (name) => (id) => {
+        const session = Object.assign({}, this.getSession())
+
+        const newCount = (session[name][id] || 1) - 1
+
+        if (newCount === 0) delete session[name][id]
+        else session[name][id] = newCount
+
+        this.props.updateSession(session)
+    }
+
     endSession() {
         const session = Object.assign({}, this.getSession())
 
@@ -88,7 +99,7 @@ class SessionPage extends Component {
 
         const customModal = <ListModal show={this.state.customRoutes}
                                        handleClose={() => this.hideModal('customRoutes')}
-                                       handleSubmit={this.addRoute('customRoutes').bind(this)}
+                                       handleSubmit={this.addRoute('customRoutes')}
                                        title='Add custom route'
                                        listContent={
                                            routesForGym.map(route => ({
@@ -100,7 +111,7 @@ class SessionPage extends Component {
 
         const standardModal = <ListModal show={this.state.standardRoutes}
                                          handleClose={() => this.hideModal('standardRoutes')}
-                                         handleSubmit={this.addRoute('standardRoutes').bind(this)}
+                                         handleSubmit={this.addRoute('standardRoutes')}
                                          title='Add generic route'
                                          listContent={
                                              Array.from(new Array(9), (x, i) => '5.' + (i + 6)).map(grade => ({
@@ -108,13 +119,25 @@ class SessionPage extends Component {
                                                  label: grade
                                              }))
                                          }
-                                         renderSubmitButtons={this.renderStandardSubmitButtons.bind(this)}
+                                         renderSubmitButtons={this.renderStandardSubmitButtons}
         />
 
         const endSessionModal = <ConfirmCancelModal show={this.state.endSession}
                                                     handleConfirm={this.endSession}
                                                     handleCancel={() => this.hideModal('endSession')}
                                                     title='End session?'/>
+
+        const addRouteButton = (name) => (id) => {
+            return <Button variant='outline-secondary' className='plus-minus-button' onClick={() => this.addRoute(name)(id)}>
+                +
+            </Button>
+        }
+
+        const removeRouteButton = (name) => (id) => {
+            return <Button variant='outline-secondary' className='plus-minus-button' onClick={() => this.removeRoute(name)(id)}>
+                -
+            </Button>
+        }
 
         return (
             <Container>
@@ -132,10 +155,11 @@ class SessionPage extends Component {
                         <h3>Routes</h3>
                         {grades && grades.length ? grades.map(grade => {
                             const routesForGrade = routes.filter(route => route.grade === grade)
-                            const countForGrade = routesForGrade.reduce((acc, route) => acc + (session.customRoutes[route.id] || 0), 0) + (session.standardRoutes[grade] || 0)
+                            const standardCountForGrade = session.standardRoutes[grade] || 0
+                            const countForGrade = routesForGrade.reduce((acc, route) => acc + (session.customRoutes[route.id] || 0), 0) + standardCountForGrade
                             return (
                                 <Fragment key={grade}>
-                                    <h5>{grade} ({countForGrade})</h5>
+                                    <h5 className='session-grade-header'>{grade} ({countForGrade}) {addRouteButton('standardRoutes')(grade)} {standardCountForGrade > 0 && removeRouteButton('standardRoutes')(grade)}</h5>
                                     {routesForGrade.map(route => (
                                         <p key={route.id}>{route.name} ({session.customRoutes[route.id]})</p>
                                     ))}
