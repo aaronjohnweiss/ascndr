@@ -22,6 +22,10 @@ export default class NewEntityModal extends Component {
         this.setState({ [id]: Number(evt.target.value) })
     }
 
+    onFileChange = (id) => (evt) => {
+        this.setState({[id]: evt.target.files[0]})
+    }
+
     render() {
         const { handleClose, handleSubmit, show, fields } = this.props
 
@@ -34,7 +38,14 @@ export default class NewEntityModal extends Component {
                 </Modal.Header>
                 <Modal.Body>
                     {fields.map(({ title, placeholder, name, options }, index) => {
-                        const onChange = (options && options.type === 'number' ? this.onNumberChange : this.onChange)
+                        let onChange = this.onChange
+                        if (options && options.type) {
+                            if (options.type === 'number') {
+                                onChange = this.onNumberChange
+                            } else if (options.type === 'file') {
+                                onChange = this.onFileChange
+                            }
+                        }
                         return (
                             <Fragment key={index}>
                                 <Form.Label>{title}</Form.Label>

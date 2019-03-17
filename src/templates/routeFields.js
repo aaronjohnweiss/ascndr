@@ -24,8 +24,11 @@ export const routeFields = [
     },
     {
         title: 'Route Image',
-        placeholder: 'URL..',
-        name: 'picture'
+        name: 'picture',
+        options: {
+            type: 'file',
+            accept: 'image/*'
+        }
     }
 
 ]

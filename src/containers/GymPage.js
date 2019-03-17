@@ -6,6 +6,7 @@ import { routeFields } from '../templates/routeFields'
 import { addRoute, addSession } from '../redux/actions'
 import { Link } from 'react-router-dom'
 import durationString from '../helpers/durationString'
+import axios from 'axios'
 
 class GymPage extends Component {
     constructor(props) {
@@ -25,9 +26,24 @@ class GymPage extends Component {
     }
 
     handleNewRoute(route) {
-        route = { ...route, gymId: Number(this.props.match.params.id) }
-        this.props.addRoute(route)
-        this.hideModal()
+        // Post to imgur
+        const pictureData = new FormData()
+        pictureData.set('album', process.env.REACT_APP_ALBUM_ID)
+        pictureData.append('image', route.picture)
+        const headers = {
+            'Authorization': 'Client-ID ' + process.env.REACT_APP_CLIENT_ID,
+            'Content-Type': 'multipart/form-data'
+        }
+
+        axios.post('https://api.imgur.com/3/image', pictureData, { headers: headers })
+            .then(resp => {
+                route = { ...route, picture: resp.data.data.link, gymId: Number(this.props.match.params.id) }
+                console.log(route)
+                this.props.addRoute(route)
+                this.hideModal()
+            }).catch(err => {
+            console.log(err.response)
+        })
     }
 
     createSession() {
