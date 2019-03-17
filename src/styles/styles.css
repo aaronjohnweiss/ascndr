@@ -54,7 +54,7 @@
     background-color: transparent;
 }
 
-.form-label {
+.form-label, .form-check {
     margin-top: 0.5em;
     margin-bottom: 0;
 }

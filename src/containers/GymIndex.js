@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { addGym } from '../redux/actions'
 import Button from 'react-bootstrap/Button'
-import NewEntityModal from '../components/NewEntityModal'
+import EntityModal from '../components/EntityModal'
 import { gymFields } from '../templates/gymFields'
 import Gym from '../components/Gym'
 
@@ -37,10 +37,10 @@ class GymIndex extends Component {
                         Add Gym
                     </Button>
 
-                <NewEntityModal show={this.state.showModal}
-                                handleClose={this.hideModal.bind(this)}
-                                handleSubmit={this.handleNewGym.bind(this)}
-                                fields={gymFields}/>
+                <EntityModal show={this.state.showModal}
+                             handleClose={this.hideModal.bind(this)}
+                             handleSubmit={this.handleNewGym.bind(this)}
+                             fields={gymFields}/>
             </Fragment>
         )
     }

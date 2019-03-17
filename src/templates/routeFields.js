@@ -1,4 +1,4 @@
-export const routeFields = [
+export const routeCreateFields = [
     {
         title: 'Route Name',
         placeholder: 'Name..',
@@ -30,5 +30,14 @@ export const routeFields = [
             accept: 'image/*'
         }
     }
+]
 
+export const routeUpdateFields = [...routeCreateFields,
+    {
+        title: 'Retired',
+        name: 'isRetired',
+        options: {
+            type: 'checkbox'
+        }
+    }
 ]

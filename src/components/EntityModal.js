@@ -3,14 +3,15 @@ import Modal from 'react-bootstrap/es/Modal'
 import Button from 'react-bootstrap/es/Button'
 import Form from 'react-bootstrap/Form'
 
-export default class NewEntityModal extends Component {
+export default class EntityModal extends Component {
     constructor(props) {
         super(props)
 
-        this.state = {}
+        this.state = { ...props.initialValues }
 
         for (let field of props.fields) {
-            this.state[field.name] = ''
+            if (this.state[field.name] === undefined) this.state[field.name] = ''
+
         }
     }
 
@@ -23,21 +24,33 @@ export default class NewEntityModal extends Component {
     }
 
     onFileChange = (id) => (evt) => {
-        this.setState({[id]: evt.target.files[0]})
+        this.setState({ [id]: evt.target.files[0] })
+    }
+
+    onCheckboxChange = (id) => (evt) => {
+        this.setState({ [id]: evt.target.checked })
     }
 
     render() {
-        const { handleClose, handleSubmit, show, fields } = this.props
+        const { handleClose, handleSubmit, show, fields, title } = this.props
 
         return <Modal show={show} onHide={handleClose}>
             <Form>
                 <Modal.Header closeButton>
                     <Modal.Title>
-                        Add New
+                        {title || 'Add New'}
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {fields.map(({ title, placeholder, name, options }, index) => {
+                        if (options && options.type === 'checkbox') {
+                            return (
+                                <Fragment key={index}>
+                                    <Form.Check checked={this.state[name]} label={title} onChange={this.onCheckboxChange(name)}/>
+                                </Fragment>
+                            )
+                        }
+
                         let onChange = this.onChange
                         if (options && options.type) {
                             if (options.type === 'number') {
@@ -51,6 +64,7 @@ export default class NewEntityModal extends Component {
                                 <Form.Label>{title}</Form.Label>
                                 <Form.Control placeholder={placeholder}
                                               onChange={onChange(name).bind(this)}
+                                              value={(options && options.type === 'file') ? undefined : this.state[name]}
                                               {...options} />
                             </Fragment>
                         )
