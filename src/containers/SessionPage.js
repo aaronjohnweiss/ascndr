@@ -5,7 +5,7 @@ import { updateSession } from '../redux/actions'
 import compareGrades from '../helpers/compareGrades'
 import ListModal from '../components/ListModal'
 import { Link } from 'react-router-dom'
-import ConfirmCancelModal from '../components/ConfirmCancelModal'
+import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import durationString from '../helpers/durationString'
 
 class SessionPage extends Component {
@@ -14,8 +14,7 @@ class SessionPage extends Component {
 
         this.state = {
             customRoutes: false,
-            standardRoutes: false,
-            endSession: false,
+            standardRoutes: false
         }
 
         this.showModal = this.showModal.bind(this)
@@ -95,7 +94,7 @@ class SessionPage extends Component {
 
         const date = new Date(session.startTime).toDateString()
 
-        const routesForGym = this.props.routes.filter(route => route.gymId === gym.id)
+        const routesForGym = this.props.routes.filter(route => route.gymId === gym.id && !route.isRetired)
 
         const customModal = <ListModal show={this.state.customRoutes}
                                        handleClose={() => this.hideModal('customRoutes')}
@@ -122,19 +121,16 @@ class SessionPage extends Component {
                                          renderSubmitButtons={this.renderStandardSubmitButtons}
         />
 
-        const endSessionModal = <ConfirmCancelModal show={this.state.endSession}
-                                                    handleConfirm={this.endSession}
-                                                    handleCancel={() => this.hideModal('endSession')}
-                                                    title='End session?'/>
-
         const addRouteButton = (name) => (id) => {
-            return <Button variant='outline-secondary' className='plus-minus-button' onClick={() => this.addRoute(name)(id)}>
+            return <Button variant='outline-secondary' className='plus-minus-button'
+                           onClick={() => this.addRoute(name)(id)}>
                 +
             </Button>
         }
 
         const removeRouteButton = (name) => (id) => {
-            return <Button variant='outline-secondary' className='plus-minus-button' onClick={() => this.removeRoute(name)(id)}>
+            return <Button variant='outline-secondary' className='plus-minus-button'
+                           onClick={() => this.removeRoute(name)(id)}>
                 -
             </Button>
         }
@@ -146,9 +142,10 @@ class SessionPage extends Component {
                     <Col md='8'>
                         {customModal}
                         {standardModal}
-                        {endSessionModal}
 
-                        <h2>Session at <Link to={`/gyms/${gym.id}`}>{gym.name}</Link> on {date} {session.endTime && ` for ${durationString(session)}`}</h2>
+                        <h2>Session at <Link
+                            to={`/gyms/${gym.id}`}>{gym.name}</Link> on {date} {session.endTime && ` for ${durationString(session)}`}
+                        </h2>
                         <h4>
                             <small>{gym.location}</small>
                         </h4>
@@ -184,10 +181,10 @@ class SessionPage extends Component {
                         {!session.endTime &&
                         <Row>
                             <Col md={12}>
-                                <Button variant='danger' block={true}
-                                        onClick={() => this.showModal('endSession')}>
-                                    End session
-                                </Button>
+                                <ConfirmCancelButton handleConfirm={this.endSession}
+                                                     modalTitle='End session?'
+                                                     buttonText='End session'
+                                                     buttonProps={{ variant: 'danger', block: true }}/>
                             </Col>
                         </Row>
                         }

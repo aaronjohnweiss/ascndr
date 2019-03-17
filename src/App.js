@@ -3,24 +3,24 @@ import GymIndex from './containers/GymIndex'
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
 import GymPage from './containers/GymPage'
 import Home from './containers/Home'
-import {Jumbotron, Row, Col} from 'react-bootstrap'
+import { Col, Jumbotron, Row } from 'react-bootstrap'
 import './styles/styles.css'
 import RoutePage from './containers/RoutePage'
 import SessionPage from './containers/SessionPage'
-import SignIn from "./components/SignIn";
-import requireAuth from "./components/requireAuth";
-import {fetchUser, signOut} from "./redux/actions";
-import {connect} from "react-redux";
-import denyAuth from "./components/denyAuth";
+import SignIn from './components/SignIn'
+import requireAuth from './components/requireAuth'
+import { fetchUser, signOut } from './redux/actions'
+import { connect } from 'react-redux'
+import denyAuth from './components/denyAuth'
 
 class App extends Component {
     componentWillMount() {
-        this.props.fetchUser();
+        this.props.fetchUser()
     }
 
     render() {
 
-        let authState;
+        let authState
 
         if (this.props.authenticated) {
             authState = <li className="nav-item">
@@ -37,8 +37,9 @@ class App extends Component {
                 <div className="App">
 
                     <Jumbotron fluid>
-                        <Link to='/' style={{ textDecoration: 'none', color: 'white' }}><h1
-                            className='text-center'>ASCNDr</h1></Link>
+                        <Link to='/' style={{ textDecoration: 'none', color: 'white' }}>
+                            <h1 className='text-center'>ASCNDr</h1>
+                        </Link>
 
                         <Col sm={1}/>
                         <Col sm={10}>
@@ -70,7 +71,7 @@ class App extends Component {
 }
 
 function mapStateToProps(state) {
-    return { authenticated: state.auth };
+    return { authenticated: state.auth }
 }
 
-export default connect(mapStateToProps, { fetchUser, signOut })(App);
+export default connect(mapStateToProps, { fetchUser, signOut })(App)

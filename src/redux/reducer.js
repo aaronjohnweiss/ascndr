@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux'
 import { gyms as initialGyms, routes as initialRoutes, sessions as initialSessions } from '../data/data'
-import { ADD_GYM, ADD_ROUTE, ADD_SESSION, UPDATE_SESSION, FETCH_USER } from './actions'
+import { ADD_GYM, ADD_ROUTE, ADD_SESSION, FETCH_USER, UPDATE_ROUTE, UPDATE_SESSION } from './actions'
 
 function gyms(state = initialGyms, action) {
     switch (action.type) {
@@ -15,6 +15,11 @@ function routes(state = initialRoutes, action) {
     switch (action.type) {
         case ADD_ROUTE:
             return [...state, action.route]
+        case UPDATE_ROUTE:
+            return state.map(route => {
+                if (route.id === action.route.id) return action.route;
+                return route;
+            })
         default:
             return state
     }
