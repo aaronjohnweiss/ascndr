@@ -32,7 +32,7 @@ export default class EntityModal extends Component {
     }
 
     render() {
-        const { handleClose, handleSubmit, show, fields, title } = this.props
+        const { handleClose, handleSubmit, show, fields, title, submitText } = this.props
 
         return <Modal show={show} onHide={handleClose}>
             <Form>
@@ -75,7 +75,7 @@ export default class EntityModal extends Component {
                         Cancel
                     </Button>
                     <Button variant="primary" onClick={() => handleSubmit(this.state)}>
-                        Submit
+                        {submitText ? submitText : 'Submit'}
                     </Button>
                 </Modal.Footer>
             </Form>

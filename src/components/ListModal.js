@@ -15,10 +15,10 @@ export default class ListModal extends Component {
     }
 
     render() {
-        const { handleClose, handleSubmit, show, title, listContent } = this.props
+        const { handleClose, handleSubmit, show, title, listContent, renderSubmitButtons } = this.props
 
         const submitDisabled = this.state.selected === undefined
-        const submitComponent = this.props.renderSubmitButtons ? this.props.renderSubmitButtons(submitDisabled, this.state.selected) : (
+        const submitComponent = renderSubmitButtons ? renderSubmitButtons(submitDisabled, this.state.selected) : (
             <Button variant="primary" disabled={submitDisabled} onClick={() => handleSubmit(this.state.selected)}>
                 Confirm
             </Button>

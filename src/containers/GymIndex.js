@@ -5,42 +5,85 @@ import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import { gymFields } from '../templates/gymFields'
 import Gym from '../components/Gym'
+import ListModal from '../components/ListModal'
 
 class GymIndex extends Component {
     constructor(props) {
         super(props)
 
         this.state = {
-            showModal: false
+            showGroupModal: false,
+            showGymModal: false
         }
+
+        this.showGroupModal = this.showGroupModal.bind(this)
+        this.hideGroupModal = this.hideGroupModal.bind(this)
+        this.showGymModal = this.showGymModal.bind(this)
+        this.hideGymModal = this.hideGymModal.bind(this)
+        this.transitionModals = this.transitionModals.bind(this)
+        this.handleNewGym = this.handleNewGym.bind(this)
     }
 
-    showModal() {
-        this.setState({ showModal: true })
+    showGroupModal() {
+        this.setState({ showGroupModal: true })
     }
 
-    hideModal() {
-        this.setState({ showModal: false })
+    hideGroupModal() {
+        this.setState({ showGroupModal: false })
+        this.setState({ newGym: undefined })
     }
 
-    handleNewGym(gym) {
-        this.props.addGym(gym)
-        this.hideModal()
+    showGymModal() {
+        this.setState({ showGymModal: true })
+    }
+
+    hideGymModal() {
+        this.setState({ showGymModal: false })
+    }
+
+    transitionModals(gym) {
+        // Store in the state and then show next modal
+        this.setState({ newGym: gym })
+        this.hideGymModal()
+        this.showGroupModal()
+    }
+
+    handleNewGym(groupId) {
+        const { newGym } = this.state
+        newGym.groupId = groupId
+        this.props.addGym(newGym)
+        this.hideGroupModal()
     }
 
     render() {
+
+        const { uid } = this.props.auth
+        const groups = this.props.groups.filter(group => group.users.includes(uid))
+        const groupIds = groups.map(group => group.id)
+        const gyms = this.props.gyms.filter(gym => groupIds.includes(gym.groupId))
+
+        const groupFormOptions = groups.map(({ id, name }) => ({ id, label: name }))
+
         return (
             <Fragment>
-                    {this.props.gyms.map((gym) => <Gym {...gym} key={gym.id}/>)}
-                    <br/>
-                    <Button variant='primary' block={true} onClick={this.showModal.bind(this)}>
-                        Add Gym
-                    </Button>
+                {gyms.map((gym) => <Gym {...gym} key={gym.id}/>)}
+                <br/>
+                <Button variant='primary' block={true} onClick={this.showGymModal}>
+                    Add Gym
+                </Button>
 
-                <EntityModal show={this.state.showModal}
-                             handleClose={this.hideModal.bind(this)}
-                             handleSubmit={this.handleNewGym.bind(this)}
-                             fields={gymFields}/>
+                <EntityModal show={this.state.showGymModal}
+                             handleClose={this.hideGymModal}
+                             handleSubmit={this.transitionModals}
+                             fields={gymFields}
+                             submitText='Next'/>
+
+                <ListModal show={this.state.showGroupModal}
+                           handleClose={this.hideGroupModal}
+                           title='Select group for new gym'
+                           listContent={groupFormOptions}
+                           handleSubmit={this.handleNewGym}
+                />
             </Fragment>
         )
     }
@@ -48,7 +91,9 @@ class GymIndex extends Component {
 
 const mapStateToProps = state => {
     return {
-        gyms: state.gyms
+        groups: state.groups,
+        gyms: state.gyms,
+        auth: state.auth
     }
 }
 

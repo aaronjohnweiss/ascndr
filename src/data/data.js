@@ -1,7 +1,11 @@
+const groups = [
+    { id: 100, name: 'Test group', users: [process.env.REACT_APP_UID] }
+]
+
 const gyms = [
-    { id: 100, name: 'Gravity Vault', location: 'Flemington, NJ', height: 35 },
-    { id: 101, name: 'Rockville', location: 'Hamilton, NJ', height: 30 },
-    { id: 102, name: 'Garden State Rocks', location: 'Morganville, NJ', height: 28 }
+    { id: 100, groupId: 100, name: 'Gravity Vault', location: 'Flemington, NJ', height: 35 },
+    { id: 101, groupId: 100, name: 'Rockville', location: 'Hamilton, NJ', height: 30 },
+    { id: 102, groupId: 100, name: 'Garden State Rocks', location: 'Morganville, NJ', height: 28 }
 ]
 
 const routes = [
@@ -32,4 +36,4 @@ const sessions = [
     }
 ]
 
-export { gyms, routes, sessions }
+export { groups, gyms, routes, sessions }

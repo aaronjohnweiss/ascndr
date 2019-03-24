@@ -1,7 +1,35 @@
 import { combineReducers } from 'redux'
-import { gyms as initialGyms, routes as initialRoutes, sessions as initialSessions } from '../data/data'
-import { ADD_GYM, ADD_ROUTE, ADD_SESSION, FETCH_USER, UPDATE_GYM, UPDATE_ROUTE, UPDATE_SESSION } from './actions'
+import {
+    groups as initialGroups,
+    gyms as initialGyms,
+    routes as initialRoutes,
+    sessions as initialSessions
+} from '../data/data'
+import {
+    ADD_GROUP,
+    ADD_GYM,
+    ADD_ROUTE,
+    ADD_SESSION,
+    FETCH_USER,
+    UPDATE_GROUP,
+    UPDATE_GYM,
+    UPDATE_ROUTE,
+    UPDATE_SESSION
+} from './actions'
 
+function groups(state = initialGroups, action) {
+    switch (action.type) {
+        case ADD_GROUP:
+            return [...state, action.group]
+        case UPDATE_GROUP:
+            return state.map(group => {
+                if (group.id === action.group.id) return action.group
+                return group
+            })
+        default:
+            return state
+    }
+}
 function gyms(state = initialGyms, action) {
     switch (action.type) {
         case ADD_GYM:
@@ -54,7 +82,7 @@ function auth(state = false, action) {
 }
 
 const rootReducer = combineReducers({
-    gyms, routes, sessions, auth
+    groups, gyms, routes, sessions, auth
 })
 
 export default rootReducer

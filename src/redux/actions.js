@@ -1,12 +1,33 @@
 import { authRef, provider } from '../config/firebase'
 
 export const FETCH_USER = 'FETCH_USER'
+export const ADD_GROUP = 'ADD_GROUP'
+export const UPDATE_GROUP = 'UPDATE_GROUP'
 export const ADD_GYM = 'ADD_GYM'
 export const ADD_ROUTE = 'ADD_ROUTE'
 export const UPDATE_GYM = 'UPDATE_GYM'
 export const ADD_SESSION = 'ADD_SESSION'
 export const UPDATE_ROUTE = 'UPDATE_ROUTE'
 export const UPDATE_SESSION = 'UPDATE_SESSION'
+
+let groupId = 0
+
+export function addGroup(group) {
+    return {
+        type: ADD_GROUP,
+        group: {
+            ...group,
+            id: groupId++
+        }
+    }
+}
+
+export function updateGroup(group) {
+    return {
+        type: UPDATE_GROUP,
+        group: group
+    }
+}
 
 let gymId = 0
 

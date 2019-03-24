@@ -12,6 +12,8 @@ import requireAuth from './components/requireAuth'
 import { fetchUser, signOut } from './redux/actions'
 import { connect } from 'react-redux'
 import denyAuth from './components/denyAuth'
+import GroupIndex from './containers/GroupIndex'
+import GroupPage from './containers/GroupPage'
 
 class App extends Component {
     componentWillMount() {
@@ -55,6 +57,8 @@ class App extends Component {
                             <Col sm={1}/>
                             <Col sm={10}>
                                 <Route exact path='/' component={Home}/>
+                                <Route exact path='/groups' component={requireAuth(GroupIndex)}/>
+                                <Route exact path='/groups/:id' component={requireAuth(GroupPage)}/>
                                 <Route exact path='/gyms' component={requireAuth(GymIndex)}/>
                                 <Route exact path='/gyms/:id' component={requireAuth(GymPage)}/>
                                 <Route exact path='/routes/:id' component={requireAuth(RoutePage)}/>

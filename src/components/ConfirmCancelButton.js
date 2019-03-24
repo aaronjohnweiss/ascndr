@@ -16,7 +16,7 @@ export default class ConfirmCancelButton extends Component {
     }
 
     render() {
-        const { handleConfirm, handleCancel, modalTitle, modalBody, buttonText, buttonProps } = this.props
+        const { handleConfirm, modalTitle, modalBody, buttonText, buttonProps } = this.props
         const { showModal } = this.state
 
         return (
@@ -24,7 +24,7 @@ export default class ConfirmCancelButton extends Component {
                 <Button variant='danger' {...buttonProps} onClick={this.showModal}>
                     {buttonText}
                 </Button>
-                <Modal show={showModal} onHide={handleCancel}>
+                <Modal show={showModal} onHide={this.hideModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>
                             {modalTitle}
