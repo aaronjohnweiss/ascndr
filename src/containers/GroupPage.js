@@ -2,9 +2,10 @@ import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Button, ListGroup } from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
-import { updateGroup } from '../redux/actions'
 import { updateGroupFields } from '../templates/groupFields'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
+import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
+import { compose } from 'redux'
 
 class GroupPage extends Component {
     constructor(props) {
@@ -13,15 +14,10 @@ class GroupPage extends Component {
         this.state = {
             showModal: false
         }
-        this.getGroup = this.getGroup.bind(this)
         this.showModal = this.showModal.bind(this)
         this.hideModal = this.hideModal.bind(this)
         this.addGroupMember = this.addGroupMember.bind(this)
         this.removeGroupMember = this.removeGroupMember.bind(this)
-    }
-
-    getGroup() {
-        return this.props.groups.find(group => group.id === Number(this.props.match.params.id))
     }
 
     showModal() {
@@ -33,25 +29,25 @@ class GroupPage extends Component {
     }
 
     addGroupMember({ uid }) {
-        let group = Object.assign({}, this.getGroup())
+        let group = Object.assign({}, this.props.group)
         group.users = [...group.users, uid]
 
-        this.props.updateGroup(group)
+        this.props.firebase.update(`groups/${this.props.match.params.id}`, group)
         this.hideModal()
     }
 
     removeGroupMember(uid) {
-        let group = Object.assign({}, this.getGroup())
+        let group = Object.assign({}, this.props.group)
         group.users = [...group.users].filter(user => user !== uid)
 
-        this.props.updateGroup(group)
+        this.props.firebase.update(`groups/${this.props.match.params.id}`, group)
     }
 
     render() {
-        const group = this.getGroup()
-        if (!group) return 'Uh oh'
+        const { auth: { uid }, group } = this.props
 
-        const { uid } = this.props.auth
+        if (!isLoaded(group)) return 'Loading'
+        if (!group) return 'Uh oh'
 
         const users = [...group.users]
 
@@ -90,20 +86,16 @@ class GroupPage extends Component {
     }
 }
 
-
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
     return {
-        groups: state.groups,
+        group: getVal(state.firebase, `data/groups/${props.match.params.id}`),
         auth: state.auth
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        updateGroup: (gym) => {
-            dispatch(updateGroup(gym))
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(GroupPage)
+export default compose(
+    firebaseConnect([
+        { path: 'groups' },
+    ]),
+    connect(mapStateToProps)
+)(GroupPage)

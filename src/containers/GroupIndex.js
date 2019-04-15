@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { addGroup } from '../redux/actions'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import { Link } from 'react-router-dom'
 import { ListGroup } from 'react-bootstrap'
 import { groupFields } from '../templates/groupFields'
+import { compose } from 'redux'
+import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
 
 class GroupIndex extends Component {
     constructor(props) {
@@ -29,23 +30,24 @@ class GroupIndex extends Component {
     }
 
     handleNewGroup(group) {
-        this.props.addGroup({...group, users: [this.props.auth.uid]})
+        this.props.firebase.push('groups', { ...group, users: [this.props.auth.uid] })
         this.hideModal()
     }
 
     render() {
-        console.log(this.props.auth)
-        const { uid } = this.props.auth
+        const { auth: { uid }, groups } = this.props
 
-        const groups = this.props.groups.filter(group => group.users.includes(uid))
+        if (!isLoaded(groups)) return 'Loading'
+
+        const groupsForUser = isEmpty(groups) ? [] : groups.filter(group => group.value.users.includes(uid))
         return (
             <Fragment>
                 <p>Your uid: <b>{uid}</b></p>
                 <ListGroup>
-                    {groups.map(group => (
-                        <Link to={`/groups/${group.id}`} style={{ textDecoration: 'none' }} key={group.id}>
+                    {groupsForUser.map(group => (
+                        <Link to={`/groups/${group.key}`} style={{ textDecoration: 'none' }} key={group.key}>
                             <ListGroup.Item action>
-                                {group.name}
+                                {group.value.name}
                             </ListGroup.Item>
                         </Link>
                     ))}
@@ -66,17 +68,14 @@ class GroupIndex extends Component {
 
 const mapStateToProps = state => {
     return {
-        groups: state.groups,
+        groups: state.firebase.ordered.groups,
         auth: state.auth
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        addGroup: (group) => {
-            dispatch(addGroup(group))
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(GroupIndex)
+export default compose(
+    firebaseConnect([
+        { path: 'groups' }
+    ]),
+    connect(mapStateToProps)
+)(GroupIndex)

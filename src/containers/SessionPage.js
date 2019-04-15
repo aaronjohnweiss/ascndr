@@ -1,12 +1,13 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Button, Col, Container, Row } from 'react-bootstrap'
-import { updateSession } from '../redux/actions'
 import compareGrades from '../helpers/compareGrades'
 import ListModal from '../components/ListModal'
 import { Link } from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import durationString from '../helpers/durationString'
+import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
+import { compose } from 'redux'
 
 class SessionPage extends Component {
     constructor(props) {
@@ -17,15 +18,15 @@ class SessionPage extends Component {
             standardRoutes: false
         }
 
+        this.updateSession = this.updateSession.bind(this)
         this.showModal = this.showModal.bind(this)
         this.hideModal = this.hideModal.bind(this)
         this.renderStandardSubmitButtons = this.renderStandardSubmitButtons.bind(this)
         this.endSession = this.endSession.bind(this)
-        this.getSession = this.getSession.bind(this)
     }
 
-    getSession() {
-        return this.props.sessions.find(({ id }) => id === Number(this.props.match.params.id))
+    updateSession(session) {
+        this.props.firebase.update(`sessions/${this.props.match.params.id}`, session)
     }
 
     showModal(name) {
@@ -51,50 +52,73 @@ class SessionPage extends Component {
         ]
     }
 
-    addRoute = (name) => (id) => {
-        const session = Object.assign({}, this.getSession())
+    addRoute = (name) => (key) => {
+        const session = Object.assign({}, this.props.session)
 
-        const currentCount = session[name][id] || 0
-        session[name][id] = currentCount + 1
+        const route = session[name].find(rt => rt.key === key)
 
-        this.props.updateSession(session)
+        if (route) {
+            route.count += 1
+        } else {
+            session[name].push({
+                key: key,
+                count: 1
+            })
+        }
+
+        this.updateSession(session)
         this.hideModal(name)
     }
 
-    removeRoute = (name) => (id) => {
-        const session = Object.assign({}, this.getSession())
+    removeRoute = (name) => (key) => {
+        const session = Object.assign({}, this.props.session)
 
-        const newCount = (session[name][id] || 1) - 1
+        const routeIndex = session[name].findIndex(rt => rt.key === key)
 
-        if (newCount === 0) delete session[name][id]
-        else session[name][id] = newCount
+        if (routeIndex > -1 && session[name][routeIndex].count > 1) {
+            session[name][routeIndex].count -= 1
+        } else if (routeIndex > -1) {
+            session[name].splice(routeIndex, 1)
+        }
 
-        this.props.updateSession(session)
+        this.updateSession(session)
     }
 
     endSession() {
-        const session = Object.assign({}, this.getSession())
+        const session = Object.assign({}, this.props.session)
 
-        session.endTime = new Date()
+        session.endTime = new Date().getTime()
 
-        this.props.updateSession(session)
+        this.updateSession(session)
         this.hideModal('endSession')
     }
 
     render() {
-        const session = this.getSession()
+        const { session, routes, gyms } = this.props
 
-        if (!session) return 'Uh oh'
+        if (!isLoaded(session, routes, gyms)) return 'Loading'
+        if (!session || !gyms) return 'Uh oh'
+
+        if (!session.customRoutes) session.customRoutes = []
+        if (!session.standardRoutes) session.standardRoutes = []
+
+        // Convert to maps for easier consumption
+        const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({ ...acc, [entry.key]: entry.count }), {})
+        const standardRoutesMap = session.standardRoutes.reduce((acc, entry) => ({
+            ...acc,
+            [entry.key]: entry.count
+        }), {})
 
         // Filter to only routes for this session
-        const routes = this.props.routes.filter(route => session.customRoutes && session.customRoutes[route.id])
-        const gym = this.props.gyms.find(gym => gym.id === session.gymId)
+        const routesForSession = this.props.routes.filter(route => customRoutesMap[route.key])
 
-        const grades = [...new Set([...routes.map(route => route.grade), ...Object.keys(session.standardRoutes)])].sort(compareGrades).reverse()
+        const gym = gyms.find(gym => gym.key === session.gymId)
+
+        const grades = [...new Set([...routesForSession.map(route => route.value.grade), ...session.standardRoutes.map(entry => entry.key)])].sort(compareGrades).reverse()
 
         const date = new Date(session.startTime).toDateString()
 
-        const routesForGym = this.props.routes.filter(route => route.gymId === gym.id && !route.isRetired)
+        const routesForGym = this.props.routes.filter(route => route.value.gymId === gym.key && !route.value.isRetired)
 
         const customModal = <ListModal show={this.state.customRoutes}
                                        handleClose={() => this.hideModal('customRoutes')}
@@ -102,8 +126,8 @@ class SessionPage extends Component {
                                        title='Add custom route'
                                        listContent={
                                            routesForGym.map(route => ({
-                                               id: route.id,
-                                               label: route.name
+                                               id: route.key,
+                                               label: route.value.name
                                            }))
                                        }
         />
@@ -144,21 +168,21 @@ class SessionPage extends Component {
                         {standardModal}
 
                         <h2>Session at <Link
-                            to={`/gyms/${gym.id}`}>{gym.name}</Link> on {date} {session.endTime && ` for ${durationString(session)}`}
+                            to={`/gyms/${gym.key}`}>{gym.value.name}</Link> on {date} {session.endTime && ` for ${durationString(session)}`}
                         </h2>
                         <h4>
-                            <small>{gym.location}</small>
+                            <small>{gym.value.location}</small>
                         </h4>
                         <h3>Routes</h3>
                         {grades && grades.length ? grades.map(grade => {
-                            const routesForGrade = routes.filter(route => route.grade === grade)
-                            const standardCountForGrade = session.standardRoutes[grade] || 0
-                            const countForGrade = routesForGrade.reduce((acc, route) => acc + (session.customRoutes[route.id] || 0), 0) + standardCountForGrade
+                            const routesForGrade = routes.filter(route => route.value.grade === grade)
+                            const standardCountForGrade = standardRoutesMap[grade] || 0
+                            const countForGrade = routesForGrade.reduce((acc, route) => acc + (customRoutesMap[route.key] || 0), 0) + standardCountForGrade
                             return (
                                 <Fragment key={grade}>
                                     <h5 className='session-grade-header'>{grade} ({countForGrade}) {addRouteButton('standardRoutes')(grade)} {standardCountForGrade > 0 && removeRouteButton('standardRoutes')(grade)}</h5>
                                     {routesForGrade.map(route => (
-                                        <p key={route.id}>{route.name} ({session.customRoutes[route.id]})</p>
+                                        <p key={route.key}>{route.value.name} ({customRoutesMap[route.key]})</p>
                                     ))}
                                 </Fragment>
                             )
@@ -197,20 +221,19 @@ class SessionPage extends Component {
     }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
     return {
-        gyms: state.gyms,
-        routes: state.routes,
-        sessions: state.sessions
+        session: getVal(state.firebase, `data/sessions/${props.match.params.id}`),
+        routes: state.firebase.ordered.routes,
+        gyms: state.firebase.ordered.gyms
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        updateSession: (session) => {
-            dispatch(updateSession(session))
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SessionPage)
+export default compose(
+    firebaseConnect([
+        { path: 'sessions' },
+        { path: 'routes' },
+        { path: 'gyms' }
+    ]),
+    connect(mapStateToProps)
+)(SessionPage)
