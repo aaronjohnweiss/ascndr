@@ -44,8 +44,13 @@ class GymIndex extends Component {
     transitionModals(gym) {
         // Store in the state and then show next modal
         this.setState({ newGym: gym })
+
+        // Not giving enough time for gym modal to close causes scroll bug
+        // Hacky solution, needs proper promise / callback solution
         this.hideGymModal()
-        this.showGroupModal()
+        setTimeout(() => {
+            this.showGroupModal()
+        }, 250);
     }
 
     handleNewGym(groupId) {

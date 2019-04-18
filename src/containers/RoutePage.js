@@ -111,7 +111,7 @@ class RoutePage extends Component {
                             <small>({route.color})</small>
                         </h3>
                         {route.isRetired && <h4>Retired</h4>}
-                        <img className='img-fluid' style={{ transform: `rotate(${this.state.rotation}deg)` }}
+                        <img className='img-fluid' alt='' style={{ transform: `rotate(${this.state.rotation}deg)` }}
                              src={route.picture} onClick={this.handleRotate}/>
                         <p>{route.description}</p>
                         {!route.isRetired && (
