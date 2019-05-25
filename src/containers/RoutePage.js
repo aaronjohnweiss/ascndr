@@ -63,14 +63,16 @@ class RoutePage extends Component {
 
             axios.post('https://api.imgur.com/3/image', pictureData, { headers: headers })
                 .then(resp => {
-                    this.updateRoute({
+                    this.props.firebase.update(`routes/${this.props.match.params.id}`, {
                         ...route,
                         picture: resp.data.data.link,
                     })
                     this.hideModal()
-                }).catch(err => {
-                console.log(err.response)
-            })
+                })
+                .catch(err => {
+                    if (err && err.response) console.log(err.response)
+                    else console.log(err)
+                })
         } else {
             this.updateRoute({ ...route })
             this.hideModal()
@@ -101,7 +103,8 @@ class RoutePage extends Component {
                         <Row>
                             <Col xs={10}>
                                 <h2>{route.name}
-                                    <small className='text-muted'> @ <Link to={`/gyms/${route.gymId}`}>{gym.value.name}</Link>
+                                    <small className='text-muted'> @ <Link
+                                        to={`/gyms/${route.gymId}`}>{gym.value.name}</Link>
                                     </small>
                                 </h2>
                             </Col>

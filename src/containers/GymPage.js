@@ -45,15 +45,17 @@ class GymPage extends Component {
 
             axios.post('https://api.imgur.com/3/image', pictureData, { headers: headers })
                 .then(resp => {
-                    this.props.addRoute({
+                    this.props.firebase.push('routes', {
                         ...route,
                         picture: resp.data.data.link,
-                        gymId: Number(this.props.match.params.id)
+                        gymId: this.props.match.params.id
                     })
                     this.hideModal('showAddRouteModal')()
-                }).catch(err => {
-                console.log(err.response)
-            })
+                })
+                .catch(err => {
+                    if (err.response) console.log(err.response)
+                    else console.log(err)
+                })
         } else {
             this.props.firebase.push('routes', { ...route, gymId: this.props.match.params.id })
             this.hideModal('showAddRouteModal')()
@@ -61,11 +63,12 @@ class GymPage extends Component {
     }
 
     createSession() {
-        const { match, firebase } = this.props
+        const { auth: { uid }, match, firebase } = this.props
         const gymId = match.params.id
 
         const session = {
             gymId: gymId,
+            uid: uid,
             startTime: new Date().getTime(),
             standardRoutes: [],
             customRoutes: []
@@ -81,7 +84,7 @@ class GymPage extends Component {
     }
 
     render() {
-        const { match, gym, sessions, routes } = this.props
+        const { auth: { uid }, match, gym, sessions, routes } = this.props
         const id = match.params.id
 
         if (!isLoaded(gym, sessions, routes)) return 'Loading'
@@ -91,7 +94,7 @@ class GymPage extends Component {
         const routesForGym = (isEmpty(routes)) ? [] : routes.filter(route => route.value.gymId === id)
         const currentRoutes = routesForGym.filter(route => !route.value.isRetired)
         const retiredRoutes = routesForGym.filter(route => route.value.isRetired)
-        const sessionsForGym = (isEmpty(sessions)) ? [] : sessions.filter(session => session.value.gymId === id).sort((a, b) => b.startTime - a.startTime)
+        const sessionsForGym = (isEmpty(sessions)) ? [] : sessions.filter(session => session.value.gymId === id && session.value.uid === uid).sort((a, b) => b.startTime - a.startTime)
 
         const routeListItem = ({ key, value }) => (
             <Link to={`/routes/${key}`} style={{ textDecoration: 'none' }} key={key}>
@@ -177,6 +180,7 @@ class GymPage extends Component {
 
 const mapStateToProps = (state, props) => {
     return {
+        auth: state.auth,
         gym: getVal(state.firebase, `data/gyms/${props.match.params.id}`),
         routes: state.firebase.ordered.routes,
         sessions: state.firebase.ordered.sessions

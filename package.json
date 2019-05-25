@@ -11,7 +11,7 @@
     "react-dom": "^16.8.3",
     "react-icons": "^3.5.0",
     "react-redux": "5.0.7",
-    "react-redux-firebase": "2.2.6",
+    "react-redux-firebase": "^2.2.6",
     "react-router-dom": "latest",
     "react-scripts": "2.1.5",
     "redux": "^4.0.1",

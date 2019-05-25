@@ -175,7 +175,7 @@ class SessionPage extends Component {
                         </h4>
                         <h3>Routes</h3>
                         {grades && grades.length ? grades.map(grade => {
-                            const routesForGrade = routes.filter(route => route.value.grade === grade)
+                            const routesForGrade = routesForSession.filter(route => route.value.grade === grade)
                             const standardCountForGrade = standardRoutesMap[grade] || 0
                             const countForGrade = routesForGrade.reduce((acc, route) => acc + (customRoutesMap[route.key] || 0), 0) + standardCountForGrade
                             return (
