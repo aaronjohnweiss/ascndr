@@ -1,10 +1,11 @@
 import React, { Component, Fragment } from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
+import { firebaseConnect, getVal, isEmpty, isLoaded } from 'react-redux-firebase'
 import { Button, Col, ListGroup, Row } from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
 import { routeCreateFields } from '../templates/routeFields'
 import { gymFields } from '../templates/gymFields'
-import { addRoute, addSession, updateGym } from '../redux/actions'
 import { Link } from 'react-router-dom'
 import durationString from '../helpers/durationString'
 import axios from 'axios'
@@ -26,13 +27,13 @@ class GymPage extends Component {
         this.setState({ [name]: true })
     }
 
-    hideModal = (name) => () =>  {
+    hideModal = (name) => () => {
         this.setState({ [name]: false })
     }
 
     handleNewRoute(route) {
         if (route && route.picture) {
-            console.log(typeof route.picture)
+            // console.log(typeof route.picture)
             // Post to imgur
             const pictureData = new FormData()
             pictureData.set('album', process.env.REACT_APP_ALBUM_ID)
@@ -44,58 +45,61 @@ class GymPage extends Component {
 
             axios.post('https://api.imgur.com/3/image', pictureData, { headers: headers })
                 .then(resp => {
-                    this.props.addRoute({
+                    this.props.firebase.push('routes', {
                         ...route,
                         picture: resp.data.data.link,
-                        gymId: Number(this.props.match.params.id)
+                        gymId: this.props.match.params.id
                     })
                     this.hideModal('showAddRouteModal')()
-                }).catch(err => {
-                console.log(err.response)
-            })
+                })
+                .catch(err => {
+                    if (err.response) console.log(err.response)
+                    else console.log(err)
+                })
         } else {
-            this.props.addRoute({ ...route, gymId: Number(this.props.match.params.id) })
+            this.props.firebase.push('routes', { ...route, gymId: this.props.match.params.id })
             this.hideModal('showAddRouteModal')()
         }
     }
 
     createSession() {
-        const { addSession, match } = this.props
-        const gymId = Number(match.params.id)
+        const { auth: { uid }, match, firebase } = this.props
+        const gymId = match.params.id
 
         const session = {
             gymId: gymId,
-            startTime: new Date(),
-            standardRoutes: {},
-            customRoutes: {}
+            uid: uid,
+            startTime: new Date().getTime(),
+            standardRoutes: [],
+            customRoutes: []
         }
 
-        addSession(session)
+        firebase.push('sessions', session)
     }
 
     handleEditedGym(gym) {
-        this.props.updateGym(gym)
+        const { firebase, match } = this.props
+        firebase.update(`gyms/${match.params.id}`, gym)
         this.hideModal('showEditGymModal')()
     }
 
     render() {
-        const { gyms, match } = this.props
-        const id = Number(match.params.id)
+        const { auth: { uid }, match, gym, sessions, routes } = this.props
+        const id = match.params.id
 
-        const gym = gyms.find(gym => gym.id === id)
-
+        if (!isLoaded(gym, sessions, routes)) return 'Loading'
         if (!gym) return 'Uh oh'
 
         // Filter to only routes for this gym
-        const routes = this.props.routes.filter(route => route.gymId === id)
-        const currentRoutes = routes.filter(route => !route.isRetired)
-        const retiredRoutes = routes.filter(route => route.isRetired)
-        const sessions = this.props.sessions.filter(session => session.gymId === id).sort((a, b) => b.startTime - a.startTime)
+        const routesForGym = (isEmpty(routes)) ? [] : routes.filter(route => route.value.gymId === id)
+        const currentRoutes = routesForGym.filter(route => !route.value.isRetired)
+        const retiredRoutes = routesForGym.filter(route => route.value.isRetired)
+        const sessionsForGym = (isEmpty(sessions)) ? [] : sessions.filter(session => session.value.gymId === id && session.value.uid === uid).sort((a, b) => b.startTime - a.startTime)
 
-        const routeListItem = (route) => (
-            <Link to={`/routes/${route.id}`} style={{ textDecoration: 'none' }} key={route.id}>
+        const routeListItem = ({ key, value }) => (
+            <Link to={`/routes/${key}`} style={{ textDecoration: 'none' }} key={key}>
                 <ListGroup.Item action>
-                    {route.name}
+                    {value.name}
                 </ListGroup.Item>
             </Link>
         )
@@ -104,7 +108,7 @@ class GymPage extends Component {
             <Fragment>
                 <Row>
                     <Col xs={10}>
-                <h2>{gym.name}</h2>
+                        <h2>{gym.name}</h2>
                     </Col>
                     <Col xs={2}>
                         <Button onClick={this.showModal('showEditGymModal')} style={{ float: 'right' }}>Edit</Button>
@@ -147,11 +151,11 @@ class GymPage extends Component {
                 <br/>
                 <h3>Sessions</h3>
                 <ListGroup>
-                    {sessions.map(session => (
-                        <Link to={`/sessions/${session.id}`} style={{ textDecoration: 'none' }}
-                              key={session.id}>
+                    {sessionsForGym.map(session => (
+                        <Link to={`/sessions/${session.key}`} style={{ textDecoration: 'none' }}
+                              key={session.key}>
                             <ListGroup.Item action>
-                                {session.startTime.toDateString() + (session.endTime ? `, duration: ${durationString(session)}` : ' (ongoing)')}
+                                {new Date(session.value.startTime).toDateString() + (session.value.endTime ? `, duration: ${durationString(session.value)}` : ' (ongoing)')}
                             </ListGroup.Item>
                         </Link>
                     ))}
@@ -174,26 +178,20 @@ class GymPage extends Component {
 }
 
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
     return {
-        gyms: state.gyms,
-        routes: state.routes,
-        sessions: state.sessions
+        auth: state.auth,
+        gym: getVal(state.firebase, `data/gyms/${props.match.params.id}`),
+        routes: state.firebase.ordered.routes,
+        sessions: state.firebase.ordered.sessions
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        addSession: (session) => {
-            dispatch(addSession(session))
-        },
-        addRoute: (route) => {
-            dispatch(addRoute(route))
-        },
-        updateGym: (gym) => {
-            dispatch(updateGym(gym))
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(GymPage)
+export default compose(
+    firebaseConnect([
+        { path: 'gyms' },
+        { path: 'routes' },
+        { path: 'sessions' }
+    ]),
+    connect(mapStateToProps)
+)(GymPage)

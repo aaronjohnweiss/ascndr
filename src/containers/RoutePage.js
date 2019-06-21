@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import { Button, Col, Container, Row } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
-import { updateRoute } from '../redux/actions'
 import axios from 'axios'
 import EntityModal from '../components/EntityModal'
 import { routeUpdateFields } from '../templates/routeFields'
+import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
+import { compose } from 'redux'
 
 class RoutePage extends Component {
 
@@ -17,12 +18,16 @@ class RoutePage extends Component {
             showModal: false
         }
 
+        this.updateRoute = this.updateRoute.bind(this)
         this.showModal = this.showModal.bind(this)
         this.hideModal = this.hideModal.bind(this)
-        this.getRoute = this.getRoute.bind(this)
         this.retireRoute = this.retireRoute.bind(this)
         this.handleRotate = this.handleRotate.bind(this)
         this.handleEditedRoute = this.handleEditedRoute.bind(this)
+    }
+
+    updateRoute(route) {
+        this.props.firebase.update(`routes/${this.props.match.params.id}`, route)
     }
 
     showModal() {
@@ -33,20 +38,16 @@ class RoutePage extends Component {
         this.setState({ showModal: false })
     }
 
-    getRoute() {
-        return this.props.routes.find(route => route.id === Number(this.props.match.params.id))
-    }
-
     handleRotate() {
         this.setState({ rotation: this.state.rotation + 90 })
     }
 
     retireRoute() {
-        const route = Object.assign({}, this.getRoute())
+        const route = Object.assign({}, this.props.route)
 
         route.isRetired = true
 
-        this.props.updateRoute(route)
+        this.updateRoute(route)
     }
 
     handleEditedRoute(route) {
@@ -62,26 +63,29 @@ class RoutePage extends Component {
 
             axios.post('https://api.imgur.com/3/image', pictureData, { headers: headers })
                 .then(resp => {
-                    this.props.updateRoute({
+                    this.props.firebase.update(`routes/${this.props.match.params.id}`, {
                         ...route,
                         picture: resp.data.data.link,
                     })
                     this.hideModal()
-                }).catch(err => {
-                console.log(err.response)
-            })
+                })
+                .catch(err => {
+                    if (err && err.response) console.log(err.response)
+                    else console.log(err)
+                })
         } else {
-            this.props.updateRoute({ ...route })
+            this.updateRoute({ ...route })
             this.hideModal()
         }
     }
 
     render() {
 
-        const route = this.getRoute()
+        const { route, gyms } = this.props
+        if (!isLoaded(route, gyms)) return 'Loading'
         if (!route) return 'Uh oh'
 
-        const gym = this.props.gyms.find(gym => gym.id === route.gymId)
+        const gym = gyms.find(gym => gym.key === route.gymId)
 
         const renderEditModal = () =>
             <EntityModal show={this.state.showModal}
@@ -99,7 +103,8 @@ class RoutePage extends Component {
                         <Row>
                             <Col xs={10}>
                                 <h2>{route.name}
-                                    <small className='text-muted'> @ <Link to={`/gyms/${gym.id}`}>{gym.name}</Link>
+                                    <small className='text-muted'> @ <Link
+                                        to={`/gyms/${route.gymId}`}>{gym.value.name}</Link>
                                     </small>
                                 </h2>
                             </Col>
@@ -130,19 +135,17 @@ class RoutePage extends Component {
     }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state, props) => {
     return {
-        gyms: state.gyms,
-        routes: state.routes
+        route: getVal(state.firebase, `data/routes/${props.match.params.id}`),
+        gyms: state.firebase.ordered.gyms
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        updateRoute: (route) => {
-            dispatch(updateRoute(route))
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(RoutePage)
+export default compose(
+    firebaseConnect([
+        { path: 'routes' },
+        { path: 'gyms' }
+    ]),
+    connect(mapStateToProps)
+)(RoutePage)

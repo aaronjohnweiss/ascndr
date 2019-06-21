@@ -1,11 +1,12 @@
 import React, { Component, Fragment } from 'react'
+import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { addGym } from '../redux/actions'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import { gymFields } from '../templates/gymFields'
 import Gym from '../components/Gym'
 import ListModal from '../components/ListModal'
+import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
 
 class GymIndex extends Component {
     constructor(props) {
@@ -56,22 +57,24 @@ class GymIndex extends Component {
     handleNewGym(groupId) {
         const { newGym } = this.state
         newGym.groupId = groupId
-        this.props.addGym(newGym)
+        this.props.firebase.push('gyms', newGym)
         this.hideGroupModal()
     }
 
     render() {
+        const { auth: { uid }, groups, gyms } = this.props
 
-        const { uid } = this.props.auth
-        const groups = this.props.groups.filter(group => group.users.includes(uid))
-        const groupIds = groups.map(group => group.id)
-        const gyms = this.props.gyms.filter(gym => groupIds.includes(gym.groupId))
+        if (!isLoaded(gyms, groups)) return 'Loading'
 
-        const groupFormOptions = groups.map(({ id, name }) => ({ id, label: name }))
+        const groupsForUser = isEmpty(groups) ? [] : groups.filter(group => group.value.users.includes(uid))
+        const groupIds = groupsForUser.map(group => group.key)
+        const gymsForGroups = isEmpty(gyms) ? [] : gyms.filter(gym => groupIds.includes(gym.value.groupId))
+
+        const groupFormOptions = groupsForUser.map(({ key, value }) => ({ id: key, label: value.name }))
 
         return (
             <Fragment>
-                {gyms.map((gym) => <Gym {...gym} key={gym.id}/>)}
+                {gymsForGroups.map((gym) => <Gym gym={gym} key={gym.key}/>)}
                 <br/>
                 <Button variant='primary' block={true} onClick={this.showGymModal}>
                     Add Gym
@@ -96,18 +99,16 @@ class GymIndex extends Component {
 
 const mapStateToProps = state => {
     return {
-        groups: state.groups,
-        gyms: state.gyms,
+        groups: state.firebase.ordered.groups,
+        gyms: state.firebase.ordered.gyms,
         auth: state.auth
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        addGym: (gym) => {
-            dispatch(addGym(gym))
-        }
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(GymIndex)
+export default compose(
+    firebaseConnect([
+        { path: 'gyms' },
+        { path: 'groups' }
+    ]),
+    connect(mapStateToProps)
+)(GymIndex)

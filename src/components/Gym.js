@@ -4,24 +4,27 @@ import { Link } from 'react-router-dom'
 
 class Gym extends Component {
     render() {
-        return (
+        let gym = this.props.gym
+        const key = gym.key
+        gym = gym.value
 
+        return (
             <Card>
                 <Card.Body>
                     <Card.Title>
-                        <Link key={this.props.id} to={`/gyms/${this.props.id}`}>
-                            {this.props.name}
+                        <Link key={key} to={`/gyms/${key}`}>
+                            {gym.name}
                         </Link>
                     </Card.Title>
                     <Card.Subtitle className='mb-2 text-muted'>
-                        {this.props.location}
+                        {gym.location}
                     </Card.Subtitle>
                     <Card.Text>
 
                     </Card.Text>
                 </Card.Body>
                 <Card.Footer>
-                    <small className='text-muted'> Average Wall Height: {this.props.height} ft.</small>
+                    <small className='text-muted'> Average Wall Height: {gym.height} ft.</small>
                 </Card.Footer>
             </Card>
         )
