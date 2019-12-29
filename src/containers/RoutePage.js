@@ -8,6 +8,7 @@ import EntityModal from '../components/EntityModal'
 import { routeUpdateFields } from '../templates/routeFields'
 import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
+import { prettyPrint } from '../helpers/gradeUtils'
 
 class RoutePage extends Component {
 
@@ -112,7 +113,7 @@ class RoutePage extends Component {
                                 <Button onClick={this.showModal} style={{ float: 'right' }}>Edit</Button>
                             </Col>
                         </Row>
-                        <h3>{route.grade}
+                        <h3>{prettyPrint(route.grade) + ' '}
                             <small>({route.color})</small>
                         </h3>
                         {route.isRetired && <h4>Retired</h4>}

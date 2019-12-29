@@ -15,7 +15,11 @@ export default class EntityModal extends Component {
         }
     }
 
-    onChange = (id) => (evt) => {
+    onChange = (id) => (value) => {
+        this.setState({[id]: value})
+    }
+
+    onChangeEvent = (id) => (evt) => {
         this.setState({ [id]: evt.target.value })
     }
 
@@ -43,6 +47,15 @@ export default class EntityModal extends Component {
                 </Modal.Header>
                 <Modal.Body>
                     {fields.map(({ title, placeholder, name, options }, index) => {
+                        if (options && options.type === 'custom') {
+                            return (
+                                <Fragment key={index}>
+                                   <Form.Label>{title}</Form.Label>
+                                    <options.component value={this.state[name]} onChange={this.onChange(name)}/>
+                                </Fragment>
+                            )
+                        }
+
                         if (options && options.type === 'checkbox') {
                             return (
                                 <Fragment key={index}>
@@ -51,7 +64,7 @@ export default class EntityModal extends Component {
                             )
                         }
 
-                        let onChange = this.onChange
+                        let onChange = this.onChangeEvent
                         if (options && options.type) {
                             if (options.type === 'number') {
                                 onChange = this.onNumberChange
