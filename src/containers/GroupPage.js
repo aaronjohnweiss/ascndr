@@ -6,6 +6,7 @@ import { updateGroupFields } from '../templates/groupFields'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
+import resolveUsers from '../helpers/resolveUsers'
 
 class GroupPage extends Component {
     constructor(props) {
@@ -44,12 +45,12 @@ class GroupPage extends Component {
     }
 
     render() {
-        const { auth: { uid }, group } = this.props
+        const { group, users } = this.props;
 
-        if (!isLoaded(group)) return 'Loading'
-        if (!group) return 'Uh oh'
+        if (!isLoaded(group) || !isLoaded(users)) return 'Loading';
+        if (!group) return 'Uh oh';
 
-        const users = [...group.users]
+        const usersForGroup = resolveUsers(users, group.users);
 
         const newUserModal = () =>
             <EntityModal show={this.state.showModal}
@@ -64,11 +65,11 @@ class GroupPage extends Component {
                 <h3>Members</h3>
 
                 <ListGroup>
-                    {users.map(user =>
-                        <ListGroup.Item key={user} style={{ lineHeight: '38px' }}>
-                            {user} <ConfirmCancelButton handleConfirm={() => this.removeGroupMember(user)}
+                    {usersForGroup.map(user =>
+                        <ListGroup.Item key={user.uid} style={{ lineHeight: '38px' }}>
+                            {user.name} <ConfirmCancelButton handleConfirm={() => this.removeGroupMember(user.uid)}
                                                         modalTitle='Remove User'
-                                                        modalBody={`Remove user ${user} from the group?`}
+                                                        modalBody={`Remove user ${user.name} from the group?`}
                                                         buttonText='Remove'
                                                         buttonProps={{ style: { float: 'right' } }}/>
                         </ListGroup.Item>
@@ -89,6 +90,7 @@ class GroupPage extends Component {
 const mapStateToProps = (state, props) => {
     return {
         group: getVal(state.firebase, `data/groups/${props.match.params.id}`),
+        users: state.firebase.data.users,
         auth: state.auth
     }
 }
@@ -96,6 +98,7 @@ const mapStateToProps = (state, props) => {
 export default compose(
     firebaseConnect([
         { path: 'groups' },
+        { path: 'users' }
     ]),
     connect(mapStateToProps)
 )(GroupPage)

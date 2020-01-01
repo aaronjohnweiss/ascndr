@@ -13,3 +13,11 @@ export const updateGroupFields = [
         name: 'uid'
     }
 ]
+
+export const userFields = [
+    {
+        title: 'User Name',
+        placeholder: 'Name..',
+        name: 'name'
+    }
+]
