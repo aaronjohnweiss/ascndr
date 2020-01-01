@@ -122,6 +122,7 @@ class GymPage extends Component {
                     <small>{gym.location}</small>
                 </h4>
                 <p>Average Wall Height: {gym.height} ft</p>
+                <Link to={`/stats?gyms=${id}`}>View stats</Link>
                 <Row>
                     <Col xs={6}>
                         <h3>Routes</h3>

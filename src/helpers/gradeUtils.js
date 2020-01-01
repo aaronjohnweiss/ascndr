@@ -2,7 +2,7 @@ export const TOP_ROPE = 'TOP_ROPE';
 export const BOULDER = 'BOULDER';
 
 
-export const prettyPrint = (grade) => {
+export const prettyPrint = (grade, useModifier = true) => {
     let str = '';
 
     if (!grade) return str;
@@ -14,7 +14,7 @@ export const prettyPrint = (grade) => {
     // Add on difficulty and any suffix
 
     str += grade.difficulty;
-    if (grade.modifier) str += grade.modifier;
+    if (grade.modifier && useModifier) str += grade.modifier;
 
     return str;
 }
