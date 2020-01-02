@@ -8,6 +8,7 @@ import { routeCreateFields } from '../templates/routeFields'
 import { gymFields } from '../templates/gymFields'
 import { Link } from 'react-router-dom'
 import durationString from '../helpers/durationString'
+import TruncatedList from '../components/TruncatedList'
 import axios from 'axios'
 
 class GymPage extends Component {
@@ -74,7 +75,10 @@ class GymPage extends Component {
             customRoutes: []
         }
 
-        firebase.push('sessions', session)
+        const { key } = firebase.push('sessions', session)
+        if (key) {
+            this.props.history.push('/sessions/' + key);
+        }
     }
 
     handleEditedGym(gym) {
@@ -94,7 +98,7 @@ class GymPage extends Component {
         const routesForGym = (isEmpty(routes)) ? [] : routes.filter(route => route.value.gymId === id)
         const currentRoutes = routesForGym.filter(route => !route.value.isRetired)
         const retiredRoutes = routesForGym.filter(route => route.value.isRetired)
-        const sessionsForGym = (isEmpty(sessions)) ? [] : sessions.filter(session => session.value.gymId === id && session.value.uid === uid).sort((a, b) => b.startTime - a.startTime)
+        const sessionsForGym = (isEmpty(sessions)) ? [] : sessions.filter(session => session.value.gymId === id && session.value.uid === uid).sort((a, b) => b.value.startTime - a.value.startTime)
 
         const routeListItem = ({ key, value }) => (
             <Link to={`/routes/${key}`} style={{ textDecoration: 'none' }} key={key}>
@@ -118,30 +122,35 @@ class GymPage extends Component {
                     <small>{gym.location}</small>
                 </h4>
                 <p>Average Wall Height: {gym.height} ft</p>
-                <h3>Routes</h3>
+                <Row>
+                    <Col sm={6}>
+                        <h3>Routes</h3>
+                    </Col>
+                    <Col sm={6}>
+                        <Button variant='primary' onClick={this.showModal('showAddRouteModal')} style={{ float: 'right' }}>
+                            Add Route
+                        </Button>
+                    </Col>
+                </Row>
                 {currentRoutes.length > 0 && (
                     <Fragment>
                         {/* Only show "Current" header if there are also retired routes */}
                         {retiredRoutes.length > 0 && <h4>Current</h4>}
-                        <ListGroup>
+                        <TruncatedList pageSize={5}>
                             {currentRoutes.map(routeListItem)}
-                        </ListGroup>
+                        </TruncatedList>
                     </Fragment>
                 )}
                 {retiredRoutes.length > 0 && (
                     <Fragment>
                         <h4>Retired</h4>
-                        <ListGroup>
+                        <TruncatedList pageSize={5}>
                             {retiredRoutes.map(routeListItem)}
-                        </ListGroup>
+                        </TruncatedList>
                     </Fragment>
                 )}
 
                 <br/>
-
-                <Button variant='primary' block={true} onClick={this.showModal('showAddRouteModal')}>
-                    Add Route
-                </Button>
 
                 <EntityModal show={this.state.showAddRouteModal}
                              handleClose={this.hideModal('showAddRouteModal')}
@@ -149,8 +158,18 @@ class GymPage extends Component {
                              fields={routeCreateFields}/>
 
                 <br/>
-                <h3>Sessions</h3>
-                <ListGroup>
+                <Row>
+                    <Col xs={6}>
+                        <h3>Sessions</h3>
+                    </Col>
+                    <Col xs={6}>
+                        <Button variant='primary' onClick={this.createSession.bind(this)} style={{ float: 'right' }}>
+                            Add Session
+                        </Button>
+                    </Col>
+                </Row>
+
+                <TruncatedList pageSize={5}>
                     {sessionsForGym.map(session => (
                         <Link to={`/sessions/${session.key}`} style={{ textDecoration: 'none' }}
                               key={session.key}>
@@ -159,12 +178,7 @@ class GymPage extends Component {
                             </ListGroup.Item>
                         </Link>
                     ))}
-                </ListGroup>
-                <br/>
-
-                <Button variant='primary' block={true} onClick={this.createSession.bind(this)}>
-                    Add Session
-                </Button>
+                </TruncatedList>
 
                 <EntityModal show={this.state.showEditGymModal}
                              handleClose={this.hideModal('showEditGymModal')}
