@@ -1,3 +1,28 @@
+import React, { useState } from 'react'
+import GradeModal from '../components/GradeModal'
+import { Button } from 'react-bootstrap'
+import { prettyPrint } from '../helpers/gradeUtils'
+
+const SetRouteGrade = ({ value, onChange }) => {
+    const [show, setShow] = useState(false)
+
+    return (
+        <div>
+            {value && prettyPrint(value) || 'None'}
+            <Button onClick={() => setShow(!show)} variant='link'>
+                {value && 'Edit' || 'Set'}
+            </Button>
+            <GradeModal show={show}
+                        handleClose={() => setShow(false)}
+                        handleSubmit={(value) => {
+                            onChange(value)
+                            setShow(false)
+                        }}
+                        title='Set route grade'/>
+        </div>
+    )
+}
+
 export const routeCreateFields = [
     {
         title: 'Route Name',
@@ -14,8 +39,11 @@ export const routeCreateFields = [
     },
     {
         title: 'Route Grade',
-        placeholder: 'Grade..',
-        name: 'grade'
+        name: 'grade',
+        options: {
+            type: 'custom',
+            component: SetRouteGrade
+        }
     },
     {
         title: 'Route Color',

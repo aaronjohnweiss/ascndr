@@ -1,7 +1,8 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
 import { Button, Col, Container, Row } from 'react-bootstrap'
-import compareGrades from '../helpers/compareGrades'
+import { compareGrades, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
+import GradeModal from '../components/GradeModal'
 import ListModal from '../components/ListModal'
 import { Link } from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
@@ -21,7 +22,6 @@ class SessionPage extends Component {
         this.updateSession = this.updateSession.bind(this)
         this.showModal = this.showModal.bind(this)
         this.hideModal = this.hideModal.bind(this)
-        this.renderStandardSubmitButtons = this.renderStandardSubmitButtons.bind(this)
         this.endSession = this.endSession.bind(this)
     }
 
@@ -37,51 +37,54 @@ class SessionPage extends Component {
         this.setState({ [name]: false })
     }
 
-    renderStandardSubmitButtons(disabled, grade) {
-        const submit = this.addRoute('standardRoutes').bind(this)
-        return [
-            <Button key='-' variant="primary" disabled={disabled} onClick={() => submit(grade + '-')}>
-                -
-            </Button>,
-            <Button key=' ' variant="primary" disabled={disabled} onClick={() => submit(grade)}>
-                Even
-            </Button>,
-            <Button key='+' variant="primary" disabled={disabled} onClick={(() => submit(grade + '+'))}>
-                +
-            </Button>
-        ]
-    }
-
-    addRoute = (name) => (key) => {
+    addStandardRoute = (grade) => {
         const session = Object.assign({}, this.props.session)
 
-        const route = session[name].find(rt => rt.key === key)
+        const route = session.standardRoutes.find(rt => gradeEquals(rt.key, grade))
 
         if (route) {
             route.count += 1
         } else {
-            session[name].push({
+            session.standardRoutes.push({
+                key: grade,
+                count: 1
+            })
+        }
+
+        this.updateSession(session)
+        this.hideModal('standardRoutes')
+    }
+
+    removeStandardRoute = (grade) => {
+        const session = Object.assign({}, this.props.session)
+
+        const routeIndex = session.standardRoutes.findIndex(rt => gradeEquals(rt.key, grade))
+
+        if (routeIndex > -1 && session.standardRoutes[routeIndex].count > 1) {
+            session.standardRoutes[routeIndex].count -= 1
+        } else if (routeIndex > -1) {
+            session.standardRoutes.splice(routeIndex, 1)
+        }
+
+        this.updateSession(session)
+    }
+
+    addCustomRoute = (key) => {
+        const session = Object.assign({}, this.props.session)
+
+        const route = session.customRoutes.find(rt => rt.key === key)
+
+        if (route) {
+            route.count += 1
+        } else {
+            session.customRoutes.push({
                 key: key,
                 count: 1
             })
         }
 
         this.updateSession(session)
-        this.hideModal(name)
-    }
-
-    removeRoute = (name) => (key) => {
-        const session = Object.assign({}, this.props.session)
-
-        const routeIndex = session[name].findIndex(rt => rt.key === key)
-
-        if (routeIndex > -1 && session[name][routeIndex].count > 1) {
-            session[name][routeIndex].count -= 1
-        } else if (routeIndex > -1) {
-            session[name].splice(routeIndex, 1)
-        }
-
-        this.updateSession(session)
+        this.hideModal('customRoutes')
     }
 
     endSession() {
@@ -106,7 +109,7 @@ class SessionPage extends Component {
         const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({ ...acc, [entry.key]: entry.count }), {})
         const standardRoutesMap = session.standardRoutes.reduce((acc, entry) => ({
             ...acc,
-            [entry.key]: entry.count
+            [prettyPrint(entry.key)]: entry.count
         }), {})
 
         // Filter to only routes for this session
@@ -114,7 +117,8 @@ class SessionPage extends Component {
 
         const gym = gyms.find(gym => gym.key === session.gymId)
 
-        const grades = [...new Set([...routesForSession.map(route => route.value.grade), ...session.standardRoutes.map(entry => entry.key)])].sort(compareGrades).reverse()
+        const allGrades = [...routesForSession.map(route => route.value.grade), ...session.standardRoutes.map(entry => entry.key)]
+        const grades = allGrades.filter((grade, idx) => allGrades.findIndex(val => gradeEquals(val, grade)) === idx).sort(compareGrades).reverse()
 
         const date = new Date(session.startTime).toDateString()
 
@@ -122,7 +126,7 @@ class SessionPage extends Component {
 
         const customModal = <ListModal show={this.state.customRoutes}
                                        handleClose={() => this.hideModal('customRoutes')}
-                                       handleSubmit={this.addRoute('customRoutes')}
+                                       handleSubmit={this.addCustomRoute}
                                        title='Add custom route'
                                        listContent={
                                            routesForGym.map(route => ({
@@ -132,29 +136,22 @@ class SessionPage extends Component {
                                        }
         />
 
-        const standardModal = <ListModal show={this.state.standardRoutes}
+        const standardModal = <GradeModal show={this.state.standardRoutes}
                                          handleClose={() => this.hideModal('standardRoutes')}
-                                         handleSubmit={this.addRoute('standardRoutes')}
+                                         handleSubmit={this.addStandardRoute}
                                          title='Add generic route'
-                                         listContent={
-                                             Array.from(new Array(9), (x, i) => '5.' + (i + 6)).map(grade => ({
-                                                 id: grade,
-                                                 label: grade
-                                             }))
-                                         }
-                                         renderSubmitButtons={this.renderStandardSubmitButtons}
         />
 
-        const addRouteButton = (name) => (id) => {
+        const addRouteButton = (grade) => {
             return <Button variant='outline-secondary' className='plus-minus-button'
-                           onClick={() => this.addRoute(name)(id)}>
+                           onClick={() => this.addStandardRoute(grade)}>
                 +
             </Button>
         }
 
-        const removeRouteButton = (name) => (id) => {
+        const removeRouteButton = (grade) => {
             return <Button variant='outline-secondary' className='plus-minus-button'
-                           onClick={() => this.removeRoute(name)(id)}>
+                           onClick={() => this.removeStandardRoute(grade)}>
                 -
             </Button>
         }
@@ -175,13 +172,14 @@ class SessionPage extends Component {
                         </h4>
                         <h3>Routes</h3>
                         {grades && grades.length ? grades.map(grade => {
-                            const routesForGrade = routesForSession.filter(route => route.value.grade === grade)
-                            const standardCountForGrade = standardRoutesMap[grade] || 0
-                            const countForGrade = routesForGrade.reduce((acc, route) => acc + (customRoutesMap[route.key] || 0), 0) + standardCountForGrade
+                            const gradeLabel = prettyPrint(grade)
+                            const customRoutesForGrade = routesForSession.filter(route => gradeEquals(route.value.grade, grade))
+                            const standardCountForGrade = standardRoutesMap[gradeLabel] || 0
+                            const countForGrade = customRoutesForGrade.reduce((acc, route) => acc + (customRoutesMap[route.key] || 0), 0) + standardCountForGrade
                             return (
-                                <Fragment key={grade}>
-                                    <h5 className='session-grade-header'>{grade} ({countForGrade}) {addRouteButton('standardRoutes')(grade)} {standardCountForGrade > 0 && removeRouteButton('standardRoutes')(grade)}</h5>
-                                    {routesForGrade.map(route => (
+                                <Fragment key={gradeLabel}>
+                                    <h5 className='session-grade-header'>{gradeLabel} ({countForGrade}) {addRouteButton(grade)} {standardCountForGrade > 0 && removeRouteButton(grade)}</h5>
+                                    {customRoutesForGrade.map(route => (
                                         <p key={route.key}>{route.value.name} ({customRoutesMap[route.key]})</p>
                                     ))}
                                 </Fragment>

@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
-import Form from 'react-bootstrap/Form'
-import { Button } from 'react-bootstrap'
-import Modal from 'react-bootstrap/Modal'
+import { Button, Form, Modal } from 'react-bootstrap'
 
 export default class ListModal extends Component {
     constructor(props) {
@@ -38,7 +36,6 @@ export default class ListModal extends Component {
                                 key={listItem.id}
                             >
                                 <Form.Check.Input type='radio'
-                                                  name={title}
                                                   onChange={() => this.onChange(listItem.id)}
                                 />
                                 <Form.Check.Label>{listItem.label}</Form.Check.Label>
