@@ -123,10 +123,10 @@ class GymPage extends Component {
                 </h4>
                 <p>Average Wall Height: {gym.height} ft</p>
                 <Row>
-                    <Col sm={6}>
+                    <Col xs={6}>
                         <h3>Routes</h3>
                     </Col>
-                    <Col sm={6}>
+                    <Col xs={6}>
                         <Button variant='primary' onClick={this.showModal('showAddRouteModal')} style={{ float: 'right' }}>
                             Add Route
                         </Button>
