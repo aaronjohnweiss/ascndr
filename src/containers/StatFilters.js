@@ -26,12 +26,9 @@ const defaultIfEmpty = (a1, a2) => {
 const StatFilters = ({auth, groups, users, gyms}) => {
     const query = new URLSearchParams(useLocation().search);
 
-    console.log(users);
     const groupsForUser = groups.filter(group => group.value.users.includes(auth.uid));
     const allowedUids = [...new Set(groupsForUser.flatMap(group => group.value.users))];
-    console.log(allowedUids);
     const visibleUsers = resolveUsers(users, allowedUids);
-    console.log(visibleUsers);
     const visibleGyms = gyms.filter(gym => groupsForUser.findIndex(group => group.key === gym.value.groupId) !== -1);
     const [gymIds, setGymIds] = useState(defaultIfEmpty(query.getAll('gyms'), visibleGyms.map(gym => gym.key)));
     const [uids, setUids] = useState(defaultIfEmpty(query.getAll('uids'), allowedUids));

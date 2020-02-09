@@ -53,7 +53,6 @@ class GroupIndex extends Component {
 
         const data = {uid, name: user.name};
         if (userInfo) {
-            console.log(userInfo);
             const userId = userInfo.key;
             this.props.firebase.update(`users/${userId}`, data);
         } else {
