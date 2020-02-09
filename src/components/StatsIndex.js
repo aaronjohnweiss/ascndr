@@ -26,17 +26,21 @@ export const StatItem = ({label, value, link}) => {
 
 const sum = (a, b) => a + b;
 
-const routeCountForSession = ({customRoutes = [], standardRoutes = []}) => [...customRoutes, ...standardRoutes].map(route => route.count).reduce(sum, 0);
+const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes) => [
+    ...customRoutes.filter(customRoute => allowedTypes.includes(routes[customRoute.key].grade.style)),
+    ...standardRoutes.filter(standardRoute => allowedTypes.includes(standardRoute.key.style))
+].map(route => route.count).reduce(sum, 0);
 
 const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}) => {
     const location = useLocation();
     const filterParams = location.search;
 
     const sessionValues = Object.values(sessions);
+    // TODO filter to only sessions with <allowedTypes> routes logged?
     const numSessions = sessionValues.length;
     // Figure out total time; for each session do (end - start) but if end doesn't exist (ongoing session) do (now - start)
     const totalTime = numSessions && sessionValues.map(({startTime, endTime = new Date().getTime()}) => endTime - startTime).reduce(sum);
-    const totalRoutes = numSessions && sessionValues.map(routeCountForSession).reduce(sum);
+    const totalRoutes = numSessions && sessionValues.map(session => routeCountForSession(session, routes, allowedTypes)).reduce(sum);
     // Figure out max grades by type
     const maxGrades = sessionValues.flatMap(({customRoutes = [], standardRoutes = []}) => {
         // Get all grades climbed within the session
@@ -54,7 +58,7 @@ const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}
     const totalDistance = sessionValues.map(session => {
         const {height = 0} = gyms[session.gymId] || {};
         // TODO include bouldering height
-        return routeCountForSession(session) * height;
+        return routeCountForSession(session, routes, allowedTypes) * height;
     }).reduce(sum, 0);
 
     return (
