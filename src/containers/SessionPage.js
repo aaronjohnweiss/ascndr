@@ -6,7 +6,7 @@ import GradeModal from '../components/GradeModal'
 import ListModal from '../components/ListModal'
 import { Link } from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
-import durationString from '../helpers/durationString'
+import { sessionDuration } from '../helpers/durationUtils'
 import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
 
@@ -165,7 +165,7 @@ class SessionPage extends Component {
                         {standardModal}
 
                         <h2>Session at <Link
-                            to={`/gyms/${gym.key}`}>{gym.value.name}</Link> on {date} {session.endTime && ` for ${durationString(session)}`}
+                            to={`/gyms/${gym.key}`}>{gym.value.name}</Link> on {date} {session.endTime && ` for ${sessionDuration(session)}`}
                         </h2>
                         <h4>
                             <small>{gym.value.location}</small>

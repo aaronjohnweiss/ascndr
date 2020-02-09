@@ -1,32 +1,17 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
+import React from 'react';
+import { connect } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
-export default function(ComposedComponent) {
-    class DenyAuthentication extends Component {
-        static contextTypes = {
-            router: PropTypes.object
-        };
-
-        componentWillMount() {
-            if (this.props.authenticated !== null) {
-                this.context.router.history.push("/");
-            }
-        }
-
-        componentWillUpdate(nextProps) {
-            if (nextProps.authenticated) {
-                this.context.router.history.push("/");
-            }
-        }
-
-        render() {
-            if (!this.props.authenticated) {
-                return <ComposedComponent {...this.props} />;
-            }
+export default (ComposedComponent) => {
+    const DenyAuthentication = ({authenticated, ...props}) => {
+        const history = useHistory();
+        if (authenticated) {
+            history.push('/');
             return null;
+        } else {
+            return <ComposedComponent {...props} />;
         }
-    }
+    };
 
     function mapStateToProps(state) {
         return { authenticated: state.auth };
