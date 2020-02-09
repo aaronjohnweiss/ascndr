@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { BOULDER, compareGrades, gradeEquals, prettyPrint, TOP_ROPE } from '../helpers/gradeUtils'
+import { compareGrades, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
 import ReactiveBarGraph from './ReactiveBarGraph';
 import moment from 'moment';
 import { Button, Col, Container, Row } from 'react-bootstrap';
@@ -74,7 +74,7 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
     return {categories, graphData};
 }
 
-const GradeHistogram = ({users, routes, sessions, allowSuffixes = false, allowedTypes = [BOULDER, TOP_ROPE]}) => {
+const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes}) => {
     // Get session dates for animating
     const validUids = Object.keys(users);
     const sessionDates = Object.values(sessions).filter(session => validUids.includes(session.uid)).map(session => session.startTime).sort();

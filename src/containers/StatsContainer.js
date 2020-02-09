@@ -8,8 +8,10 @@ import resolveUsers from '../helpers/resolveUsers'
 import StatsIndex from '../components/StatsIndex';
 import { toObj } from '../helpers/objectConverters';
 import { FaChevronLeft } from 'react-icons/fa';
+import { BOULDER, TOP_ROPE } from '../helpers/gradeUtils';
+import GradeHistory from '../components/GradeHistory';
 
-const filterByKeys = (data, keys)  => {
+const filterByKeys = (data, keys) => {
     if (!data) return [];
     if (!keys || !keys.length) return data;
     return data.filter(({key}) => keys.includes(key));
@@ -49,22 +51,32 @@ const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
 
     const allowedUsers = resolveUsers(users && users.map(user => user.value) || [], allowedUids);
 
-    const filterProps = { gyms: toObj(allowedGyms), users: allowedUsers.reduce((obj, user) => ({...obj, [user.uid]: user}), {}), routes, sessions: toObj(allowedSessions) };
+    const filterProps = {
+        gyms: toObj(allowedGyms),
+        users: allowedUsers.reduce((obj, user) => ({...obj, [user.uid]: user}), {}),
+        routes,
+        sessions: toObj(allowedSessions)
+    };
 
     if (query.has('allowedTypes')) {
         filterProps.allowedTypes = query.getAll('allowedTypes');
+    } else {
+        filterProps.allowedTypes = [BOULDER, TOP_ROPE];
     }
 
     if (query.has('allowSuffixes')) {
-        filterProps.allowSuffixes = query.getAll('allowSuffixes');
+        filterProps.allowSuffixes = query.get('allowSuffixes');
+    } else {
+        filterProps.allowSuffixes = false;
     }
 
     return (
         <Switch>
-            <Route exact path={'/stats'}><StatsIndex {...filterProps}/></Route>
+            <Route exact path={'/stats'}><StatsIndex {...filterProps} /></Route>
             <>
                 <StatsHeader search={search} />
-                <Route exact path={'/stats/gradeHistogram'}><GradeHistogram {...filterProps}/></Route>
+                <Route exact path={'/stats/gradeHistogram'}><GradeHistogram {...filterProps} /></Route>
+                <Route exact path={'/stats/gradeHistory'}><GradeHistory {...filterProps} /></Route>
             </>
         </Switch>
     );
@@ -83,11 +95,11 @@ const mapStateToProps = (state) => {
 
 export default compose(
     firebaseConnect([
-        { path: 'gyms' },
-        { path: 'routes' },
-        { path: 'sessions' },
-        { path: 'groups' },
-        { path: 'users' }
+        {path: 'gyms'},
+        {path: 'routes'},
+        {path: 'sessions'},
+        {path: 'groups'},
+        {path: 'users'}
     ]),
     connect(mapStateToProps)
 )(StatsContainer)
