@@ -1,11 +1,12 @@
 import React from 'react';
 import { compareGrades, prettyPrint } from '../helpers/gradeUtils';
-import { Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
+import { Button, Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 import { FaChevronRight } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom';
 import { durationString } from '../helpers/durationUtils';
+import { filtersLink } from '../containers/StatFilters';
 
-const StatItem = ({label, value, link}) => {
+export const StatItem = ({label, value, link}) => {
     const itemProps = link ? {action: true, href: link} : {};
 
     return (
@@ -28,7 +29,8 @@ const sum = (a, b) => a + b;
 const routeCountForSession = ({customRoutes = [], standardRoutes = []}) => [...customRoutes, ...standardRoutes].map(route => route.count).reduce(sum, 0);
 
 const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}) => {
-    const filterParams = useLocation().search;
+    const location = useLocation();
+    const filterParams = location.search;
 
     const sessionValues = Object.values(sessions);
     const numSessions = sessionValues.length;
@@ -57,11 +59,12 @@ const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}
 
     return (
         <>
-            <Row>
-                <h2>Stats</h2>
+            <Row noGutters>
+                <Col xs={6}><h2>Stats</h2></Col>
+                <Col><Button href={filtersLink(location)} style={{float: 'right'}}>Filters</Button></Col>
             </Row>
             <Row>
-                <h4>Totals</h4>
+                <Col><h4>Totals</h4></Col>
             </Row>
             <ListGroup>
                 <StatItem label={'Time spent'} value={durationString(totalTime, false)} />
@@ -73,7 +76,7 @@ const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}
             </ListGroup>
             <br />
             <Row>
-                <h4>Averages</h4>
+                <Col><h4>Averages</h4></Col>
             </Row>
             <ListGroup>
                 <StatItem label={'Time spent'} value={durationString(totalTime / numSessions)} />

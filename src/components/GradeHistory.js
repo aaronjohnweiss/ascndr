@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react'
 import { compareGrades, prettyPrint, printType } from '../helpers/gradeUtils'
-import { ListGroup, ListGroupItem, Row } from 'react-bootstrap';
+import { ListGroup } from 'react-bootstrap';
 import { toArray } from '../helpers/objectConverters';
+import { StatItem } from './StatsIndex';
 
 const GradeHistory = ({users, routes, sessions, allowSuffixes, allowedTypes}) => {
     const sessionsArray = toArray(sessions);
@@ -41,9 +42,7 @@ const GradeHistory = ({users, routes, sessions, allowSuffixes, allowedTypes}) =>
                     <h3>{printType(type)}</h3>
                     <ListGroup>
                         {firsts.map(({date, grade, key}, k) => (
-                            <ListGroupItem key={k} action href={`/sessions/${key}`}>
-                                {prettyPrint(grade, allowSuffixes)}: {new Date(date).toDateString()}
-                            </ListGroupItem>
+                            <StatItem key={k} label={`${prettyPrint(grade, allowSuffixes)}: ${new Date(date).toDateString()}`} link={`/sessions/${key}`} />
                         ))}
                     </ListGroup>
                 </Fragment>
@@ -56,7 +55,7 @@ const GradeHistory = ({users, routes, sessions, allowSuffixes, allowedTypes}) =>
         // Show user name and their grade history
         return (
             <Fragment key={i}>
-                <Row><h2>{name}</h2></Row>
+                <h2>{name}</h2>
                 {firstsByType}
                 <br />
             </Fragment>

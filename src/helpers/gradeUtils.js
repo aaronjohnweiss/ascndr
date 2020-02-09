@@ -1,6 +1,8 @@
 export const TOP_ROPE = 'TOP_ROPE';
 export const BOULDER = 'BOULDER';
 
+export const ALL_STYLES = [TOP_ROPE, BOULDER];
+
 
 export const prettyPrint = (grade, useModifier = true) => {
     let str = '';

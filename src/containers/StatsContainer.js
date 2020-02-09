@@ -3,13 +3,15 @@ import { firebaseConnect, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
 import GradeHistogram from '../components/GradeHistogram'
-import { Link, Route, Switch, useLocation } from 'react-router-dom'
+import { Route, Switch, useLocation } from 'react-router-dom'
 import resolveUsers from '../helpers/resolveUsers'
 import StatsIndex from '../components/StatsIndex';
 import { toObj } from '../helpers/objectConverters';
 import { FaChevronLeft } from 'react-icons/fa';
 import { BOULDER, TOP_ROPE } from '../helpers/gradeUtils';
 import GradeHistory from '../components/GradeHistory';
+import StatFilters, { filtersLink } from './StatFilters';
+import { Button } from 'react-bootstrap';
 
 const filterByKeys = (data, keys) => {
     if (!data) return [];
@@ -17,17 +19,20 @@ const filterByKeys = (data, keys) => {
     return data.filter(({key}) => keys.includes(key));
 };
 
-const StatsHeader = ({search}) => (
-    <Link to={`/stats${search}`}><FaChevronLeft />Stats</Link>
+const StatsHeader = ({location}) => (
+    <>
+    <Button variant='link' href={`/stats${location.search}`}><FaChevronLeft />Stats</Button>
+    <Button href={filtersLink(location)} style={{float: 'right'}}>Filters</Button>
+    </>
 );
 
 const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
-    const search = useLocation().search;
-    const query = new URLSearchParams(search);
+    const location = useLocation();
+    const query = new URLSearchParams(location.search);
 
     if (!isLoaded(routes, sessions, groups, users, gyms)) return 'Loading';
 
-    let allowedGroups = filterByKeys(groups, query.getAll('groups'));
+    let allowedGroups = filterByKeys(groups, query.getAll('groups')); // TODO keep?
 
     let allowedSessions = sessions;
     let allowedGyms = gyms;
@@ -65,7 +70,7 @@ const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
     }
 
     if (query.has('allowSuffixes')) {
-        filterProps.allowSuffixes = query.get('allowSuffixes');
+        filterProps.allowSuffixes = query.get('allowSuffixes') === 'true';
     } else {
         filterProps.allowSuffixes = false;
     }
@@ -73,8 +78,9 @@ const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
     return (
         <Switch>
             <Route exact path={'/stats'}><StatsIndex {...filterProps} /></Route>
+            <Route exact path={'/stats/filters'}><StatFilters /></Route>
             <>
-                <StatsHeader search={search} />
+                <StatsHeader location={location} />
                 <Route exact path={'/stats/gradeHistogram'}><GradeHistogram {...filterProps} /></Route>
                 <Route exact path={'/stats/gradeHistory'}><GradeHistory {...filterProps} /></Route>
             </>
