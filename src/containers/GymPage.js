@@ -7,7 +7,7 @@ import EntityModal from '../components/EntityModal'
 import { routeCreateFields } from '../templates/routeFields'
 import { gymFields } from '../templates/gymFields'
 import { Link } from 'react-router-dom'
-import durationString from '../helpers/durationString'
+import { sessionDuration } from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
 import axios from 'axios'
 
@@ -122,6 +122,7 @@ class GymPage extends Component {
                     <small>{gym.location}</small>
                 </h4>
                 <p>Average Wall Height: {gym.height} ft</p>
+                <Link to={`/stats?gyms=${id}`}>View stats</Link>
                 <Row>
                     <Col xs={6}>
                         <h3>Routes</h3>
@@ -174,7 +175,7 @@ class GymPage extends Component {
                         <Link to={`/sessions/${session.key}`} style={{ textDecoration: 'none' }}
                               key={session.key}>
                             <ListGroup.Item action>
-                                {new Date(session.value.startTime).toDateString() + (session.value.endTime ? `, duration: ${durationString(session.value)}` : ' (ongoing)')}
+                                {new Date(session.value.startTime).toDateString() + (session.value.endTime ? `, duration: ${sessionDuration(session.value)}` : ' (ongoing)')}
                             </ListGroup.Item>
                         </Link>
                     ))}

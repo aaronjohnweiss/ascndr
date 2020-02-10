@@ -14,6 +14,7 @@ import { connect } from 'react-redux'
 import denyAuth from './components/denyAuth'
 import GroupIndex from './containers/GroupIndex'
 import GroupPage from './containers/GroupPage'
+import StatsPage from './containers/StatsContainer'
 
 class App extends Component {
     componentWillMount() {
@@ -59,6 +60,7 @@ class App extends Component {
                             <Route exact path='/gyms/:id' component={requireAuth(GymPage)}/>
                             <Route exact path='/routes/:id' component={requireAuth(RoutePage)}/>
                             <Route exact path='/sessions/:id' component={requireAuth(SessionPage)}/>
+                            <Route path='/stats' component={requireAuth(StatsPage)}/>
                             <Route exact path='/login' component={denyAuth(SignIn)}/>
                         </Col>
                     </Container>

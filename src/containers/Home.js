@@ -15,7 +15,10 @@ class Home extends Component {
                         <Button block style={{marginBottom: '4px'}}>Your Gyms</Button>
                     </Link>
                     <Link to='/groups'>
-                        <Button block>Your Groups</Button>
+                        <Button block style={{marginBottom: '4px'}}>Your Groups</Button>
+                    </Link>
+                    <Link to={`/stats?uids=${this.props.authenticated.uid}`}>
+                        <Button block>Your Stats</Button>
                     </Link>
                 </Fragment>
         } else {
@@ -29,16 +32,16 @@ class Home extends Component {
                 <h2>Climbing, tracked.</h2>
                 <p>Welcome to ASCNDr. This is a small application designed to help record indoor climbing routes and
                     sessions.</p>
-                <Features/>
+                <Features />
                 {buttons}
-                <br/>
+                <br />
             </Fragment>
         )
     }
 }
 
 function mapStateToProps(state) {
-    return { authenticated: state.auth }
+    return {authenticated: state.auth}
 }
 
 export default connect(mapStateToProps)(Home)
