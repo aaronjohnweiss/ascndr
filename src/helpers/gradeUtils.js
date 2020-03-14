@@ -13,7 +13,7 @@ export const prettyPrint = (grade, useModifier = true) => {
     // Prefix based on type
     if (grade.style === TOP_ROPE) str += '5.';
     else if (grade.style === BOULDER) str += 'V';
-    else if (grade.style === LEAD) str += '5.';
+    else if (grade.style === LEAD) str += 'L5.';
 
     // Add on difficulty and any suffix
     str += grade.difficulty;

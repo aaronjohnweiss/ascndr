@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { BOULDER, gradeEquals, prettyPrint, TOP_ROPE } from '../helpers/gradeUtils'
+import { BOULDER, gradeEquals, LEAD, prettyPrint, TOP_ROPE } from '../helpers/gradeUtils'
 import { Button, Form, Modal } from 'react-bootstrap'
 
 const TOP_ROPE_GRADES = Array.from(new Array(9),(x, i) => i + 6).map(difficulty => ({
@@ -9,6 +9,11 @@ const TOP_ROPE_GRADES = Array.from(new Array(9),(x, i) => i + 6).map(difficulty 
 
 const BOULDER_GRADES = Array.from(new Array(8), (x, i) => i).map(difficulty => ({
     style: BOULDER,
+    difficulty
+}));
+
+const LEAD_GRADES = Array.from(new Array(9),(x, i) => i + 6).map(difficulty => ({
+    style: LEAD,
     difficulty
 }));
 
@@ -49,9 +54,16 @@ const GradeModal = ({ defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, 
                                     setStyle(BOULDER)
                                     setSelected(undefined)
                                 }}/>
+                    <Form.Check key='l' id='l' type='radio'
+                                label='Lead'
+                                checked={style === LEAD}
+                                onChange={() => {
+                                    setStyle(LEAD)
+                                    setSelected(undefined)
+                                }}/>
 
                     <Form.Label>Grade</Form.Label>
-                    {(style === TOP_ROPE && TOP_ROPE_GRADES || BOULDER_GRADES).map((grade, idx) => (
+                    {(style === TOP_ROPE && TOP_ROPE_GRADES || style === BOULDER && BOULDER_GRADES || style === LEAD && LEAD_GRADES).map((grade, idx) => (
                         <Form.Check
                             id={idx + 1}
                             key={idx + 1}
