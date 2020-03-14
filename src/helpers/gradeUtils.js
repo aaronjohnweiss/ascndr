@@ -1,7 +1,8 @@
 export const TOP_ROPE = 'TOP_ROPE';
 export const BOULDER = 'BOULDER';
+export const LEAD = 'LEAD';
 
-export const ALL_STYLES = [TOP_ROPE, BOULDER];
+export const ALL_STYLES = [TOP_ROPE, BOULDER, LEAD];
 
 
 export const prettyPrint = (grade, useModifier = true) => {
@@ -12,9 +13,9 @@ export const prettyPrint = (grade, useModifier = true) => {
     // Prefix based on type
     if (grade.style === TOP_ROPE) str += '5.';
     else if (grade.style === BOULDER) str += 'V';
+    else if (grade.style === LEAD) str += '5.';
 
     // Add on difficulty and any suffix
-
     str += grade.difficulty;
     if (grade.modifier && useModifier) str += grade.modifier;
 
@@ -27,6 +28,8 @@ export const printType = (type) => {
             return 'Top Rope';
         case BOULDER:
             return 'Boulder';
+        case LEAD:
+            return 'Lead';
         default:
             return 'Unknown';
     }
@@ -35,9 +38,19 @@ export const printType = (type) => {
 export const compareGrades = (g1, g2, useModifier = true) => {
     if (!g1) return -1;
     if (!g2) return 1;
-    // First sort between toprope/boulder
+    // First sort between toprope/boulder/lead
     if (g1.style !== g2.style) {
+
+        // toprope > boulder > lead
         if (g1.style === TOP_ROPE) return 1;
+        if (g2.style === TOP_ROPE) return -1;
+
+        if (g1.style === BOULDER) return 1;
+        if (g2.style === BOULDER) return -1;
+
+        if (g1.style === LEAD) return -1;
+        if (g2.style === LEAD) return 1;
+
         return -1;
     }
 
