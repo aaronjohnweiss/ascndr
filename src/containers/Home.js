@@ -15,7 +15,7 @@ class Home extends Component {
                         <Button block style={{marginBottom: '4px'}}>Your Gyms</Button>
                     </Link>
                     <Link to='/groups'>
-                        <Button block style={{marginBottom: '4px'}}>Your Groups</Button>
+                        <Button block style={{marginBottom: '4px'}}>Your User</Button>
                     </Link>
                     <Link to={`/stats?uids=${this.props.authenticated.uid}`}>
                         <Button block>Your Stats</Button>

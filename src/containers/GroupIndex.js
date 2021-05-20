@@ -51,7 +51,7 @@ class GroupIndex extends Component {
         const { auth: { uid }, users } = this.props;
         const userInfo = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid);
 
-        const data = {uid, name: user.name};
+        const data = {uid, ...user};
         if (userInfo) {
             const userId = userInfo.key;
             this.props.firebase.update(`users/${userId}`, data);
@@ -99,7 +99,7 @@ class GroupIndex extends Component {
                               handleClose={this.hideUserModal}
                               handleSubmit={this.handleUserUpdate}
                               fields={userFields}
-                              initialValues={{name: userName}}/>
+                              initialValues={{...userInfo.value}}/>
             </Fragment>
         )
     }
