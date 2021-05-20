@@ -7,10 +7,12 @@ import { sortHiatuses } from './HiatusModal';
 import { dateString } from '../helpers/dateUtils';
 
 const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes) => {
+    // Given hiatuses: Split up and section off data around the hiatuses
     if (hiatuses && hiatuses.length > 0) {
         const components = [];
         const sortedHiatuses = sortHiatuses(hiatuses);
         for (let i = 0; i <= sortedHiatuses.length; i++) {
+            // For each hiatus, window the sessions to all sessions that were after the hiatus (but before the next one)
             const rangeStartDate = (i === hiatuses.length) ? null : sortedHiatuses[i].endDate;
             const rangeEndDate = (i === 0) ? null : sortedHiatuses[i-1].startDate;
 
@@ -25,6 +27,8 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
                 } else {
                     headerString = `Before ${dateString(rangeEndDate)}`
                 }
+                // Build an accordion for the current window
+                // First one (most recent) will default to open, rest will default to closed
                 components.push(
                     <Accordion key={i} defaultActiveKey={'0'}>
                     <Card>
@@ -42,6 +46,7 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
         return components;
     }
 
+    // No hiatuses: just show all data together
     return calculateProgression(sessionsForUser, routes, allowSuffixes, allowedTypes)
 }
 
