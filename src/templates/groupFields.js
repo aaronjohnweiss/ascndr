@@ -1,3 +1,5 @@
+import HiatusModel from '../components/HiatusModal';
+
 export const groupFields = [
     {
         title: 'Group Name',
@@ -19,5 +21,13 @@ export const userFields = [
         title: 'User Name',
         placeholder: 'Name..',
         name: 'name'
+    },
+    {
+        title: 'Hiatuses',
+        name: 'hiatuses',
+        options: {
+            type: 'custom',
+            component: HiatusModel
+        }
     }
 ]

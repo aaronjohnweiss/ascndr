@@ -1,6 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import Modal from 'react-bootstrap/es/Modal'
-import Button from 'react-bootstrap/es/Button'
+import { Button, Modal } from 'react-bootstrap';
 
 export default class ConfirmCancelButton extends Component {
     state = {

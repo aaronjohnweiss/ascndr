@@ -51,7 +51,7 @@ class GroupIndex extends Component {
         const { auth: { uid }, users } = this.props;
         const userInfo = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid);
 
-        const data = {uid, name: user.name};
+        const data = {uid, ...user};
         if (userInfo) {
             const userId = userInfo.key;
             this.props.firebase.update(`users/${userId}`, data);
@@ -62,7 +62,7 @@ class GroupIndex extends Component {
     }
 
     render() {
-        const { auth: { uid }, groups, users, all } = this.props
+        const { auth: { uid }, groups, users } = this.props
 
         if (!isLoaded(groups) || !isLoaded(users)) return 'Loading'
 
@@ -74,8 +74,8 @@ class GroupIndex extends Component {
 
         return (
             <Fragment>
-                <p>Your uid: <b>{uid}</b></p>
-                <p>Your display name: <b>{userName}</b> <Button onClick={this.showUserModal}>Edit</Button></p>
+                <p>Your uid: <b>{uid}</b><Button style={{float: 'right'}} onClick={this.showUserModal}>Edit User</Button></p>
+                <p>Your display name: <b>{userName}</b> </p>
                 <ListGroup>
                     {groupsForUser.map(group => (
                         <Link to={`/groups/${group.key}`} style={{ textDecoration: 'none' }} key={group.key}>
@@ -99,7 +99,7 @@ class GroupIndex extends Component {
                               handleClose={this.hideUserModal}
                               handleSubmit={this.handleUserUpdate}
                               fields={userFields}
-                              initialValues={{name: userName}}/>
+                              initialValues={{...userInfo.value}}/>
             </Fragment>
         )
     }
