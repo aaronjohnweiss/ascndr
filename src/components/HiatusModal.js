@@ -1,9 +1,10 @@
 import React, { Fragment, useState } from 'react'
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap'
+import { dateString } from '../helpers/dateUtils';
 
 
 const HiatusListEntry = ({displayNum, hiatus, onChange, onRemove}) => {
-    const handleDateChange = evt => onChange({...hiatus, endDate: new Date(evt.target.value).getTime()})
+    const handleDateChange = name => evt => onChange({...hiatus, [name]: new Date(evt.target.value).getTime()})
     return (
         <>
             <Row>
@@ -16,9 +17,13 @@ const HiatusListEntry = ({displayNum, hiatus, onChange, onRemove}) => {
                     </Button>
                 </Col>
             </Row>
+            <Form.Label>Start Date</Form.Label>
+            <Form.Control onChange={handleDateChange('startDate')}
+                          value={hiatus && hiatus.startDate ? dateString(hiatus.startDate) : ''}
+                          type='date' />
             <Form.Label>End Date</Form.Label>
-            <Form.Control onChange={handleDateChange}
-                          value={hiatus && hiatus.endDate ? new Date(hiatus.endDate).toISOString().split('T')[0] : ''}
+            <Form.Control onChange={handleDateChange('endDate')}
+                          value={hiatus && hiatus.endDate ? dateString(hiatus.endDate) : ''}
                           type='date' />
         </>
     )
@@ -79,12 +84,12 @@ const HiatusModel = ({value, onChange}) => {
                             hiatuses &&
                             <>
                                 {hiatuses.map((hiatus, idx) => (
-                                    <Fragment key={idx}>
-                                        <hr />
-                                        <HiatusListEntry key={idx} displayNum={hiatuses.length - idx} hiatus={hiatus}
-                                                         onChange={updateHiatus(idx)}
-                                                         onRemove={() => removeHiatus(idx)} />
-                                    </Fragment>
+                                        <Fragment key={idx}>
+                                            <hr />
+                                            <HiatusListEntry key={idx} displayNum={hiatuses.length - idx} hiatus={hiatus}
+                                                             onChange={updateHiatus(idx)}
+                                                             onRemove={() => removeHiatus(idx)} />
+                                        </Fragment>
                                     )
                                 )}
                             </>

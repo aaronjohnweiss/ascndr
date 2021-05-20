@@ -1,7 +1,5 @@
 import React, { Component, Fragment } from 'react'
-import Modal from 'react-bootstrap/es/Modal'
-import Button from 'react-bootstrap/es/Button'
-import Form from 'react-bootstrap/Form'
+import { Button, Form, Modal } from 'react-bootstrap'
 
 export default class EntityModal extends Component {
     constructor(props) {
