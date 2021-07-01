@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react'
 import { compose } from 'redux'
 import { connect } from 'react-redux'
-import { firebaseConnect, getVal, isEmpty, isLoaded } from 'react-redux-firebase'
+import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { Button, Col, ListGroup, Row } from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
 import { routeCreateFields } from '../templates/routeFields'
@@ -10,6 +10,7 @@ import { Link } from 'react-router-dom'
 import { sessionDuration } from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
 import axios from 'axios'
+import { getRoutesForGym, getSessionsForGym } from '../helpers/filterUtils';
 
 class GymPage extends Component {
     constructor(props) {
@@ -95,10 +96,10 @@ class GymPage extends Component {
         if (!gym) return 'Uh oh'
 
         // Filter to only routes for this gym
-        const routesForGym = (isEmpty(routes)) ? [] : routes.filter(route => route.value.gymId === id)
+        const routesForGym = getRoutesForGym(routes, {key: id});
         const currentRoutes = routesForGym.filter(route => !route.value.isRetired)
         const retiredRoutes = routesForGym.filter(route => route.value.isRetired)
-        const sessionsForGym = (isEmpty(sessions)) ? [] : sessions.filter(session => session.value.gymId === id && session.value.uid === uid).sort((a, b) => b.value.startTime - a.value.startTime)
+        const sessionsForGym = getSessionsForGym(sessions, {key: id}).sort((a, b) => b.value.startTime - a.value.startTime)
 
         const routeListItem = ({ key, value }) => (
             <Link to={`/routes/${key}`} style={{ textDecoration: 'none' }} key={key}>

@@ -9,6 +9,8 @@ import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import { sessionDuration } from '../helpers/durationUtils'
 import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
+import SessionModal from '../components/SessionModal';
+import { getGymsForUser } from '../helpers/filterUtils';
 
 class SessionPage extends Component {
     constructor(props) {
@@ -97,9 +99,9 @@ class SessionPage extends Component {
     }
 
     render() {
-        const { session, routes, gyms } = this.props
+        const { session, routes, gyms, groups } = this.props
 
-        if (!isLoaded(session, routes, gyms)) return 'Loading'
+        if (!isLoaded(session, routes, gyms, groups)) return 'Loading'
         if (!session || !gyms) return 'Uh oh'
 
         if (!session.customRoutes) session.customRoutes = []
@@ -121,6 +123,8 @@ class SessionPage extends Component {
         const grades = allGrades.filter((grade, idx) => allGrades.findIndex(val => gradeEquals(val, grade)) === idx).sort(compareGrades).reverse()
 
         const date = new Date(session.startTime).toDateString()
+
+        const isFinished = !!session.endTime;
 
         const routesForGym = this.props.routes.filter(route => route.value.gymId === gym.key && !route.value.isRetired)
 
@@ -163,12 +167,20 @@ class SessionPage extends Component {
                     <Col md='8'>
                         {customModal}
                         {standardModal}
-
-                        <h2>Session at <Link
-                            to={`/gyms/${gym.key}`}>{gym.value.name}</Link> on {date} {session.endTime && ` for ${sessionDuration(session)}`}
-                        </h2>
+                        <Row>
+                            <Col>
+                                <h2>
+                                    Session at <Link to={`/gyms/${gym.key}`}>{gym.value.name}</Link>
+                                </h2>
+                            </Col>
+                            {isFinished &&
+                                <Col xs={2}>
+                                    <SessionModal session={session} gyms={getGymsForUser(gyms, groups, session.uid)} onChange={this.updateSession} buttonProps={{style: {float: 'right'}}}/>
+                                </Col>
+                            }
+                        </Row>
                         <h4>
-                            <small>{gym.value.location}</small>
+                            <small>{date} in {gym.value.location} {isFinished && ` for ${sessionDuration(session)}`}</small>
                         </h4>
                         <h3>Routes</h3>
                         {grades && grades.length ? grades.map(grade => {
@@ -200,7 +212,7 @@ class SessionPage extends Component {
                                 </Button>
                             </Col>
                         </Row>
-                        {!session.endTime &&
+                        {!isFinished &&
                         <Row>
                             <Col md={12}>
                                 <ConfirmCancelButton handleConfirm={this.endSession}
@@ -223,7 +235,8 @@ const mapStateToProps = (state, props) => {
     return {
         session: getVal(state.firebase, `data/sessions/${props.match.params.id}`),
         routes: state.firebase.ordered.routes,
-        gyms: state.firebase.ordered.gyms
+        gyms: state.firebase.ordered.gyms,
+        groups: state.firebase.ordered.groups
     }
 }
 
@@ -231,7 +244,8 @@ export default compose(
     firebaseConnect([
         { path: 'sessions' },
         { path: 'routes' },
-        { path: 'gyms' }
+        { path: 'gyms' },
+        { path: 'groups' }
     ]),
     connect(mapStateToProps)
 )(SessionPage)

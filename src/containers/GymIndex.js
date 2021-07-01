@@ -6,7 +6,8 @@ import EntityModal from '../components/EntityModal'
 import { gymFields } from '../templates/gymFields'
 import Gym from '../components/Gym'
 import ListModal from '../components/ListModal'
-import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
+import { firebaseConnect, isLoaded } from 'react-redux-firebase'
+import { getGroupsForUser, getGymsForGroups } from '../helpers/filterUtils';
 
 class GymIndex extends Component {
     constructor(props) {
@@ -66,9 +67,8 @@ class GymIndex extends Component {
 
         if (!isLoaded(gyms, groups)) return 'Loading'
 
-        const groupsForUser = isEmpty(groups) ? [] : groups.filter(group => group.value.users.includes(uid))
-        const groupIds = groupsForUser.map(group => group.key)
-        const gymsForGroups = isEmpty(gyms) ? [] : gyms.filter(gym => groupIds.includes(gym.value.groupId))
+        const groupsForUser = getGroupsForUser(groups, uid);
+        const gymsForGroups = getGymsForGroups(gyms, groupsForUser);
 
         const groupFormOptions = groupsForUser.map(({ key, value }) => ({ id: key, label: value.name }))
 
