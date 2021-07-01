@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom'
 import { sessionDuration } from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
 import axios from 'axios'
-import { getRoutesForGym, getSessionsForGym } from '../helpers/filterUtils';
+import { getRoutesForGym, getSessionsForUserAndGym } from '../helpers/filterUtils';
 
 class GymPage extends Component {
     constructor(props) {
@@ -99,7 +99,7 @@ class GymPage extends Component {
         const routesForGym = getRoutesForGym(routes, {key: id});
         const currentRoutes = routesForGym.filter(route => !route.value.isRetired)
         const retiredRoutes = routesForGym.filter(route => route.value.isRetired)
-        const sessionsForGym = getSessionsForGym(sessions, {key: id}).sort((a, b) => b.value.startTime - a.value.startTime)
+        const sessionsForUser = getSessionsForUserAndGym(sessions, {key: id}, uid).sort((a, b) => b.value.startTime - a.value.startTime)
 
         const routeListItem = ({ key, value }) => (
             <Link to={`/routes/${key}`} style={{ textDecoration: 'none' }} key={key}>
@@ -172,7 +172,7 @@ class GymPage extends Component {
                 </Row>
 
                 <TruncatedList pageSize={5}>
-                    {sessionsForGym.map(session => (
+                    {sessionsForUser.map(session => (
                         <Link to={`/sessions/${session.key}`} style={{ textDecoration: 'none' }}
                               key={session.key}>
                             <ListGroup.Item action>

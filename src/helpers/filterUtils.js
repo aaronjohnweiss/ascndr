@@ -17,3 +17,5 @@ export const getGymsForUser = (gyms, groups, uid) => getGymsForGroups(gyms, getG
 
 export const getRoutesForGym = (routes, gym) => filterList(routes, 'gymId', gym.key);
 export const getSessionsForGym = (sessions, gym) => filterList(sessions, 'gymId', gym.key);
+export const getSessionsForUser = (sessions, uid) => filterList(sessions, 'uid', uid);
+export const getSessionsForUserAndGym = (sessions, gym, uid) => getSessionsForUser(getSessionsForGym(sessions, gym), uid);
