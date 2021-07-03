@@ -7,6 +7,7 @@ import { ListGroup } from 'react-bootstrap'
 import { groupFields, userFields } from '../templates/groupFields'
 import { compose } from 'redux'
 import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
+import { getGroupsForUser } from '../helpers/filterUtils';
 
 class GroupIndex extends Component {
     constructor(props) {
@@ -66,7 +67,7 @@ class GroupIndex extends Component {
 
         if (!isLoaded(groups) || !isLoaded(users)) return 'Loading'
 
-        const groupsForUser = isEmpty(groups) ? [] : groups.filter(group => group.value.users.includes(uid))
+        const groupsForUser = getGroupsForUser(groups, uid);
 
         const userInfo = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid)
 

@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { Button, Form } from 'react-bootstrap';
 import resolveUsers from '../helpers/resolveUsers';
 import { ALL_STYLES, printType } from '../helpers/gradeUtils';
+import { getGroupsForUser, getGymsForGroups } from '../helpers/filterUtils';
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
 
@@ -26,10 +27,10 @@ const defaultIfEmpty = (a1, a2) => {
 const StatFilters = ({auth, groups, users, gyms}) => {
     const query = new URLSearchParams(useLocation().search);
 
-    const groupsForUser = groups.filter(group => group.value.users.includes(auth.uid));
+    const groupsForUser = getGroupsForUser(groups, auth.uid);
     const allowedUids = [...new Set(groupsForUser.flatMap(group => group.value.users))];
     const visibleUsers = resolveUsers(users, allowedUids);
-    const visibleGyms = gyms.filter(gym => groupsForUser.findIndex(group => group.key === gym.value.groupId) !== -1);
+    const visibleGyms = getGymsForGroups(gyms, groupsForUser);
     const [gymIds, setGymIds] = useState(defaultIfEmpty(query.getAll('gyms'), visibleGyms.map(gym => gym.key)));
     const [uids, setUids] = useState(defaultIfEmpty(query.getAll('uids'), allowedUids));
 
