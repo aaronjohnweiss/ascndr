@@ -8,7 +8,7 @@ import resolveUsers from '../helpers/resolveUsers'
 import StatsIndex from '../components/StatsIndex';
 import { toObj } from '../helpers/objectConverters';
 import { FaChevronLeft } from 'react-icons/fa';
-import { BOULDER, TOP_ROPE } from '../helpers/gradeUtils';
+import { ALL_STYLES } from '../helpers/gradeUtils';
 import GradeHistory from '../components/GradeHistory';
 import StatFilters, { filtersLink } from './StatFilters';
 import { Button } from 'react-bootstrap';
@@ -66,7 +66,7 @@ const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
     if (query.has('allowedTypes')) {
         filterProps.allowedTypes = query.getAll('allowedTypes');
     } else {
-        filterProps.allowedTypes = [BOULDER, TOP_ROPE];
+        filterProps.allowedTypes = ALL_STYLES;
     }
 
     if (query.has('allowSuffixes')) {
