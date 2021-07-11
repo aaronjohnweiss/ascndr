@@ -2,9 +2,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { Button } from 'react-bootstrap';
-import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase';
+import { firebaseConnect, isLoaded } from 'react-redux-firebase';
 import { compose } from 'redux';
-import { findEntry, getSessionsForUser } from '../helpers/filterUtils';
+import { findEntry, findUser, getSessionsForUser } from '../helpers/filterUtils';
 import SessionCard from '../components/SessionCard';
 
 const UserHome = ({auth: {uid}, gyms, sessions, routes, users}) => {
@@ -17,11 +17,11 @@ const UserHome = ({auth: {uid}, gyms, sessions, routes, users}) => {
 
     const gym = latestSession && findEntry(gyms, latestSession.value.gymId).value;
 
-    const user = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid).value;
+    const user = findUser(users, uid);
 
     return (
         <>
-            <h2>Welcome{user ? `, ${user.name}` : ' back'}!</h2>
+            <h2>Welcome{user.name ? `, ${user.name}` : ' back'}!</h2>
             {latestSession &&
             <>
                 <h3>Last Session:</h3>

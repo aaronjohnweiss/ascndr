@@ -12,6 +12,10 @@ export const filterList = (arr, field, value) => isEmpty(arr) ? [] : arr.filter(
 });
 
 export const findEntry = (array, key) => array.find(item => item.key === key);
+export const findUser = (users, uid) => {
+    const user = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid);
+    return user ? user.value : { uid };
+}
 
 export const getGroupsForUser = (groups, uid) => filterList(groups, 'users', uid);
 export const getGymsForGroups = (gyms, groups) => filterList(gyms, 'groupId', groups.map(group => group.key));

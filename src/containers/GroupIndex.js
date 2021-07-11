@@ -7,7 +7,7 @@ import { ListGroup } from 'react-bootstrap'
 import { groupFields, userFields } from '../templates/groupFields'
 import { compose } from 'redux'
 import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
-import { getGroupsForUser } from '../helpers/filterUtils';
+import { findUser, getGroupsForUser } from '../helpers/filterUtils';
 
 class GroupIndex extends Component {
     constructor(props) {
@@ -69,9 +69,9 @@ class GroupIndex extends Component {
 
         const groupsForUser = getGroupsForUser(groups, uid);
 
-        const userInfo = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid)
+        const userInfo = findUser(users, uid);
 
-        const userName = userInfo && userInfo.value.name || uid;
+        const userName = userInfo && userInfo.name || uid;
 
         return (
             <Fragment>
@@ -100,7 +100,7 @@ class GroupIndex extends Component {
                               handleClose={this.hideUserModal}
                               handleSubmit={this.handleUserUpdate}
                               fields={userFields}
-                              initialValues={{...userInfo.value}}/>
+                              initialValues={{...userInfo}} />
             </Fragment>
         )
     }
