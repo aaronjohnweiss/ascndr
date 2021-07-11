@@ -74,12 +74,12 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
     return {categories, graphData};
 }
 
-const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes}) => {
+const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, canAnimate = true}) => {
     // Get session dates for animating
     const validUids = Object.keys(users);
     const sessionDates = Object.values(sessions).filter(session => validUids.includes(session.uid)).map(session => session.startTime).sort();
     const firstDate = moment(sessionDates[0]).subtract(1, 'month').endOf('month');
-    const lastDate = moment(sessionDates[sessionDates - 1]).endOf('month');
+    const lastDate = moment(sessionDates[sessionDates.length - 1]).endOf('month');
 
     // While animating, track current max date
     const [maxDate, setMaxDate] = useState(undefined);
@@ -109,7 +109,10 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes}) 
     );
 
     // Use full graph data to get domain/range
-    const {categories: allCategories, graphData: fullGraphData} = getGraphData(Object.values(users), Object.values(sessions), routes, allowedTypes, allowSuffixes);
+    const {
+        categories: allCategories,
+        graphData: fullGraphData
+    } = getGraphData(Object.values(users), Object.values(sessions), routes, allowedTypes, allowSuffixes);
     const maxValue = Math.max(...fullGraphData.flatMap(({barData}) => barData).map(({y}) => y));
 
     const allowedSessions = maxDate ? Object.values(sessions).filter(session => moment(session.startTime).isBefore(maxDate)) : Object.values(sessions);
@@ -122,22 +125,26 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes}) 
             <Row>
                 <Col xs={12}>
                     <ReactiveBarGraph data={graphData} categories={allCategories} maxDomain={{y: maxValue}}
-                                      animate={{duration: ANIMATION_INTERVAL / 4, onLoad: {duration: 0}}} />
+                                      animate={{duration: ANIMATION_INTERVAL / 4, onLoad: {duration: 0}}} showLegend={validUids.length > 1}/>
                 </Col>
             </Row>
-            <Row>
-                <Col xs={12}>
-                    <p style={{textAlign: 'center'}}>{firstDate.format('MMMM YYYY')} to {(maxDate || lastDate).format('MMMM YYYY')}</p>
-                </Col>
-            </Row>
-            <Row>
-                <Col sm={{span: 6, offset: 3}}>
-                    {maxDate ?
-                        <Button block onClick={() => setMaxDate(undefined)}>Stop</Button> :
-                        <Button block onClick={() => setMaxDate(firstDate)}>Play</Button>
-                    }
-                </Col>
-            </Row>
+            {canAnimate &&
+            <>
+                <Row>
+                    <Col xs={12}>
+                        <p style={{textAlign: 'center'}}>{firstDate.format('MMMM YYYY')} to {(maxDate || lastDate).format('MMMM YYYY')}</p>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col sm={{span: 6, offset: 3}}>
+                        {maxDate ?
+                            <Button block onClick={() => setMaxDate(undefined)}>Stop</Button> :
+                            <Button block onClick={() => setMaxDate(firstDate)}>Play</Button>
+                        }
+                    </Col>
+                </Row>
+            </>
+            }
         </Container>
     );
 };

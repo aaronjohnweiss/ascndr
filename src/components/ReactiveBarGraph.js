@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
-import { VictoryBar, VictoryChart, VictoryGroup, VictoryLegend } from 'victory';
+import { VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLegend } from 'victory';
 
 // Width of each bar
 const GRAPH_BAR_WIDTH = 20;
@@ -8,7 +8,7 @@ const GRAPH_BAR_PADDING = 110;
 // Height of each entry in legend
 const GRAPH_LEGEND_ENTRY_HEIGHT = 30;
 
-const ReactiveBarGraph = ({data, categories, maxDomain, animate}) => {
+const ReactiveBarGraph = ({data, categories, maxDomain, animate, showLegend = true}) => {
     const divRef = useRef();
 
     const [width, setWidth] = useState(0);
@@ -24,14 +24,18 @@ const ReactiveBarGraph = ({data, categories, maxDomain, animate}) => {
         <div ref={divRef}>
             <svg height={graphHeight + legendHeight} width={width}>
                 <VictoryChart standalone={false} horizontal width={width} height={graphHeight} maxDomain={maxDomain}>
-                    <VictoryLegend
-                        colorScale={'blue'}
-                        centerTitle
-                        orientation="vertical"
-                        width={width}
-                        y={graphHeight}
-                        data={data.map(({name}) => ({name}))}
-                    />
+                    {showLegend &&
+                        <VictoryLegend
+                            colorScale={'blue'}
+                            centerTitle
+                            orientation="vertical"
+                            width={width}
+                            y={graphHeight}
+                            data={data.map(({name}) => ({name}))}
+                        />
+                    }
+                    <VictoryAxis />
+                    <VictoryAxis dependentAxis tickFormat={(t) => Math.floor(t)}/>
                     <VictoryGroup animate={animate} categories={{x: categories}} colorScale={'blue'}
                                   offset={GRAPH_BAR_WIDTH}>
                         {

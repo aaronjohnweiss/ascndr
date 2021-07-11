@@ -11,6 +11,8 @@ export const filterList = (arr, field, value) => isEmpty(arr) ? [] : arr.filter(
     return fieldValue.some(x => value.includes(x));
 });
 
+export const findEntry = (array, key) => array.find(item => item.key === key);
+
 export const getGroupsForUser = (groups, uid) => filterList(groups, 'users', uid);
 export const getGymsForGroups = (gyms, groups) => filterList(gyms, 'groupId', groups.map(group => group.key));
 export const getGymsForUser = (gyms, groups, uid) => getGymsForGroups(gyms, getGroupsForUser(groups, uid));
