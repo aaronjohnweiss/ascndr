@@ -15,7 +15,7 @@ const UserHome = ({auth: {uid}, gyms, sessions, routes, users}) => {
 
     const latestSession = sessionsForUser.sort((a, b) => b.value.startTime - a.value.startTime)[0];
 
-    const gym = latestSession && findEntry(gyms, latestSession.value.gymId).value;
+    const gym = latestSession && findEntry(gyms, latestSession.value.gymId);
 
     const user = findUser(users, uid);
 
