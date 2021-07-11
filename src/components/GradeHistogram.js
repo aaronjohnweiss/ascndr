@@ -14,6 +14,7 @@ const addCount = (arr, key, count, allowSuffixes) => {
 };
 
 const ANIMATION_INTERVAL = 1000;
+const MAX_ANIMATION_DURATION = 10000;
 
 function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixes) {
     // Maintain list of all grades for the x axis labels
@@ -87,19 +88,21 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, c
     useEffect(
         () => {
             let interval;
+            const numMonths = Math.min(lastDate.diff(firstDate, 'months', false), 1);
+            const animationInterval = Math.min(ANIMATION_INTERVAL, MAX_ANIMATION_DURATION / numMonths);
             if (maxDate) {
                 // At each interval tick, set max date range to the next month
                 interval = setInterval(
                     () => {
                         // Once all sessions are included, cancel animation
-                        if (maxDate.isAfter(moment(sessionDates[sessionDates.length - 1]))) {
+                        if (maxDate.isAfter(lastDate)) {
                             setMaxDate(undefined);
                         } else {
                             // Bump to end of next month
                             setMaxDate(maxDate.clone().add(1, 'day').endOf('month'));
                         }
                     },
-                    ANIMATION_INTERVAL
+                    animationInterval
                 );
             }
             // In case component is unmounted, clear the interval
