@@ -1,3 +1,5 @@
+import { ALL_STYLES, printType } from '../helpers/gradeUtils';
+
 export const gymFields = [
     {
         title: 'Gym Name',
@@ -12,13 +14,14 @@ export const gymFields = [
             type: 'text'
         }
     },
-    {
-        title: 'Average Wall Height (feet)',
-        placeholder: 'Height..',
-        name: 'height',
-        options: {
-            type: 'number'
+    ...ALL_STYLES.map(style => {
+        return {
+            title: `Wall height (${printType(style)})` ,
+            placeholder: 'Height..',
+            name: `${style}_HEIGHT`,
+            options: {
+                type: 'number'
+            }
         }
-    }
-
+    })
 ]

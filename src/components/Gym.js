@@ -19,13 +19,8 @@ class Gym extends Component {
                     <Card.Subtitle className='mb-2 text-muted'>
                         {gym.location}
                     </Card.Subtitle>
-                    <Card.Text>
 
-                    </Card.Text>
                 </Card.Body>
-                <Card.Footer>
-                    <small className='text-muted'> Average Wall Height: {gym.height} ft.</small>
-                </Card.Footer>
             </Card>
         )
     }
