@@ -14,6 +14,7 @@ import {
     getSessionsForGym,
     getSessionsForUser
 } from '../helpers/filterUtils';
+import { Link } from 'react-router-dom';
 
 const getLatestTimeForGym = (gym, sessions) => {
     const latest = getLatestSession(getSessionsForGym(sessions, gym));
@@ -86,6 +87,19 @@ class GymIndex extends Component {
 
         const groupFormOptions = groupsForUser.map(({ key, value }) => ({ id: key, label: value.name }))
 
+        if (!groupsForUser || !groupsForUser.length) {
+            return (
+                <>
+                    <p>
+                        Gyms must be associated with a group, but you are not currently part of any groups.
+                    </p>
+                    <p>
+                        <Link to='/groups'>Click here</Link> to manage your user; either create a group,
+                        or share your uid with someone to have them add you to a group.
+                    </p>
+            </>
+            )
+        }
         return (
             <Fragment>
                 {gymsForGroups.map((gym) => <Gym gym={gym} key={gym.key} sessions={getSessionsForGym(sessionsForUser, gym)}/>)}
