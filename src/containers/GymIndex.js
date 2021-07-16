@@ -7,7 +7,18 @@ import { gymFields } from '../templates/gymFields'
 import Gym from '../components/Gym'
 import ListModal from '../components/ListModal'
 import { firebaseConnect, isLoaded } from 'react-redux-firebase'
-import { getGroupsForUser, getGymsForGroups } from '../helpers/filterUtils';
+import {
+    getGroupsForUser,
+    getGymsForGroups,
+    getLatestSession,
+    getSessionsForGym,
+    getSessionsForUser
+} from '../helpers/filterUtils';
+
+const getLatestTimeForGym = (gym, sessions) => {
+    const latest = getLatestSession(getSessionsForGym(sessions, gym));
+    return latest ? latest.value.startTime : 0;
+}
 
 class GymIndex extends Component {
     constructor(props) {
@@ -63,18 +74,21 @@ class GymIndex extends Component {
     }
 
     render() {
-        const { auth: { uid }, groups, gyms } = this.props
+        const { auth: { uid }, groups, gyms, sessions } = this.props
 
         if (!isLoaded(gyms, groups)) return 'Loading'
 
         const groupsForUser = getGroupsForUser(groups, uid);
         const gymsForGroups = getGymsForGroups(gyms, groupsForUser);
+        const sessionsForUser = getSessionsForUser(sessions, uid);
+        // Sort gyms according to latest sessions
+        gymsForGroups.sort((gymA, gymB) => getLatestTimeForGym(gymB, sessionsForUser) - getLatestTimeForGym(gymA, sessionsForUser))
 
         const groupFormOptions = groupsForUser.map(({ key, value }) => ({ id: key, label: value.name }))
 
         return (
             <Fragment>
-                {gymsForGroups.map((gym) => <Gym gym={gym} key={gym.key}/>)}
+                {gymsForGroups.map((gym) => <Gym gym={gym} key={gym.key} sessions={getSessionsForGym(sessionsForUser, gym)}/>)}
                 <br/>
                 <Button variant='primary' block={true} onClick={this.showGymModal}>
                     Add Gym
@@ -101,6 +115,7 @@ const mapStateToProps = state => {
     return {
         groups: state.firebase.ordered.groups,
         gyms: state.firebase.ordered.gyms,
+        sessions: state.firebase.ordered.sessions,
         auth: state.auth
     }
 }
@@ -108,7 +123,8 @@ const mapStateToProps = state => {
 export default compose(
     firebaseConnect([
         { path: 'gyms' },
-        { path: 'groups' }
+        { path: 'groups' },
+        { path: 'sessions' }
     ]),
     connect(mapStateToProps)
 )(GymIndex)
