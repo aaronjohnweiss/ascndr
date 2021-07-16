@@ -31,6 +31,13 @@ const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, 
     ...standardRoutes.filter(standardRoute => allowedTypes.includes(standardRoute.key.style))
 ].map(route => route.count).reduce(sum, 0);
 
+const heightForSession = (session, routes, gym = {}, allowedTypes = []) =>
+    allowedTypes.map(type => {
+        const count = routeCountForSession(session, routes, [type]);
+        const height = gym[`${type}_HEIGHT`] || 0;
+        return count * height;
+    }).reduce(sum, 0);
+
 const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}) => {
     const location = useLocation();
     const filterParams = location.search;
@@ -41,6 +48,7 @@ const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}
     // Figure out total time; for each session do (end - start) but if end doesn't exist (ongoing session) do (now - start)
     const totalTime = numSessions && sessionValues.map(({startTime, endTime = new Date().getTime()}) => endTime - startTime).reduce(sum);
     const totalRoutes = numSessions && sessionValues.map(session => routeCountForSession(session, routes, allowedTypes)).reduce(sum);
+    const totalDistance = numSessions && sessionValues.map(session => heightForSession(session, routes, gyms[session.gymId], allowedTypes)).reduce(sum);
     // Figure out max grades by type
     const maxGrades = sessionValues.flatMap(({customRoutes = [], standardRoutes = []}) => {
         // Get all grades climbed within the session
@@ -54,12 +62,6 @@ const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}
         }
         return obj;
     }, {});
-
-    const totalDistance = sessionValues.map(session => {
-        const {height = 0} = gyms[session.gymId] || {};
-        // TODO include bouldering height
-        return routeCountForSession(session, routes, allowedTypes) * height;
-    }).reduce(sum, 0);
 
     return (
         <>
