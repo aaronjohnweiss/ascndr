@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react'
+import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Button, Col, Container, Row } from 'react-bootstrap'
 import { compareGrades, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
@@ -89,6 +89,20 @@ class SessionPage extends Component {
         this.hideModal('customRoutes')
     }
 
+    removeCustomRoute = (key) => {
+        const session = Object.assign({}, this.props.session);
+
+        const routeIndex = session.customRoutes.findIndex(rt => rt.key === key);
+
+        if (routeIndex > -1 && session.customRoutes[routeIndex].count > 1) {
+            session.customRoutes[routeIndex].count -= 1;
+        } else if (routeIndex > -1) {
+            session.customRoutes.splice(routeIndex, 1);
+        }
+
+        this.updateSession(session);
+    }
+
     endSession() {
         const session = Object.assign({}, this.props.session)
 
@@ -146,16 +160,16 @@ class SessionPage extends Component {
                                          title='Add generic route'
         />
 
-        const addRouteButton = (grade) => {
+        const addRouteButton = (key, isCustom = false) => {
             return <Button variant='outline-secondary' className='plus-minus-button'
-                           onClick={() => this.addStandardRoute(grade)}>
+                           onClick={() => isCustom ? this.addCustomRoute(key) : this.addStandardRoute(key)}>
                 +
             </Button>
         }
 
-        const removeRouteButton = (grade) => {
+        const removeRouteButton = (key, isCustom = false) => {
             return <Button variant='outline-secondary' className='plus-minus-button'
-                           onClick={() => this.removeStandardRoute(grade)}>
+                           onClick={() => isCustom ? this.removeCustomRoute(key) : this.removeStandardRoute(key)}>
                 -
             </Button>
         }
@@ -189,12 +203,26 @@ class SessionPage extends Component {
                             const standardCountForGrade = standardRoutesMap[gradeLabel] || 0
                             const countForGrade = customRoutesForGrade.reduce((acc, route) => acc + (customRoutesMap[route.key] || 0), 0) + standardCountForGrade
                             return (
-                                <Fragment key={gradeLabel}>
-                                    <h5 className='session-grade-header'>{gradeLabel} ({countForGrade}) {addRouteButton(grade)} {standardCountForGrade > 0 && removeRouteButton(grade)}</h5>
+                                <div key={gradeLabel}>
+                                    <Row className='align-items-center session-grade-row' key={gradeLabel} >
+                                        <Col xs={6}>
+                                            <h5 className="session-grade-header">{gradeLabel} ({countForGrade})</h5>
+                                        </Col>
+                                        <Col>
+                                            {addRouteButton(grade)} {standardCountForGrade > 0 && removeRouteButton(grade)}
+                                        </Col>
+                                    </Row>
                                     {customRoutesForGrade.map(route => (
-                                        <p key={route.key}>{route.value.name} ({customRoutesMap[route.key]})</p>
+                                        <Row className='align-items-center session-grade-row' key={route.key}>
+                                            <Col xs={6}>
+                                                {route.value.name} ({customRoutesMap[route.key]})
+                                            </Col>
+                                            <Col>
+                                                {addRouteButton(route.key, true)} {removeRouteButton(route.key, true)}
+                                            </Col>
+                                        </Row>
                                     ))}
-                                </Fragment>
+                                </div>
                             )
                         }) : <p>No routes in this session</p>}
 
