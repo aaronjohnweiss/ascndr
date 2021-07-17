@@ -25,3 +25,7 @@ export const getRoutesForGym = (routes, gym) => filterList(routes, 'gymId', gym.
 export const getSessionsForGym = (sessions, gym) => filterList(sessions, 'gymId', gym.key);
 export const getSessionsForUser = (sessions, uid) => filterList(sessions, 'uid', uid);
 export const getSessionsForUserAndGym = (sessions, gym, uid) => getSessionsForUser(getSessionsForGym(sessions, gym), uid);
+
+export const hasRoutes = (session) => (session.customRoutes && session.customRoutes.length > 0) || (session.standardRoutes && session.standardRoutes.length > 0);
+
+export const getLatestSession = (sessions = []) => sessions.reduce((prev, current) => (prev && prev.value && prev.value.startTime > current.value.startTime) ? prev : current, null);
