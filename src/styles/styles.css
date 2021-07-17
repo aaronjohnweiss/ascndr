@@ -37,6 +37,22 @@
 
 .session-grade-header {
     line-height: 38px;
+    margin-bottom: 0;
+}
+
+.session-grade-row {
+    margin-bottom: 0.25em;
+}
+.session-grade-row:last-child {
+    margin-bottom: 0.5em;
+}
+
+.slider-row {
+    margin-bottom: 0;
+}
+
+.grade-modal-label {
+    font-weight: 500;
 }
 
 .plus-minus-button {

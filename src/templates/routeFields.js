@@ -18,6 +18,7 @@ const SetRouteGrade = ({ value, onChange }) => {
                             onChange(value)
                             setShow(false)
                         }}
+                        allowPartial={false}
                         title='Set route grade'/>
         </div>
     )

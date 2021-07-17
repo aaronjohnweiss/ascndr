@@ -5,6 +5,7 @@ import { FaChevronRight } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom';
 import { durationString } from '../helpers/durationUtils';
 import { filtersLink } from '../containers/StatFilters';
+import { sum } from '../helpers/sum';
 
 export const StatItem = ({label, value, link}) => {
     const itemProps = link ? {action: true, href: link} : {};
@@ -23,8 +24,6 @@ export const StatItem = ({label, value, link}) => {
         </ListGroupItem>
     )
 };
-
-const sum = (a, b) => a + b;
 
 const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes) => [
     ...customRoutes.filter(customRoute => allowedTypes.includes(routes[customRoute.key].grade.style)),
