@@ -1,9 +1,16 @@
+import { sum } from './sum';
+
 export const TOP_ROPE = 'TOP_ROPE';
 export const BOULDER = 'BOULDER';
 export const LEAD = 'LEAD';
 
 export const ALL_STYLES = [TOP_ROPE, BOULDER, LEAD];
-
+export const ALL_MODIFIERS = ['-', null, '+']
+export const GRADE_RANGE = {
+    [TOP_ROPE]: {min: 6, max: 14},
+    [BOULDER]: {min: 0, max: 8},
+    [LEAD]: {min: 6, max: 14}
+}
 
 export const prettyPrint = (grade, useModifier = true) => {
     let str = '';
@@ -21,6 +28,10 @@ export const prettyPrint = (grade, useModifier = true) => {
 
     return str;
 };
+
+export const printModifier = (modifier) => modifier ? modifier : 'Even';
+
+export const countPartials = (partials = {}) => Object.values(partials).reduce(sum, 0);
 
 export const printType = (type) => {
     switch (type) {

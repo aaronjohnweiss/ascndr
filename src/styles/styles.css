@@ -47,6 +47,14 @@
     margin-bottom: 0.5em;
 }
 
+.slider-row {
+    margin-bottom: 0;
+}
+
+.grade-modal-label {
+    font-weight: 500;
+}
+
 .plus-minus-button {
     float: right;
     width: 38px;

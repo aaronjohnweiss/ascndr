@@ -1,9 +1,8 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Button, Col, Container, Row } from 'react-bootstrap'
-import { compareGrades, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
+import { compareGrades, countPartials, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
 import GradeModal from '../components/GradeModal'
-import ListModal from '../components/ListModal'
 import { Link } from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import { sessionDuration } from '../helpers/durationUtils'
@@ -11,6 +10,8 @@ import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
 import SessionModal from '../components/SessionModal';
 import { getGymsForUser } from '../helpers/filterUtils';
+import { sum } from '../helpers/sum';
+import CustomRouteModal from '../components/CustomRouteModal';
 
 class SessionPage extends Component {
     constructor(props) {
@@ -39,68 +40,66 @@ class SessionPage extends Component {
         this.setState({ [name]: false })
     }
 
-    addStandardRoute = (grade) => {
+    addRoute = (type, key, percentage, keyEquals = (a, b) => a === b) => {
         const session = Object.assign({}, this.props.session)
 
-        const route = session.standardRoutes.find(rt => gradeEquals(rt.key, grade))
+        const route = session[type].find(rt => keyEquals(rt.key, key))
 
-        if (route) {
-            route.count += 1
+        if (percentage && percentage < 100) {
+            if (route) {
+                const partials = route.partials || {};
+                const newCount = (partials[percentage] || 0) + 1;
+                route.partials = {...partials, [percentage]: newCount}
+            } else {
+                session[type].push({
+                    key: key,
+                    partials: {[percentage]: 1}
+                })
+            }
         } else {
-            session.standardRoutes.push({
-                key: grade,
-                count: 1
-            })
+            if (route) {
+                route.count = (route.count || 0) + 1;
+            } else {
+                session[type].push({
+                    key: key,
+                    count: 1
+                })
+            }
         }
 
         this.updateSession(session)
-        this.hideModal('standardRoutes')
+        this.hideModal(type)
     }
 
-    removeStandardRoute = (grade) => {
+    removeRoute = (type, key, keyEquals = (a, b) => a === b) => {
         const session = Object.assign({}, this.props.session)
 
-        const routeIndex = session.standardRoutes.findIndex(rt => gradeEquals(rt.key, grade))
+        const routeIndex = session[type].findIndex(rt => keyEquals(rt.key, key))
 
-        if (routeIndex > -1 && session.standardRoutes[routeIndex].count > 1) {
-            session.standardRoutes[routeIndex].count -= 1
+        if (routeIndex > -1 && (session[type][routeIndex].count > 1 || session[type][routeIndex].partials)) {
+            session[[type]][routeIndex].count -= 1
         } else if (routeIndex > -1) {
-            session.standardRoutes.splice(routeIndex, 1)
+            session[type].splice(routeIndex, 1)
         }
 
         this.updateSession(session)
     }
 
-    addCustomRoute = (key) => {
-        const session = Object.assign({}, this.props.session)
-
-        const route = session.customRoutes.find(rt => rt.key === key)
-
-        if (route) {
-            route.count += 1
-        } else {
-            session.customRoutes.push({
-                key: key,
-                count: 1
-            })
-        }
-
-        this.updateSession(session)
-        this.hideModal('customRoutes')
+    addStandardRoute = ({percentage, ...key}) => {
+        this.addRoute('standardRoutes', key, percentage, (a, b) => gradeEquals(a, b))
     }
 
-    removeCustomRoute = (key) => {
-        const session = Object.assign({}, this.props.session);
+    removeStandardRoute = (key) => {
+        this.removeRoute('standardRoutes', key, (a, b) => gradeEquals(a, b));
+    }
 
-        const routeIndex = session.customRoutes.findIndex(rt => rt.key === key);
+    addCustomRoute = ({key, percentage}) => {
+        console.log(key, percentage);
+        this.addRoute('customRoutes', key, percentage);
+    }
 
-        if (routeIndex > -1 && session.customRoutes[routeIndex].count > 1) {
-            session.customRoutes[routeIndex].count -= 1;
-        } else if (routeIndex > -1) {
-            session.customRoutes.splice(routeIndex, 1);
-        }
-
-        this.updateSession(session);
+    removeCustomRoute = ({key}) => {
+        this.removeRoute('customRoutes', key);
     }
 
     endSession() {
@@ -122,10 +121,10 @@ class SessionPage extends Component {
         if (!session.standardRoutes) session.standardRoutes = []
 
         // Convert to maps for easier consumption
-        const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({ ...acc, [entry.key]: entry.count }), {})
+        const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({ ...acc, [entry.key]: entry }), {})
         const standardRoutesMap = session.standardRoutes.reduce((acc, entry) => ({
             ...acc,
-            [prettyPrint(entry.key)]: entry.count
+            [prettyPrint(entry.key)]: entry
         }), {})
 
         // Filter to only routes for this session
@@ -142,16 +141,10 @@ class SessionPage extends Component {
 
         const routesForGym = this.props.routes.filter(route => route.value.gymId === gym.key && !route.value.isRetired)
 
-        const customModal = <ListModal show={this.state.customRoutes}
+        const customModal = <CustomRouteModal show={this.state.customRoutes}
                                        handleClose={() => this.hideModal('customRoutes')}
                                        handleSubmit={this.addCustomRoute}
-                                       title='Add custom route'
-                                       listContent={
-                                           routesForGym.map(route => ({
-                                               id: route.key,
-                                               label: route.value.name
-                                           }))
-                                       }
+                                       customRoutes={routesForGym}
         />
 
         const standardModal = <GradeModal show={this.state.standardRoutes}
@@ -200,8 +193,11 @@ class SessionPage extends Component {
                         {grades && grades.length ? grades.map(grade => {
                             const gradeLabel = prettyPrint(grade)
                             const customRoutesForGrade = routesForSession.filter(route => gradeEquals(route.value.grade, grade))
-                            const standardCountForGrade = standardRoutesMap[gradeLabel] || 0
-                            const countForGrade = customRoutesForGrade.reduce((acc, route) => acc + (customRoutesMap[route.key] || 0), 0) + standardCountForGrade
+                            const standardRoutesForGrade = standardRoutesMap[gradeLabel] || {};
+                            const standardCountForGrade = standardRoutesForGrade.count || 0;
+                            const partialsForGrade = standardRoutesForGrade.partials || {};
+                            const countForGrade = customRoutesForGrade.map(route => customRoutesMap[route.key].count || 0).reduce(sum, 0) + standardCountForGrade
+                            const partialCountForGrade = countPartials(partialsForGrade) + customRoutesForGrade.map(route => customRoutesMap[route.key].partials || {}).map(partials => countPartials(partials)).reduce(sum, 0);
                             return (
                                 <div key={gradeLabel}>
                                     <Row className='align-items-center session-grade-row' key={gradeLabel} >
@@ -215,13 +211,18 @@ class SessionPage extends Component {
                                     {customRoutesForGrade.map(route => (
                                         <Row className='align-items-center session-grade-row' key={route.key}>
                                             <Col xs={6}>
-                                                {route.value.name} ({customRoutesMap[route.key]})
+                                                {route.value.name} ({customRoutesMap[route.key].count || 0})
                                             </Col>
                                             <Col>
-                                                {addRouteButton(route.key, true)} {removeRouteButton(route.key, true)}
+                                                {addRouteButton({key: route.key}, true)} {customRoutesMap[route.key].count > 0 && removeRouteButton({key: route.key}, true)}
                                             </Col>
                                         </Row>
                                     ))}
+                                    {partialCountForGrade > 0 &&
+                                        <Row className='align-items-center session-grade-row' key={gradeLabel + '-partials'}>
+                                            <Col>Partial completions: {partialCountForGrade}</Col>
+                                        </Row>
+                                    }
                                 </div>
                             )
                         }) : <p>No routes in this session</p>}
