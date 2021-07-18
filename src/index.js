@@ -9,6 +9,7 @@ import { reactReduxFirebase } from 'react-redux-firebase'
 import rootReducer from './redux/reducer'
 import thunkMiddleware from 'redux-thunk'
 import 'firebase/database'
+import * as serviceWorker from './serviceWorker'
 
 const createStoreWithFirebase = reactReduxFirebase(firebase, {})(createStore)
 
@@ -20,3 +21,5 @@ ReactDOM.render(
     </Provider>,
     document.getElementById('root')
 )
+
+serviceWorker.register();
