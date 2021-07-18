@@ -5,7 +5,9 @@
   },
   "headers": {
     "/**": {
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
+      "Strict-Transport-Security": "max-age=86400"
     }
-  }
+  },
+  "https_only": true
 }
