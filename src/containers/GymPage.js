@@ -9,8 +9,8 @@ import { gymFields } from '../templates/gymFields'
 import { Link } from 'react-router-dom'
 import { sessionDuration } from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
-import axios from 'axios'
 import { getRoutesForGym, getSessionsForUserAndGym } from '../helpers/filterUtils';
+import { PENDING_IMAGE, uploadImage } from './RoutePage';
 
 class GymPage extends Component {
     constructor(props) {
@@ -35,28 +35,12 @@ class GymPage extends Component {
 
     handleNewRoute(route) {
         if (route && route.picture) {
-            // console.log(typeof route.picture)
-            // Post to imgur
-            const pictureData = new FormData()
-            pictureData.set('album', process.env.REACT_APP_ALBUM_ID)
-            pictureData.append('image', route.picture)
-            const headers = {
-                'Authorization': 'Client-ID ' + process.env.REACT_APP_CLIENT_ID,
-                'Content-Type': 'multipart/form-data'
-            }
-
-            axios.post('https://api.imgur.com/3/image', pictureData, { headers: headers })
-                .then(resp => {
-                    this.props.firebase.push('routes', {
-                        ...route,
-                        picture: resp.data.data.link,
-                        gymId: this.props.match.params.id
-                    })
-                    this.hideModal('showAddRouteModal')()
-                })
+            this.hideModal('showAddRouteModal')();
+            // Push route with picture pending; after imgur upload, update route with image link
+            this.props.firebase.push('routes', { ...route, picture: PENDING_IMAGE, gymId: this.props.match.params.id })
+                .then(routeRef => uploadImage(routeRef, route.picture))
                 .catch(err => {
-                    if (err.response) console.log(err.response)
-                    else console.log(err)
+                    console.log(err);
                 })
         } else {
             this.props.firebase.push('routes', { ...route, gymId: this.props.match.params.id })

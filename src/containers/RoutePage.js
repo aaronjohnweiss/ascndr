@@ -10,6 +10,30 @@ import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { prettyPrint } from '../helpers/gradeUtils'
 
+export const PENDING_IMAGE = 'PENDING';
+export const FAILED_IMAGE = 'FAILED';
+
+export const uploadImage = (routeRef, picture) => {
+    // Post to imgur
+    const pictureData = new FormData()
+    pictureData.set('album', process.env.REACT_APP_ALBUM_ID)
+    pictureData.append('image', picture)
+    const headers = {
+        'Authorization': 'Client-ID ' + process.env.REACT_APP_CLIENT_ID,
+        'Content-Type': 'multipart/form-data'
+    }
+
+    axios.post('https://api.imgur.com/3/image', pictureData, {headers: headers})
+        .then(resp => {
+            routeRef.update({picture: resp.data.data.link});
+        })
+        .catch(err => {
+            if (err && err.response) console.log(err.response);
+            else console.log(err);
+            routeRef.update({picture: FAILED_IMAGE});
+        });
+}
+
 class RoutePage extends Component {
 
     constructor(props) {
@@ -53,26 +77,16 @@ class RoutePage extends Component {
 
     handleEditedRoute(route) {
         if (route && route.picture && route.picture instanceof File) {
-            // Post to imgur
-            const pictureData = new FormData()
-            pictureData.set('album', process.env.REACT_APP_ALBUM_ID)
-            pictureData.append('image', route.picture)
-            const headers = {
-                'Authorization': 'Client-ID ' + process.env.REACT_APP_CLIENT_ID,
-                'Content-Type': 'multipart/form-data'
-            }
 
-            axios.post('https://api.imgur.com/3/image', pictureData, { headers: headers })
-                .then(resp => {
-                    this.props.firebase.update(`routes/${this.props.match.params.id}`, {
-                        ...route,
-                        picture: resp.data.data.link,
-                    })
-                    this.hideModal()
-                })
+
+            this.hideModal()
+            this.props.firebase.update(`routes/${this.props.match.params.id}`, {
+                ...route,
+                picture: PENDING_IMAGE,
+            })
+                .then(routeRef => uploadImage(routeRef, route.picture))
                 .catch(err => {
-                    if (err && err.response) console.log(err.response)
-                    else console.log(err)
+                    console.log(err);
                 })
         } else {
             this.updateRoute({ ...route })
@@ -96,6 +110,16 @@ class RoutePage extends Component {
                          title='Edit route'
                          initialValues={{ ...route }}/>
 
+        let RouteImageComponent;
+        if (route.picture === FAILED_IMAGE) {
+            RouteImageComponent = <p>(Image upload failed)</p>;
+        } else if (route.picture === PENDING_IMAGE) {
+            RouteImageComponent = <p>(Image upload in progress)</p>
+        } else {
+            RouteImageComponent = <img className='img-fluid' alt='' style={{transform: `rotate(${this.state.rotation}deg)`}}
+                              src={route.picture} onClick={this.handleRotate} />;
+        }
+
         return (
             <Container>
                 <Row>
@@ -117,8 +141,7 @@ class RoutePage extends Component {
                             <small>({route.color})</small>
                         </h3>
                         {route.isRetired && <h4>Retired</h4>}
-                        <img className='img-fluid' alt='' style={{ transform: `rotate(${this.state.rotation}deg)` }}
-                             src={route.picture} onClick={this.handleRotate}/>
+                        {RouteImageComponent}
                         <p>{route.description}</p>
                         {!route.isRetired && (
                             <ConfirmCancelButton handleConfirm={this.retireRoute}
