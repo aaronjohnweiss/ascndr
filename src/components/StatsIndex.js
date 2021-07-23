@@ -28,7 +28,7 @@ export const StatItem = ({label, value, link}) => {
 const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes) => [
     ...customRoutes.filter(customRoute => allowedTypes.includes(routes[customRoute.key].grade.style)),
     ...standardRoutes.filter(standardRoute => allowedTypes.includes(standardRoute.key.style))
-].map(route => route.count).reduce(sum, 0);
+].map(route => route.count || 0).reduce(sum, 0);
 
 const heightForSession = (session, routes, gym = {}, allowedTypes = []) =>
     allowedTypes.map(type => {
