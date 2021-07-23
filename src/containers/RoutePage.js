@@ -80,11 +80,8 @@ class RoutePage extends Component {
 
 
             this.hideModal()
-            this.props.firebase.update(`routes/${this.props.match.params.id}`, {
-                ...route,
-                picture: PENDING_IMAGE,
-            })
-                .then(routeRef => uploadImage(routeRef, route.picture))
+            this.props.firebase.update(`routes/${this.props.match.params.id}`, {...route, picture: PENDING_IMAGE})
+                .then(() => uploadImage(this.props.firebase.ref(`routes/${this.props.match.params.id}`), route.picture))
                 .catch(err => {
                     console.log(err);
                 })
