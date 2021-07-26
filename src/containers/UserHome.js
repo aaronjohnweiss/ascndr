@@ -28,14 +28,14 @@ const UserHome = ({auth: {uid}, gyms, sessions, routes, users}) => {
                 <SessionCard session={latestSession} gym={gym} user={user} routes={routes} />
             </>
             }
-            <Link to="/gyms">
-                <Button block style={{marginBottom: '4px'}}>Your Gyms</Button>
+            <Link to="/gyms" className="d-grid d-block">
+                <Button style={{marginBottom: '4px'}}>Your Gyms</Button>
             </Link>
-            <Link to="/groups">
-                <Button block style={{marginBottom: '4px'}}>Your User</Button>
+            <Link to="/groups" className="d-grid d-block">
+                <Button style={{marginBottom: '4px'}}>Your User</Button>
             </Link>
-            <Link to={`/stats?uids=${uid}`}>
-                <Button block>Your Stats</Button>
+            <Link to={`/stats?uids=${uid}`} className="d-grid d-block mb-4">
+                <Button>Your Stats</Button>
             </Link>
         </>
     )

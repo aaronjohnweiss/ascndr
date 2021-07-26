@@ -44,7 +44,7 @@ const SessionModal = ({session, gyms, onChange, buttonProps}) => {
                         <Form.Label>Gym</Form.Label>
                         <Form.Control as='select' defaultValue={session.gymId} onChange={evt => updateSession('gymId')(evt.target.value)}>
                             {
-                                gyms.map((gym, idx) => <option key={idx} value={gym.key}>{gym.value.name}</option>)
+                                gyms.map((gym, idx) => <option key={idx} value={gym.key} className="text-truncate">{gym.value.name + " - " + gym.value.location}</option>)
                             }
                         </Form.Control>
                         <Form.Label>Start Time</Form.Label>

@@ -15,14 +15,16 @@ export default class ConfirmCancelButton extends Component {
     }
 
     render() {
-        const { handleConfirm, modalTitle, modalBody, buttonText, buttonProps } = this.props
+        const { handleConfirm, modalTitle, modalBody, buttonText, buttonProps, buttonBlock } = this.props
         const { showModal } = this.state
 
         return (
             <Fragment>
-                <Button variant='danger' {...buttonProps} onClick={this.showModal}>
-                    {buttonText}
-                </Button>
+                <div className={buttonBlock ? "d-grid d-block" : ""}>
+                    <Button variant='danger' {...buttonProps} onClick={this.showModal}>
+                        {buttonText}
+                    </Button>
+                </div>
                 <Modal show={showModal} onHide={this.hideModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>

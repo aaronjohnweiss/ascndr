@@ -10,8 +10,8 @@ const GenericHome = () => {
             <p>Welcome to ASCNDr. This is a small application designed to help record indoor climbing routes and
                 sessions.</p>
             <Features />
-            <Link to={'/login'}>
-                <Button block>Get Started</Button>
+            <Link to={'/login'} className="d-grid d-block mb-4">
+                <Button>Get Started</Button>
             </Link>
             <br />
         </>

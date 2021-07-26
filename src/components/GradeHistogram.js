@@ -152,10 +152,10 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, a
                     </Col>
                 </Row>
                 <Row>
-                    <Col sm={{span: 6, offset: 3}}>
+                    <Col sm={{span: 6, offset: 3}} className="d-grid d-block">
                         {maxDate ?
-                            <Button block onClick={() => setMaxDate(undefined)}>Stop</Button> :
-                            <Button block onClick={() => setMaxDate(firstDate)}>Play</Button>
+                            <Button onClick={() => setMaxDate(undefined)}>Stop</Button> :
+                            <Button onClick={() => setMaxDate(firstDate)}>Play</Button>
                         }
                     </Col>
                 </Row>

@@ -198,9 +198,9 @@ class SessionPage extends Component {
                                 </Col>
                             }
                         </Row>
-                        <h4>
-                            <small>{date} in {gym.value.location} {isFinished && ` for ${sessionDuration(session)}`}</small>
-                        </h4>
+                        <h5 className="fw-normal mb-3">
+                            {date} in {gym.value.location} {isFinished && ` for ${sessionDuration(session)}`}
+                        </h5>
                         <h3>Routes</h3>
                         {grades && grades.length ? grades.map(grade => {
                             const gradeLabel = prettyPrint(grade)
@@ -247,14 +247,14 @@ class SessionPage extends Component {
                         {canEdit &&
                         <>
                             <Row>
-                                <Col xs={6}>
-                                    <Button variant="primary" block={true}
+                                <Col xs={6} className="d-grid d-block">
+                                    <Button variant="primary"
                                             onClick={() => this.showModal('standardRoutes')}>
                                         Add generic
                                     </Button>
                                 </Col>
-                                <Col xs={6}>
-                                    <Button variant="primary" block={true} disabled={!routesForGym.length}
+                                <Col xs={6} className="d-grid d-block">
+                                    <Button variant="primary" disabled={!routesForGym.length}
                                             onClick={() => this.showModal('customRoutes')}>
                                         Add custom
                                     </Button>
@@ -266,7 +266,9 @@ class SessionPage extends Component {
                                     <ConfirmCancelButton handleConfirm={this.endSession}
                                                          modalTitle="End session?"
                                                          buttonText="End session"
-                                                         buttonProps={{variant: 'danger', block: true}} />
+                                                         buttonProps={{variant: 'danger'}}
+                                                         buttonBlock={true}
+                                    />
                                 </Col>
                             </Row>
                             }

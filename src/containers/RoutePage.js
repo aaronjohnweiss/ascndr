@@ -145,7 +145,8 @@ class RoutePage extends Component {
                                                  modalTitle='Retire route?'
                                                  modalBody='Retiring this route will prevent it from being added to any sessions.'
                                                  buttonText='Retire route'
-                                                 buttonProps={{ variant: 'danger', block: true }}/>
+                                                 buttonProps={{ variant: 'danger'}}
+                                                 buttonBlock={true} />
                         )}
                         {this.state.showModal && renderEditModal()}
                     </Col>
