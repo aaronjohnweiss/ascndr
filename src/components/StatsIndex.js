@@ -55,8 +55,8 @@ const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes,
     const totalDistance = numSessions && sessionValues.map(session => heightForSession(session, routes, gyms[session.gymId], allowedTypes, allowPartials)).reduce(sum);
     // Figure out max grades by type
     const maxGrades = sessionValues.flatMap(({customRoutes = [], standardRoutes = []}) => {
-        // Get all grades climbed within the session
-        return [...customRoutes.map(customRoute => routes[customRoute.key].grade), ...standardRoutes.map(standardRoute => standardRoute.key)]
+        // Get all grades climbed within the session (for the summary view, only do full completions)
+        return [...customRoutes.filter(route => routeCount(route, false) > 0).map(customRoute => routes[customRoute.key].grade), ...standardRoutes.filter(route => routeCount(route, false) > 0).map(standardRoute => standardRoute.key)]
     }).reduce((obj, grade) => {
         if (allowedTypes.includes(grade.style)) {
             // Keep running max for each style
