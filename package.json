@@ -18,7 +18,7 @@
     "redux": "^4.0.1",
     "redux-devtools": "^3.5.0",
     "redux-thunk": "^2.3.0",
-    "victory": "^33.1.7"
+    "victory": "^35.9.3"
   },
   "scripts": {
     "start": "react-scripts start",
