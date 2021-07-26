@@ -3,7 +3,6 @@ import { Button, Form, Modal } from 'react-bootstrap'
 import InputSlider from './InputSlider';
 
 const CustomRouteModal = ({ handleClose, handleSubmit, show, customRoutes = [], allowPartial = true}) => {
-    console.log(customRoutes);
     const [selected, setSelected] = useState(undefined);
     const [percentage, setPercentage] = useState(100);
     const submitDisabled = selected === undefined || percentage <= 0;
