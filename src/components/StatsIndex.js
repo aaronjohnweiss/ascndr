@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { durationString } from '../helpers/durationUtils';
 import { filtersLink } from '../containers/StatFilters';
 import { sum } from '../helpers/sum';
+import { PARTIAL_MAX } from './GradeModal';
 
 export const StatItem = ({label, value, link}) => {
     const itemProps = link ? {action: true, href: link} : {};
@@ -25,19 +26,23 @@ export const StatItem = ({label, value, link}) => {
     )
 };
 
-const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes) => [
+export const partialRouteCount = route => route.partials && Object.entries(route.partials).map(([key, val]) => key * val / PARTIAL_MAX).reduce(sum, 0) || 0;
+
+export const routeCount = (route, allowPartials = false) => (route.count || 0) + + (allowPartials && partialRouteCount(route));
+
+const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes, allowPartials = false) => [
     ...customRoutes.filter(customRoute => allowedTypes.includes(routes[customRoute.key].grade.style)),
     ...standardRoutes.filter(standardRoute => allowedTypes.includes(standardRoute.key.style))
-].map(route => route.count || 0).reduce(sum, 0);
+].map(route => routeCount(route, allowPartials)).reduce(sum, 0);
 
-const heightForSession = (session, routes, gym = {}, allowedTypes = []) =>
+const heightForSession = (session, routes, gym = {}, allowedTypes = [], allowPartials = false) =>
     allowedTypes.map(type => {
-        const count = routeCountForSession(session, routes, [type]);
+        const count = routeCountForSession(session, routes, [type], allowPartials);
         const height = gym[`${type}_HEIGHT`] || 0;
         return count * height;
     }).reduce(sum, 0);
 
-const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}) => {
+const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes, allowPartials}) => {
     const location = useLocation();
     const filterParams = location.search;
 
@@ -46,8 +51,8 @@ const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes}
     const numSessions = sessionValues.length;
     // Figure out total time; for each session do (end - start) but if end doesn't exist (ongoing session) do (now - start)
     const totalTime = numSessions && sessionValues.map(({startTime, endTime = new Date().getTime()}) => endTime - startTime).reduce(sum);
-    const totalRoutes = numSessions && sessionValues.map(session => routeCountForSession(session, routes, allowedTypes)).reduce(sum);
-    const totalDistance = numSessions && sessionValues.map(session => heightForSession(session, routes, gyms[session.gymId], allowedTypes)).reduce(sum);
+    const totalRoutes = numSessions && sessionValues.map(session => routeCountForSession(session, routes, allowedTypes, allowPartials)).reduce(sum);
+    const totalDistance = numSessions && sessionValues.map(session => heightForSession(session, routes, gyms[session.gymId], allowedTypes, allowPartials)).reduce(sum);
     // Figure out max grades by type
     const maxGrades = sessionValues.flatMap(({customRoutes = [], standardRoutes = []}) => {
         // Get all grades climbed within the session
