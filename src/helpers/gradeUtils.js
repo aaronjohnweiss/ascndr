@@ -51,34 +51,20 @@ export const compareGrades = (g1, g2, useModifier = true) => {
     if (!g2) return 1;
     // First sort between toprope/boulder/lead
     if (g1.style !== g2.style) {
-
-        // toprope > boulder > lead
-        if (g1.style === TOP_ROPE) return 1;
-        if (g2.style === TOP_ROPE) return -1;
-
-        if (g1.style === BOULDER) return 1;
-        if (g2.style === BOULDER) return -1;
-
-        if (g1.style === LEAD) return -1;
-        if (g2.style === LEAD) return 1;
-
-        return -1;
+        return ALL_STYLES.indexOf(g2.style) - ALL_STYLES.indexOf(g1.style)
     }
 
     // Sort by difficulty
     const g1Difficulty = Number(g1.difficulty);
     const g2Difficulty = Number(g2.difficulty);
 
-    if (g1Difficulty > g2Difficulty) return 1;
-    if (g2Difficulty > g1Difficulty) return -1;
+    if (g1Difficulty !== g2Difficulty) {
+        return g1Difficulty - g2Difficulty;
+    }
 
     // Sort last by any suffix
     if (useModifier) {
-        if (g1.modifier === '+' && g2.modifier !== '+') return 1;
-        if (g1.modifier !== '-' && g2.modifier === '-') return 1;
-
-        if (g2.modifier === '+' && g1.modifier !== '+') return -1;
-        if (g2.modifier !== '-' && g1.modifier === '-') return -1;
+        return ALL_MODIFIERS.indexOf(g1.modifier || null) - ALL_MODIFIERS.indexOf(g2.modifier || null);
     }
 
     return 0;
