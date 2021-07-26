@@ -1,6 +1,6 @@
 import React, { Fragment } from 'react'
 import { compareGrades, prettyPrint, printType } from '../helpers/gradeUtils'
-import { Accordion, Card, ListGroup } from 'react-bootstrap';
+import { Accordion, ListGroup } from 'react-bootstrap';
 import { toArray } from '../helpers/objectConverters';
 import { StatItem } from './StatsIndex';
 import { sortHiatuses } from './HiatusModal';
@@ -31,14 +31,14 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
                 // First one (most recent) will default to open, rest will default to closed
                 components.push(
                     <Accordion key={i} defaultActiveKey={'0'}>
-                    <Card>
-                        <Accordion.Toggle as={Card.Header} eventKey={`${components.length}`}>
-                            {headerString}
-                        </Accordion.Toggle>
-                        <Accordion.Collapse eventKey={`${components.length}`}>
-                            <Card.Body>{progression}</Card.Body>
-                        </Accordion.Collapse>
-                    </Card>
+                        <Accordion.Item eventKey={`${components.length}`}>
+                            <Accordion.Header >
+                                {headerString}
+                            </Accordion.Header>
+                            <Accordion.Body>
+                                {progression}
+                            </Accordion.Body>
+                        </Accordion.Item>
                     </Accordion>
                 );
             }
