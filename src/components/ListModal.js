@@ -14,8 +14,9 @@ export default class ListModal extends Component {
 
     render() {
         const { handleClose, handleSubmit, show, title, listContent, renderSubmitButtons } = this.props
+        const { selected } = this.state;
 
-        const submitDisabled = this.state.selected === undefined
+        const submitDisabled = selected === undefined
         const submitComponent = renderSubmitButtons ? renderSubmitButtons(submitDisabled, this.state.selected) : (
             <Button variant="primary" disabled={submitDisabled} onClick={() => handleSubmit(this.state.selected)}>
                 Confirm
@@ -36,6 +37,7 @@ export default class ListModal extends Component {
                                 key={listItem.id}
                             >
                                 <Form.Check.Input type='radio'
+                                                  checked={selected === listItem.id}
                                                   onChange={() => this.onChange(listItem.id)}
                                 />
                                 <Form.Check.Label>{listItem.label}</Form.Check.Label>

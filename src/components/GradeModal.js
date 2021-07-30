@@ -11,6 +11,8 @@ import {
 import { Button, Form, Modal } from 'react-bootstrap'
 import InputSlider from './InputSlider';
 
+export const PARTIAL_MAX = 100;
+
 const GradeModal = ({defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, title, allowPartial = true}) => {
 
     const [style, setStyle] = useState(defaultStyle);
@@ -19,7 +21,7 @@ const GradeModal = ({defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, t
 
     const [modifier, setModifier] = useState(null);
 
-    const [percentage, setPercentage] = useState(100);
+    const [percentage, setPercentage] = useState(PARTIAL_MAX);
 
     const submitDisabled = percentage <= 0;
 
@@ -82,7 +84,7 @@ const GradeModal = ({defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, t
                     {allowPartial && (
                         <>
                             <Form.Label className='grade-modal-label'>Progress</Form.Label>
-                            <InputSlider min={0} max={100} step={25} value={percentage} onChange={setPercentage}
+                            <InputSlider min={0} max={PARTIAL_MAX} step={PARTIAL_MAX/4} value={percentage} onChange={setPercentage}
                                          toString={p => `${p}%`} minLabelWidth='4.5em' />
                         </>
                     )}

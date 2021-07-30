@@ -4,11 +4,11 @@
   "private": true,
   "dependencies": {
     "axios": "^0.18.0",
-    "bootstrap": "^4.3.1",
+    "bootstrap": "^5.0.2",
     "firebase": "^5.8.6",
     "moment": "^2.24.0",
-    "react": "^16.8.3",
-    "react-bootstrap": "^1.6.0",
+    "react": "^16.14.0",
+    "react-bootstrap": "^2.0.0-beta.4",
     "react-dom": "^16.8.3",
     "react-icons": "^3.5.0",
     "react-redux": "5.0.7",
@@ -18,7 +18,7 @@
     "redux": "^4.0.1",
     "redux-devtools": "^3.5.0",
     "redux-thunk": "^2.3.0",
-    "victory": "^33.1.7"
+    "victory": "^35.9.3"
   },
   "scripts": {
     "start": "react-scripts start",

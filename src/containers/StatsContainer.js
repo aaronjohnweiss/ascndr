@@ -26,6 +26,8 @@ const StatsHeader = ({location}) => (
     </>
 );
 
+export const getBooleanFromQuery = (query, name, valueIfMissing = false) => query.has(name) ? query.get(name) === 'true' : valueIfMissing;
+
 const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
@@ -69,11 +71,8 @@ const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
         filterProps.allowedTypes = ALL_STYLES;
     }
 
-    if (query.has('allowSuffixes')) {
-        filterProps.allowSuffixes = query.get('allowSuffixes') === 'true';
-    } else {
-        filterProps.allowSuffixes = false;
-    }
+    filterProps.allowSuffixes = getBooleanFromQuery(query, 'allowSuffixes');
+    filterProps.allowPartials = getBooleanFromQuery(query, 'allowPartials', true);
 
     return (
         <Switch>

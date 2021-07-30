@@ -3,7 +3,7 @@ import GymIndex from './containers/GymIndex'
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
 import GymPage from './containers/GymPage'
 import Home from './containers/Home'
-import { Col, Container, Jumbotron } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
 import './styles/styles.css'
 import RoutePage from './containers/RoutePage'
 import SessionPage from './containers/SessionPage'
@@ -39,20 +39,18 @@ class App extends Component {
             <Router>
                 <div className="App">
 
-                    <Jumbotron fluid>
-                        <Container>
+                        <Container fluid className="jumbotron pt-4 mb-4">
                             <Link to='/' style={{ textDecoration: 'none', color: 'white' }}>
-                                <h1 className='text-center'>ASCNDr</h1>
+                                <h1 className='text-center display-2'>ASCNDr</h1>
                             </Link>
-                            <Col>
-                                <ul className="nav justify-content-end">
+                            <div className="px-2">
+                                <p className="nav justify-content-end">
                                     {authState}
-                                </ul>
-                            </Col>
+                                </p>
+                            </div>
                         </Container>
-                    </Jumbotron>
                     <Container>
-                        <Col>
+                        <div className="px-2">
                             <Route exact path='/' component={Home}/>
                             <Route exact path='/groups' component={requireAuth(GroupIndex)}/>
                             <Route exact path='/groups/:id' component={requireAuth(GroupPage)}/>
@@ -62,7 +60,7 @@ class App extends Component {
                             <Route exact path='/sessions/:id' component={requireAuth(SessionPage)}/>
                             <Route path='/stats' component={requireAuth(StatsPage)}/>
                             <Route exact path='/login' component={denyAuth(SignIn)}/>
-                        </Col>
+                        </div>
                     </Container>
                 </div>
             </Router>

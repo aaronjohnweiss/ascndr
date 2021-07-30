@@ -3,22 +3,25 @@ import { compareGrades, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
 import ReactiveBarGraph from './ReactiveBarGraph';
 import moment from 'moment';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import { partialRouteCount, routeCount } from './StatsIndex';
 
-const addCount = (arr, key, count, allowSuffixes) => {
+const addCount = (arr, key, count, partialCount, allowSuffixes) => {
     const entry = arr.find(val => gradeEquals(val.key, key, allowSuffixes));
     if (entry) {
         entry.count += count;
+        entry.partialCount += partialCount;
     } else {
-        arr.push({key, count});
+        arr.push({key, count, partialCount});
     }
 };
 
 const ANIMATION_INTERVAL = 1000;
 const MAX_ANIMATION_DURATION = 10000;
 
-function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixes) {
+function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixes, allowPartials) {
     // Maintain list of all grades for the x axis labels
     const allGrades = [];
+    let maxValue = 0;
 
     // Aggregate session data for each user
     const data = users.map(({uid, name}) => {
@@ -32,7 +35,7 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
                     const grade = routes[customRoute.key].grade;
 
                     if (allowedTypes.includes(grade.style)) {
-                        addCount(acc, grade, customRoute.count, allowSuffixes);
+                        addCount(acc, grade, routeCount(customRoute), allowPartials && partialRouteCount(customRoute), allowSuffixes);
                     }
                 });
             }
@@ -41,7 +44,7 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
             if (session.standardRoutes) {
                 session.standardRoutes.forEach(standardRoute => {
                     if (allowedTypes.includes(standardRoute.key.style)) {
-                        addCount(acc, standardRoute.key, standardRoute.count, allowSuffixes);
+                        addCount(acc, standardRoute.key, routeCount(standardRoute), allowPartials && partialRouteCount(standardRoute), allowSuffixes);
                     }
                 });
             }
@@ -50,10 +53,11 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
         }, []);
 
         // Add to list of all grades
-        countByGrade.forEach(({key}) => {
+        countByGrade.forEach(({key, count, partialCount}) => {
             if (!allGrades.find(val => gradeEquals(val, key, allowSuffixes))) {
                 allGrades.push(key);
             }
+            maxValue = Math.max(maxValue, count + partialCount);
         });
 
         return {uid, name, countByGrade};
@@ -65,17 +69,27 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
 
     const graphData = data.map(({name, countByGrade}) => {
 
-        const barData = sortedGrades.map(grade => {
+        const fullCompletions = [];
+        const partialCompletions = [];
+        const totalCompletions = {};
+
+        sortedGrades.forEach(grade => {
             const entry = countByGrade.find(val => gradeEquals(val.key, grade, allowSuffixes));
-            return {x: prettyPrint(grade, allowSuffixes), y: entry && entry.count || 0};
+            const x = prettyPrint(grade, allowSuffixes);
+            const fullCount = entry && entry.count || 0;
+            const partialCount = entry && entry.partialCount || 0;
+            const fullAndPartialCount = fullCount + partialCount;
+            fullCompletions.push({x, y: fullCount});
+            partialCompletions.push({x, y: partialCount});
+            totalCompletions[x] = fullAndPartialCount;
         });
 
-        return {name, barData};
+        return {name, barData: [fullCompletions, partialCompletions], barTotals: totalCompletions};
     });
-    return {categories, graphData};
+    return {categories, graphData, maxValue};
 }
 
-const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, canAnimate = true}) => {
+const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, allowPartials, canAnimate = true}) => {
     // Get session dates for animating
     const validUids = Object.keys(users);
     const sessionDates = Object.values(sessions).filter(session => validUids.includes(session.uid)).map(session => session.startTime).sort();
@@ -88,7 +102,7 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, c
     useEffect(
         () => {
             let interval;
-            const numMonths = Math.min(lastDate.diff(firstDate, 'months', false), 1);
+            const numMonths = Math.max(lastDate.diff(firstDate, 'months', false), 1);
             const animationInterval = Math.min(ANIMATION_INTERVAL, MAX_ANIMATION_DURATION / numMonths);
             if (maxDate) {
                 // At each interval tick, set max date range to the next month
@@ -114,21 +128,20 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, c
     // Use full graph data to get domain/range
     const {
         categories: allCategories,
-        graphData: fullGraphData
-    } = getGraphData(Object.values(users), Object.values(sessions), routes, allowedTypes, allowSuffixes);
-    const maxValue = Math.max(...fullGraphData.flatMap(({barData}) => barData).map(({y}) => y));
+        maxValue
+    } = getGraphData(Object.values(users), Object.values(sessions), routes, allowedTypes, allowSuffixes, allowPartials);
 
     const allowedSessions = maxDate ? Object.values(sessions).filter(session => moment(session.startTime).isBefore(maxDate)) : Object.values(sessions);
 
     // Calculate totals for each user
-    const {graphData} = getGraphData(Object.values(users), allowedSessions, routes, allowedTypes, allowSuffixes);
+    const {graphData} = getGraphData(Object.values(users), allowedSessions, routes, allowedTypes, allowSuffixes, allowPartials);
 
     return (
         <Container>
             <Row>
                 <Col xs={12}>
                     <ReactiveBarGraph data={graphData} categories={allCategories} maxDomain={{y: maxValue}}
-                                      animate={{duration: ANIMATION_INTERVAL / 4, onLoad: {duration: 0}}} showLegend={validUids.length > 1}/>
+                                      animate={{duration: ANIMATION_INTERVAL / 4, onLoad: {duration: 0}}} showLegend={validUids.length > 1} isStacked={allowPartials}/>
                 </Col>
             </Row>
             {canAnimate &&
@@ -139,10 +152,10 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, c
                     </Col>
                 </Row>
                 <Row>
-                    <Col sm={{span: 6, offset: 3}}>
+                    <Col sm={{span: 6, offset: 3}} className="d-grid d-block">
                         {maxDate ?
-                            <Button block onClick={() => setMaxDate(undefined)}>Stop</Button> :
-                            <Button block onClick={() => setMaxDate(firstDate)}>Play</Button>
+                            <Button onClick={() => setMaxDate(undefined)}>Stop</Button> :
+                            <Button onClick={() => setMaxDate(firstDate)}>Play</Button>
                         }
                     </Col>
                 </Row>

@@ -104,10 +104,11 @@ class GymIndex extends Component {
             <Fragment>
                 {gymsForGroups.map((gym) => <Gym gym={gym} key={gym.key} sessions={getSessionsForGym(sessionsForUser, gym)}/>)}
                 <br/>
-                <Button variant='primary' block={true} onClick={this.showGymModal}>
-                    Add Gym
-                </Button>
-
+                <div className="d-grid d-block mb-4">
+                    <Button variant='primary' onClick={this.showGymModal}>
+                        Add Gym
+                    </Button>
+                </div>
                 <EntityModal show={this.state.showGymModal}
                              handleClose={this.hideGymModal}
                              handleSubmit={this.transitionModals}

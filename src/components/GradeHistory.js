@@ -1,12 +1,12 @@
 import React, { Fragment } from 'react'
-import { compareGrades, prettyPrint, printType } from '../helpers/gradeUtils'
-import { Accordion, Card, ListGroup } from 'react-bootstrap';
+import { compareGrades, isPartial, prettyPrint, printType } from '../helpers/gradeUtils'
+import { Accordion, ListGroup } from 'react-bootstrap';
 import { toArray } from '../helpers/objectConverters';
 import { StatItem } from './StatsIndex';
 import { sortHiatuses } from './HiatusModal';
 import { dateString } from '../helpers/dateUtils';
 
-const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes) => {
+const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes, allowPartials) => {
     // Given hiatuses: Split up and section off data around the hiatuses
     if (hiatuses && hiatuses.length > 0) {
         const components = [];
@@ -17,7 +17,7 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
             const rangeEndDate = (i === 0) ? null : sortedHiatuses[i-1].startDate;
 
             const sessionsInRange = sessionsForUser.filter(session => (rangeStartDate === null || session.value.startTime >= rangeStartDate) && (rangeEndDate === null || session.value.startTime < rangeEndDate));
-            const progression = calculateProgression(sessionsInRange, routes, allowSuffixes, allowedTypes, 'h4');
+            const progression = calculateProgression(sessionsInRange, routes, allowSuffixes, allowedTypes, allowPartials, 'h4');
             if (progression.filter(entry => entry != null).length !== 0) {
                 let headerString;
                 if (rangeStartDate != null && rangeEndDate != null) {
@@ -31,14 +31,14 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
                 // First one (most recent) will default to open, rest will default to closed
                 components.push(
                     <Accordion key={i} defaultActiveKey={'0'}>
-                    <Card>
-                        <Accordion.Toggle as={Card.Header} eventKey={`${components.length}`}>
-                            {headerString}
-                        </Accordion.Toggle>
-                        <Accordion.Collapse eventKey={`${components.length}`}>
-                            <Card.Body>{progression}</Card.Body>
-                        </Accordion.Collapse>
-                    </Card>
+                        <Accordion.Item eventKey={`${components.length}`}>
+                            <Accordion.Header >
+                                {headerString}
+                            </Accordion.Header>
+                            <Accordion.Body>
+                                {progression}
+                            </Accordion.Body>
+                        </Accordion.Item>
                     </Accordion>
                 );
             }
@@ -47,29 +47,62 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
     }
 
     // No hiatuses: just show all data together
-    return calculateProgression(sessionsForUser, routes, allowSuffixes, allowedTypes)
+    return calculateProgression(sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials)
 }
 
-const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTypes, Header = 'h3') => {
+const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials, Header = 'h3') => {
     // For each style of climb...
     return allowedTypes.map((type, j) => {
         // Go through all sessions, oldest to newest
         const firsts = sessionsForUser.sort((a, b) => b.value.startTime - a.value.startTime)
             .reduce((arr, {key, value: {startTime, customRoutes = [], standardRoutes = []}}) => {
                 // Get all grades climbed in that session
-                const maxGrade = [...customRoutes.map(customRoute => routes[customRoute.key].grade), ...standardRoutes.map(standardRoute => standardRoute.key)]
+                let maxFullGrade = null;
+                let maxPartialGrade = null;
+
+                // Get the max difficulty for this session
+                [...customRoutes.map(({key, count, partials}) => ({grade: routes[key].grade, count, partials})), ...standardRoutes.map(({key, count, partials}) => ({grade: key, count, partials}))]
                     // Filter down to the current type
-                    .filter(grade => type === grade.style)
-                    // Get the max difficulty for this session
-                    .reduce((a, b) => compareGrades(a, b, allowSuffixes) > 0 ? a : b, undefined);
+                    .filter(route => type === route.grade.style)
+                    .forEach(({grade, count, partials}) => {
+                        if (count > 0) {
+                            // Keep track of max grade for full completions
+                            if (compareGrades(grade, maxFullGrade) > 0) {
+                                maxFullGrade = grade;
+                            }
+                        } else {
+                            if (partials && allowPartials) {
+                                // Make sure a valid partial climb was logged; find highest partial percentage for this grade
+                                const highestPercentage = Object.entries(partials).filter(([, val]) => val > 0).map(([key,]) => key).reduce((a, b) => Math.max(a, b), 0)
+                                if (highestPercentage > 0) {
+                                    // Keep track of max grade for partial completions
+                                    const partialGrade = {
+                                        ...grade,
+                                        percentage: highestPercentage
+                                    };
+
+                                    if (compareGrades(partialGrade, maxPartialGrade) > 0) {
+                                        maxPartialGrade = partialGrade;
+                                    }
+                                }
+                            }
+                        }
+                    });
 
                 // Max could be undefined if no routes of that style were climbed this session
-                if (maxGrade) {
-                    // Filter out other maxes that are more recent but not a higher grade
-                    arr = arr.filter(entry => compareGrades(entry.grade, maxGrade) > 0);
+                if (maxPartialGrade) {
+                    // Filter out other partial maxes that are more recent but not a higher grade
+                    arr = arr.filter(entry => !isPartial(entry.grade) || compareGrades(entry.grade, maxPartialGrade, allowSuffixes, allowPartials) > 0);
                     // Add this entry; include session key for linking
-                    arr.push({date: startTime, grade: maxGrade, key});
+                    arr.push({date: startTime, grade: maxPartialGrade, key});
                 }
+                if (maxFullGrade) {
+                    // Filter out other maxes that are more recent but not a higher grade
+                    arr = arr.filter(entry => compareGrades(entry.grade, maxFullGrade, allowSuffixes) > 0);
+                    // Add this entry; include session key for linking
+                    arr.push({date: startTime, grade: maxFullGrade, key});
+                }
+
                 return arr;
             }, []);
         // If there are no routes at all for this user/style return null to ignore it
@@ -82,7 +115,7 @@ const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTyp
                 <ListGroup>
                     {firsts.map(({date, grade, key}, k) => (
                         <StatItem key={k}
-                                  label={`${prettyPrint(grade, allowSuffixes)}: ${new Date(date).toDateString()}`}
+                                  label={`${prettyPrint(grade, allowSuffixes, allowPartials)}: ${new Date(date).toDateString()}`}
                                   link={`/sessions/${key}`} />
                     ))}
                 </ListGroup>
@@ -91,14 +124,14 @@ const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTyp
     });
 }
 
-const GradeHistory = ({users, routes, sessions, allowSuffixes, allowedTypes}) => {
+const GradeHistory = ({users, routes, sessions, allowSuffixes, allowedTypes, allowPartials}) => {
     const sessionsArray = toArray(sessions);
 
     // Build history per user
     return Object.values(users).map(({name, uid, hiatuses}, i) => {
         const sessionsForUser = sessionsArray.filter(session => session.value.uid === uid);
 
-        const firstsByType = calculateAllProgressions(sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes)
+        const firstsByType = calculateAllProgressions(sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes, allowPartials)
 
         // Show user name and their grade history
         return (

@@ -112,13 +112,14 @@ class SessionPage extends Component {
     }
 
     render() {
-        const { session, routes, gyms, groups } = this.props
+        const { auth: {uid}, session, routes, gyms, groups } = this.props
 
         if (!isLoaded(session, routes, gyms, groups)) return 'Loading'
         if (!session || !gyms) return 'Uh oh'
 
         if (!session.customRoutes) session.customRoutes = []
         if (!session.standardRoutes) session.standardRoutes = []
+
 
         // Convert to maps for easier consumption
         const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({ ...acc, [entry.key]: entry }), {})
@@ -138,6 +139,8 @@ class SessionPage extends Component {
         const date = new Date(session.startTime).toDateString()
 
         const isFinished = !!session.endTime;
+
+        const canEdit = uid === session.uid;
 
         const routesForGym = this.props.routes.filter(route => route.value.gymId === gym.key && !route.value.isRetired)
 
@@ -167,6 +170,15 @@ class SessionPage extends Component {
             </Button>
         }
 
+        const quickEditButtons = (count, key, isCustom) => {
+            return (
+                <>
+                    {addRouteButton(key, isCustom)}
+                    {count > 0 && removeRouteButton(key, isCustom)}
+                </>
+            )
+        }
+
         return (
             <Container>
                 <Row>
@@ -180,15 +192,15 @@ class SessionPage extends Component {
                                     Session at <Link to={`/gyms/${gym.key}`}>{gym.value.name}</Link>
                                 </h2>
                             </Col>
-                            {isFinished &&
+                            {isFinished && canEdit &&
                                 <Col xs={2}>
                                     <SessionModal session={session} gyms={getGymsForUser(gyms, groups, session.uid)} onChange={this.updateSession} buttonProps={{style: {float: 'right'}}}/>
                                 </Col>
                             }
                         </Row>
-                        <h4>
-                            <small>{date} in {gym.value.location} {isFinished && ` for ${sessionDuration(session)}`}</small>
-                        </h4>
+                        <h5 className="fw-normal mb-3">
+                            {date} in {gym.value.location} {isFinished && ` for ${sessionDuration(session)}`}
+                        </h5>
                         <h3>Routes</h3>
                         {grades && grades.length ? grades.map(grade => {
                             const gradeLabel = prettyPrint(grade)
@@ -201,21 +213,25 @@ class SessionPage extends Component {
                             return (
                                 <div key={gradeLabel}>
                                     <Row className='align-items-center session-grade-row' key={gradeLabel} >
-                                        <Col xs={6}>
+                                        <Col>
                                             <h5 className="session-grade-header">{gradeLabel} ({countForGrade})</h5>
                                         </Col>
-                                        <Col>
-                                            {addRouteButton(grade)} {standardCountForGrade > 0 && removeRouteButton(grade)}
+                                        {canEdit &&
+                                        <Col xs={6}>
+                                            {quickEditButtons(standardCountForGrade, grade)}
                                         </Col>
+                                        }
                                     </Row>
                                     {customRoutesForGrade.map(route => (
                                         <Row className='align-items-center session-grade-row' key={route.key}>
-                                            <Col xs={6}>
+                                            <Col>
                                                 {route.value.name} ({customRoutesMap[route.key].count || 0})
                                             </Col>
-                                            <Col>
-                                                {addRouteButton({key: route.key}, true)} {customRoutesMap[route.key].count > 0 && removeRouteButton({key: route.key}, true)}
+                                            {canEdit &&
+                                            <Col xs={6}>
+                                                {quickEditButtons(customRoutesMap[route.key].count, {key: route.key}, true)}
                                             </Col>
+                                            }
                                         </Row>
                                     ))}
                                     {partialCountForGrade > 0 &&
@@ -228,28 +244,35 @@ class SessionPage extends Component {
                         }) : <p>No routes in this session</p>}
 
 
-                        <Row>
-                            <Col xs={6}>
-                                <Button variant='primary' block={true} onClick={() => this.showModal('standardRoutes')}>
-                                    Add generic
-                                </Button>
-                            </Col>
-                            <Col xs={6}>
-                                <Button variant='primary' block={true} disabled={!routesForGym.length}
-                                        onClick={() => this.showModal('customRoutes')}>
-                                    Add custom
-                                </Button>
-                            </Col>
-                        </Row>
-                        {!isFinished &&
-                        <Row>
-                            <Col md={12}>
-                                <ConfirmCancelButton handleConfirm={this.endSession}
-                                                     modalTitle='End session?'
-                                                     buttonText='End session'
-                                                     buttonProps={{ variant: 'danger', block: true }}/>
-                            </Col>
-                        </Row>
+                        {canEdit &&
+                        <>
+                            <Row>
+                                <Col xs={6} className="d-grid d-block">
+                                    <Button variant="primary"
+                                            onClick={() => this.showModal('standardRoutes')}>
+                                        Add generic
+                                    </Button>
+                                </Col>
+                                <Col xs={6} className="d-grid d-block">
+                                    <Button variant="primary" disabled={!routesForGym.length}
+                                            onClick={() => this.showModal('customRoutes')}>
+                                        Add custom
+                                    </Button>
+                                </Col>
+                            </Row>
+                            {!isFinished &&
+                            <Row>
+                                <Col md={12}>
+                                    <ConfirmCancelButton handleConfirm={this.endSession}
+                                                         modalTitle="End session?"
+                                                         buttonText="End session"
+                                                         buttonProps={{variant: 'danger'}}
+                                                         buttonBlock={true}
+                                    />
+                                </Col>
+                            </Row>
+                            }
+                        </>
                         }
                     </Col>
                     <Col md='2'/>
@@ -262,6 +285,7 @@ class SessionPage extends Component {
 
 const mapStateToProps = (state, props) => {
     return {
+        auth: state.auth,
         session: getVal(state.firebase, `data/sessions/${props.match.params.id}`),
         routes: state.firebase.ordered.routes,
         gyms: state.firebase.ordered.gyms,

@@ -9,9 +9,11 @@ const SignIn = ({signIn}) => {
         <Fragment>
             <h2>Sign in</h2>
             <h6 className='text-muted'>Welcome.</h6>
-            <Button block href="#" className="social-signin" onClick={signIn}>
-                <FaGoogle style={{marginTop: '-2px'}}/> Sign in with Google
-            </Button>
+            <div className="d-grid d-block">
+                <Button href="#" className="social-signin" onClick={signIn}>
+                    <FaGoogle style={{marginTop: '-2px'}}/> Sign in with Google
+                </Button>
+            </div>
         </Fragment>
     );
 };

@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import { Link } from 'react-router-dom'
-import { ListGroup } from 'react-bootstrap'
+import { Col, ListGroup, Row } from 'react-bootstrap'
 import { groupFields, userFields } from '../templates/groupFields'
 import { compose } from 'redux'
 import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
@@ -71,12 +71,24 @@ class GroupIndex extends Component {
 
         const userInfo = findUser(users, uid);
 
-        const userName = userInfo && userInfo.name || uid;
+        const userName = userInfo && userInfo.name;
 
         return (
             <Fragment>
-                <p>Your uid: <b>{uid}</b><Button style={{float: 'right'}} onClick={this.showUserModal}>Edit User</Button></p>
-                <p>Your display name: <b>{userName}</b> </p>
+
+                    <p>Your uid: <b>{uid}</b></p>
+                <div className="align-items-center">
+                    <Row className="align-items-center">
+                        <Col >
+                            <p className="align-middle m-0">Your display name: {userName ? <b>{userName}</b> : <i>Not set</i>}</p>
+                        </Col>
+                        <Col xs="auto">
+                            <Button className="float-end" onClick={this.showUserModal}>Edit User</Button>
+                        </Col>
+                    </Row>
+
+                </div>
+
                 <ListGroup>
                     {groupsForUser.map(group => (
                         <Link to={`/groups/${group.key}`} style={{ textDecoration: 'none' }} key={group.key}>
@@ -87,9 +99,11 @@ class GroupIndex extends Component {
                     ))}
                 </ListGroup>
                 <br/>
-                <Button variant='primary' block={true} onClick={this.showGroupModal}>
-                    Add Group
-                </Button>
+                <div className="d-grid d-block">
+                    <Button variant='primary' onClick={this.showGroupModal}>
+                        Add Group
+                    </Button>
+                </div>
 
                 <EntityModal show={this.state.showGroupModal}
                              handleClose={this.hideGroupModal}

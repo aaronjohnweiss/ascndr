@@ -1,4 +1,5 @@
 import { sum } from './sum';
+import { PARTIAL_MAX } from '../components/GradeModal';
 
 export const TOP_ROPE = 'TOP_ROPE';
 export const BOULDER = 'BOULDER';
@@ -12,7 +13,7 @@ export const GRADE_RANGE = {
     [LEAD]: {min: 6, max: 14}
 }
 
-export const prettyPrint = (grade, useModifier = true) => {
+export const prettyPrint = (grade, useModifier = true, usePercentage = false) => {
     let str = '';
 
     if (!grade) return str;
@@ -25,6 +26,11 @@ export const prettyPrint = (grade, useModifier = true) => {
     // Add on difficulty and any suffix
     str += grade.difficulty;
     if (grade.modifier && useModifier) str += grade.modifier;
+
+    if (usePercentage && grade.percentage) {
+        const percentage = Math.round(100 * (grade.percentage / PARTIAL_MAX));
+        str += ` (${percentage}%)`;
+    }
 
     return str;
 };
@@ -46,42 +52,37 @@ export const printType = (type) => {
     }
 };
 
-export const compareGrades = (g1, g2, useModifier = true) => {
+export const compareGrades = (g1, g2, useModifier = true, usePercentage = false) => {
     if (!g1) return -1;
     if (!g2) return 1;
     // First sort between toprope/boulder/lead
     if (g1.style !== g2.style) {
-
-        // toprope > boulder > lead
-        if (g1.style === TOP_ROPE) return 1;
-        if (g2.style === TOP_ROPE) return -1;
-
-        if (g1.style === BOULDER) return 1;
-        if (g2.style === BOULDER) return -1;
-
-        if (g1.style === LEAD) return -1;
-        if (g2.style === LEAD) return 1;
-
-        return -1;
+        return ALL_STYLES.indexOf(g2.style) - ALL_STYLES.indexOf(g1.style)
     }
 
     // Sort by difficulty
     const g1Difficulty = Number(g1.difficulty);
     const g2Difficulty = Number(g2.difficulty);
 
-    if (g1Difficulty > g2Difficulty) return 1;
-    if (g2Difficulty > g1Difficulty) return -1;
+    if (g1Difficulty !== g2Difficulty) {
+        return g1Difficulty - g2Difficulty;
+    }
 
-    // Sort last by any suffix
-    if (useModifier) {
-        if (g1.modifier === '+' && g2.modifier !== '+') return 1;
-        if (g1.modifier !== '-' && g2.modifier === '-') return 1;
+    // Sort by any suffix
+    if (useModifier && g1.modifier !== g2.modifier) {
+        return ALL_MODIFIERS.indexOf(g1.modifier || null) - ALL_MODIFIERS.indexOf(g2.modifier || null);
+    }
 
-        if (g2.modifier === '+' && g1.modifier !== '+') return -1;
-        if (g2.modifier !== '-' && g1.modifier === '-') return -1;
+    if (usePercentage && g1.percentage !== g2.percentage) {
+        // Treat undefined as max
+        return (g1.percentage || PARTIAL_MAX) - (g2.percentage || PARTIAL_MAX);
     }
 
     return 0;
+}
+
+export const isPartial = (grade) => {
+    return !!grade.percentage && grade.percentage < PARTIAL_MAX;
 }
 
 export const gradeEquals = (g1, g2, useModifier = true) => {

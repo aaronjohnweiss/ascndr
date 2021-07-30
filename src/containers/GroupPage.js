@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react'
 import { connect } from 'react-redux'
-import { Button, ListGroup } from 'react-bootstrap'
+import { Button, Col, ListGroup, Row } from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
 import { updateGroupFields } from '../templates/groupFields'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
@@ -66,21 +66,30 @@ class GroupPage extends Component {
 
                 <ListGroup>
                     {usersForGroup.map(user =>
-                        <ListGroup.Item key={user.uid} style={{ lineHeight: '38px' }}>
-                            {user.name} <ConfirmCancelButton handleConfirm={() => this.removeGroupMember(user.uid)}
+                        <ListGroup.Item key={user.uid}>
+                            <Row className="m-0 align-items-center">
+                                <Col className="text-truncate">
+                                    {user.name}
+                                </Col>
+                                <Col xs="auto">
+                             <ConfirmCancelButton handleConfirm={() => this.removeGroupMember(user.uid)}
                                                         modalTitle='Remove User'
                                                         modalBody={`Remove user ${user.name} from the group?`}
                                                         buttonText='Remove'
-                                                        buttonProps={{ style: { float: 'right' } }}/>
+                                                        buttonBlock={true}
+                             />
+                                </Col>
+                            </Row>
                         </ListGroup.Item>
                     )}
                 </ListGroup>
 
                 <br/>
-                <Button variant='primary' block={true} onClick={this.showModal}>
-                    Add Member
-                </Button>
-
+                <div className="d-grid d-block">
+                    <Button variant='primary' onClick={this.showModal}>
+                        Add Member
+                    </Button>
+                </div>
                 {this.state.showModal && newUserModal()}
             </Fragment>
         )

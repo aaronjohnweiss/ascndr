@@ -7,6 +7,7 @@ import { Button, Form } from 'react-bootstrap';
 import resolveUsers from '../helpers/resolveUsers';
 import { ALL_STYLES, printType } from '../helpers/gradeUtils';
 import { getGroupsForUser, getGymsForGroups } from '../helpers/filterUtils';
+import { getBooleanFromQuery } from './StatsContainer';
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
 
@@ -34,7 +35,8 @@ const StatFilters = ({auth, groups, users, gyms}) => {
     const [gymIds, setGymIds] = useState(defaultIfEmpty(query.getAll('gyms'), visibleGyms.map(gym => gym.key)));
     const [uids, setUids] = useState(defaultIfEmpty(query.getAll('uids'), allowedUids));
 
-    const [allowSuffixes, setAllowSuffixes] = useState(query.get('allowSuffixes')  === 'true');
+    const [allowSuffixes, setAllowSuffixes] = useState(getBooleanFromQuery(query, 'allowSuffixes'));
+    const [allowPartials, setAllowPartials] = useState(getBooleanFromQuery(query, 'allowPartials', true));
 
     const [allowedTypes, setAllowedTypes] = useState(defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES));
 
@@ -73,6 +75,7 @@ const StatFilters = ({auth, groups, users, gyms}) => {
         uids.forEach(id => queryParams.append('uids', id));
         allowedTypes.forEach(type => queryParams.append('allowedTypes', type));
         queryParams.append('allowSuffixes', allowSuffixes);
+        queryParams.append('allowPartials', allowPartials);
         return queryParams.toString();
     };
 
@@ -90,8 +93,12 @@ const StatFilters = ({auth, groups, users, gyms}) => {
                          onChange={onChange(setAllowedTypes)} />
 
             <h3>Include sub-grades?</h3>
-            <Form.Check type='radio' id='y' key='y' label='Include +/-' checked={allowSuffixes} onChange={() => setAllowSuffixes(true)}/>
-            <Form.Check type='radio' id='n' key='n' label='Ignore +/-' checked={!allowSuffixes} onChange={() => setAllowSuffixes(false)}/>
+            <Form.Check type='radio' id='sy' key='sy' label='Include +/-' checked={allowSuffixes} onChange={() => setAllowSuffixes(true)}/>
+            <Form.Check type='radio' id='sn' key='sn' label='Ignore +/-' checked={!allowSuffixes} onChange={() => setAllowSuffixes(false)}/>
+
+            <h3>Include partial completions?</h3>
+            <Form.Check type='radio' id='py' key='py' label='Include Partials' checked={allowPartials} onChange={() => setAllowPartials(true)}/>
+            <Form.Check type='radio' id='pn' key='pn' label='Ignore Partials' checked={!allowPartials} onChange={() => setAllowPartials(false)}/>
 
             <Button href={`${returnUrl}?${generateQueryParams()}`}>Confirm</Button>
         </>
