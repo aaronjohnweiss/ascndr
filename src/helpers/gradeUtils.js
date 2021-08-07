@@ -13,6 +13,8 @@ export const GRADE_RANGE = {
     [LEAD]: {min: 6, max: 14}
 }
 
+export const printPercentage = (percentage) => `${Math.round(100 * (percentage / PARTIAL_MAX))}%`;
+
 export const prettyPrint = (grade, useModifier = true, usePercentage = false) => {
     let str = '';
 
@@ -28,8 +30,7 @@ export const prettyPrint = (grade, useModifier = true, usePercentage = false) =>
     if (grade.modifier && useModifier) str += grade.modifier;
 
     if (usePercentage && grade.percentage) {
-        const percentage = Math.round(100 * (grade.percentage / PARTIAL_MAX));
-        str += ` (${percentage}%)`;
+        str += ` (${printPercentage(grade.percentage)})`;
     }
 
     return str;

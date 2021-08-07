@@ -2,9 +2,8 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Button, Col, Container, Row } from 'react-bootstrap'
 import { compareGrades, countPartials, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
-import GradeModal from '../components/GradeModal'
+import GradeModal, { PARTIAL_MAX } from '../components/GradeModal'
 import { Link } from 'react-router-dom'
-import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import { sessionDuration } from '../helpers/durationUtils'
 import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
@@ -12,6 +11,12 @@ import SessionModal from '../components/SessionModal';
 import { getGymsForUser } from '../helpers/filterUtils';
 import { sum } from '../helpers/sum';
 import CustomRouteModal from '../components/CustomRouteModal';
+import ConfirmCancelButton from '../components/ConfirmCancelButton';
+import { routeCount } from '../components/StatsIndex';
+import { PartialRoutesAccordion } from '../components/PartialRoutesAccordion';
+
+const hasPartialCompletions = ({partials = {}}) => Object.entries(partials).some(([key, val]) => key > 0 && val > 0)
+const hasFullCompletions = ({count = 0}) => count > 0;
 
 class SessionPage extends Component {
     constructor(props) {
@@ -45,7 +50,7 @@ class SessionPage extends Component {
 
         const route = session[type].find(rt => keyEquals(rt.key, key))
 
-        if (percentage && percentage < 100) {
+        if (percentage && percentage < PARTIAL_MAX) {
             if (route) {
                 const partials = route.partials || {};
                 const newCount = (partials[percentage] || 0) + 1;
@@ -71,35 +76,48 @@ class SessionPage extends Component {
         this.hideModal(type)
     }
 
-    removeRoute = (type, key, keyEquals = (a, b) => a === b) => {
+    removeRoute = (type, key, percentage, keyEquals = (a, b) => a === b) => {
         const session = Object.assign({}, this.props.session)
 
         const routeIndex = session[type].findIndex(rt => keyEquals(rt.key, key))
 
-        if (routeIndex > -1 && (session[type][routeIndex].count > 1 || session[type][routeIndex].partials)) {
-            session[[type]][routeIndex].count -= 1
-        } else if (routeIndex > -1) {
-            session[type].splice(routeIndex, 1)
-        }
+        if (routeIndex > -1) {
+            const route = session[type][routeIndex];
+            if (percentage && percentage < PARTIAL_MAX) {
+                if (route.partials && percentage in route.partials) {
+                    if (route.partials[percentage] > 1) {
+                        route.partials[percentage] -= 1;
+                    } else {
+                        delete route.partials[percentage];
+                    }
+                }
+            } else {
+                if (route.count > 0) {
+                    route.count -= 1;
+                }
+            }
 
-        this.updateSession(session)
+            if (routeCount(route, true) <= 0) {
+                session[type].splice(routeIndex, 1);
+            }
+            this.updateSession(session);
+        }
     }
 
     addStandardRoute = ({percentage, ...key}) => {
         this.addRoute('standardRoutes', key, percentage, (a, b) => gradeEquals(a, b))
     }
 
-    removeStandardRoute = (key) => {
-        this.removeRoute('standardRoutes', key, (a, b) => gradeEquals(a, b));
+    removeStandardRoute = ({percentage, ...key}) => {
+        this.removeRoute('standardRoutes', key, percentage, (a, b) => gradeEquals(a, b));
     }
 
     addCustomRoute = ({key, percentage}) => {
-        console.log(key, percentage);
         this.addRoute('customRoutes', key, percentage);
     }
 
-    removeCustomRoute = ({key}) => {
-        this.removeRoute('customRoutes', key);
+    removeCustomRoute = ({key, percentage}) => {
+        this.removeRoute('customRoutes', key, percentage);
     }
 
     endSession() {
@@ -119,7 +137,6 @@ class SessionPage extends Component {
 
         if (!session.customRoutes) session.customRoutes = []
         if (!session.standardRoutes) session.standardRoutes = []
-
 
         // Convert to maps for easier consumption
         const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({ ...acc, [entry.key]: entry }), {})
@@ -207,9 +224,12 @@ class SessionPage extends Component {
                             const customRoutesForGrade = routesForSession.filter(route => gradeEquals(route.value.grade, grade))
                             const standardRoutesForGrade = standardRoutesMap[gradeLabel] || {};
                             const standardCountForGrade = standardRoutesForGrade.count || 0;
-                            const partialsForGrade = standardRoutesForGrade.partials || {};
                             const countForGrade = customRoutesForGrade.map(route => customRoutesMap[route.key].count || 0).reduce(sum, 0) + standardCountForGrade
-                            const partialCountForGrade = countPartials(partialsForGrade) + customRoutesForGrade.map(route => customRoutesMap[route.key].partials || {}).map(partials => countPartials(partials)).reduce(sum, 0);
+                            const partialsForGrade = standardRoutesForGrade.partials || {};
+                            const standardPartialCount = countPartials(partialsForGrade);
+                            const customsWithPartials = customRoutesForGrade.filter(route => hasPartialCompletions(customRoutesMap[route.key]));
+                            const customPartialCount = customsWithPartials.map(route => customRoutesMap[route.key].partials).map(partials => countPartials(partials)).reduce(sum, 0)
+                            const partialCountForGrade = standardPartialCount + customPartialCount;
                             return (
                                 <div key={gradeLabel}>
                                     <Row className='align-items-center session-grade-row' key={gradeLabel} >
@@ -222,10 +242,10 @@ class SessionPage extends Component {
                                         </Col>
                                         }
                                     </Row>
-                                    {customRoutesForGrade.map(route => (
+                                    {customRoutesForGrade.filter(route => hasFullCompletions(customRoutesMap[route.key])).map(route => (
                                         <Row className='align-items-center session-grade-row' key={route.key}>
                                             <Col>
-                                                {route.value.name} ({customRoutesMap[route.key].count || 0})
+                                                {route.value.name} ({customRoutesMap[route.key].count})
                                             </Col>
                                             {canEdit &&
                                             <Col xs={6}>
@@ -236,7 +256,14 @@ class SessionPage extends Component {
                                     ))}
                                     {partialCountForGrade > 0 &&
                                         <Row className='align-items-center session-grade-row' key={gradeLabel + '-partials'}>
-                                            <Col>Partial completions: {partialCountForGrade}</Col>
+                                            <PartialRoutesAccordion grade={grade}
+                                                                    partialsForGrade={partialsForGrade}
+                                                                    partialCountForGrade={partialCountForGrade}
+                                                                    standardPartialCount={standardPartialCount}
+                                                                    customPartialCount={customPartialCount}
+                                                                    customsWithPartials={customsWithPartials}
+                                                                    customRoutesMap={customRoutesMap}
+                                                                    quickEditButtons={quickEditButtons} />
                                         </Row>
                                     }
                                 </div>
