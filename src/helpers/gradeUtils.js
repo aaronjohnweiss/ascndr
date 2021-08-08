@@ -1,4 +1,4 @@
-import { sum } from './sum';
+import { sum } from './mathUtils';
 import { PARTIAL_MAX } from '../components/GradeModal';
 
 export const TOP_ROPE = 'TOP_ROPE';
