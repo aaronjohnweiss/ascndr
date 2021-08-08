@@ -28,7 +28,7 @@ export const StatItem = ({label, value, link}) => {
 
 export const partialRouteCount = route => route.partials && Object.entries(route.partials).map(([key, val]) => key * val / PARTIAL_MAX).reduce(sum, 0) || 0;
 
-export const routeCount = (route, allowPartials = false) => (route.count || 0) + + (allowPartials && partialRouteCount(route));
+export const routeCount = (route, allowPartials = false) => (route.count || 0) + (allowPartials && partialRouteCount(route));
 
 const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes, allowPartials = false) => [
     ...customRoutes.filter(customRoute => allowedTypes.includes(routes[customRoute.key].grade.style)),
