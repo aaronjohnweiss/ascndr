@@ -6,8 +6,8 @@ import { firebaseConnect, isLoaded } from 'react-redux-firebase';
 import { compose } from 'redux';
 import { findEntry, findUser, getSessionsForUser } from '../helpers/filterUtils';
 import SessionCard from '../components/SessionCard';
-import { SessionCalendar } from '../components/SessionCalendar';
 import moment from 'moment';
+import ResponsiveSessionCalendar from '../components/ResponsiveSessionCalendar';
 
 const UserHome = ({auth: {uid}, gyms, sessions, routes, users}) => {
 
@@ -21,11 +21,11 @@ const UserHome = ({auth: {uid}, gyms, sessions, routes, users}) => {
 
     const user = findUser(users, uid);
 
-    const calendarCutoffDate = moment().subtract(4, 'months').startOf('day');
+    const calendarCutoffDate = moment().subtract(4, 'months').startOf('week');
     return (
         <>
             <h2>Welcome{user.name ? `, ${user.name}` : ' back'}!</h2>
-            <SessionCalendar sessions={sessionsForUser} routes={routes} cutoffDate={calendarCutoffDate} />
+            <ResponsiveSessionCalendar sessions={sessionsForUser} routes={routes} minCutoffDate={calendarCutoffDate} />
             {latestSession &&
             <>
                 <h3>Last Session:</h3>

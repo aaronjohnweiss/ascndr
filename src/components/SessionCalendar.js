@@ -19,7 +19,7 @@ const getEmptyCounts = cutoffDate => {
     return emptyCounts;
 }
 
-export const SessionCalendar = ({sessions, routes, cutoffDate}) => {
+export const SessionCalendar = ({sessions, routes, cutoffDate, blockSize = 12, blockMargin = 4}) => {
     const emptyCounts = getEmptyCounts(cutoffDate);
     const fullCounts = sessions.filter(({value}) => cutoffDate.isBefore(moment(value.startTime)))
         .map(({value}) => ({date: dateString(value.startTime), count: routeCountForSession(value, routes, ALL_STYLES, true)}))
@@ -41,6 +41,7 @@ export const SessionCalendar = ({sessions, routes, cutoffDate}) => {
     const data = Object.entries(fullCounts).map(([date, count]) => ({date: date, count: count, level: getLevel(count)})).sort((a, b) => a.date.localeCompare(b.date));
 
     return <div className="d-flex justify-content-center mb-2">
-        <ActivityCalendar data={data} hideColorLegend hideTotalCount color="#0000CC"/>
+        <ActivityCalendar data={data} hideColorLegend hideTotalCount color="#0000CC" blockSize={blockSize} blockMargin={blockMargin}/>
     </div>
 }
+export default SessionCalendar;
