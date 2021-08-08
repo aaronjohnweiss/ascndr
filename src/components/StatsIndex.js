@@ -5,7 +5,7 @@ import { FaChevronRight } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom';
 import { durationString } from '../helpers/durationUtils';
 import { filtersLink } from '../containers/StatFilters';
-import { sum } from '../helpers/sum';
+import { sum } from '../helpers/mathUtils';
 import { PARTIAL_MAX } from './GradeModal';
 
 export const StatItem = ({label, value, link}) => {
@@ -30,12 +30,12 @@ export const partialRouteCount = route => route.partials && Object.entries(route
 
 export const routeCount = (route, allowPartials = false) => (route.count || 0) + + (allowPartials && partialRouteCount(route));
 
-const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes, allowPartials = false) => [
+export const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes, allowPartials = false) => [
     ...customRoutes.filter(customRoute => allowedTypes.includes(routes[customRoute.key].grade.style)),
     ...standardRoutes.filter(standardRoute => allowedTypes.includes(standardRoute.key.style))
 ].map(route => routeCount(route, allowPartials)).reduce(sum, 0);
 
-const heightForSession = (session, routes, gym = {}, allowedTypes = [], allowPartials = false) =>
+export const heightForSession = (session, routes, gym = {}, allowedTypes = [], allowPartials = false) =>
     allowedTypes.map(type => {
         const count = routeCountForSession(session, routes, [type], allowPartials);
         const height = gym[`${type}_HEIGHT`] || 0;

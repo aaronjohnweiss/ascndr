@@ -10,7 +10,7 @@ import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
 import SessionModal from '../components/SessionModal';
 import { getGymsForUser } from '../helpers/filterUtils';
-import { sum } from '../helpers/sum';
+import { sum } from '../helpers/mathUtils';
 import CustomRouteModal from '../components/CustomRouteModal';
 
 class SessionPage extends Component {
