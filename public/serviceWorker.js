@@ -1,4 +1,4 @@
-var CACHE_NAME = 'pwa-ascndr-v4';
+var CACHE_NAME = 'pwa-ascndr-v5';
 var urlsToCache = [
     '/'
 ];
