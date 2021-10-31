@@ -9,6 +9,8 @@ import { routeUpdateFields } from '../templates/routeFields'
 import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { prettyPrint } from '../helpers/gradeUtils'
+import { findUser, getSessionsForRoute } from '../helpers/filterUtils';
+import RouteHistory from '../components/RouteHistory';
 
 export const PENDING_IMAGE = 'PENDING';
 export const FAILED_IMAGE = 'FAILED';
@@ -92,9 +94,9 @@ class RoutePage extends Component {
     }
 
     render() {
-
-        const { route, gyms } = this.props
-        if (!isLoaded(route, gyms)) return 'Loading'
+        const { match, gyms, sessions, route, users } = this.props
+        const routeId = match.params.id
+        if (!isLoaded(route, gyms, sessions, users)) return 'Loading'
         if (!route) return 'Uh oh'
 
         const gym = gyms.find(gym => gym.key === route.gymId)
@@ -116,6 +118,10 @@ class RoutePage extends Component {
             RouteImageComponent = <img className='img-fluid' alt='' style={{transform: `rotate(${this.state.rotation}deg)`}}
                               src={route.picture} onClick={this.handleRotate} />;
         }
+
+        const sessionsForRoute = getSessionsForRoute(sessions, routeId);
+        const uidsForRoute = [...new Set(sessionsForRoute.map(session => session.value.uid))];
+        const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
 
         return (
             <Container>
@@ -140,6 +146,8 @@ class RoutePage extends Component {
                         {route.isRetired && <h4>Retired</h4>}
                         {RouteImageComponent}
                         <p>{route.description}</p>
+                        <RouteHistory routeKey={routeId} users={usersForRoute} sessions={sessionsForRoute} />
+                        <br />
                         {!route.isRetired && (
                             <ConfirmCancelButton handleConfirm={this.retireRoute}
                                                  modalTitle='Retire route?'
@@ -160,14 +168,18 @@ class RoutePage extends Component {
 const mapStateToProps = (state, props) => {
     return {
         route: getVal(state.firebase, `data/routes/${props.match.params.id}`),
-        gyms: state.firebase.ordered.gyms
+        gyms: state.firebase.ordered.gyms,
+        sessions: state.firebase.ordered.sessions,
+        users: state.firebase.ordered.users
     }
 }
 
 export default compose(
     firebaseConnect([
         { path: 'routes' },
-        { path: 'gyms' }
+        { path: 'gyms' },
+        { path: 'sessions' },
+        { path: 'users' }
     ]),
     connect(mapStateToProps)
 )(RoutePage)
