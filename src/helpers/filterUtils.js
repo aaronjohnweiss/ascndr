@@ -25,6 +25,13 @@ export const getRoutesForGym = (routes, gym) => filterList(routes, 'gymId', gym.
 export const getSessionsForGym = (sessions, gym) => filterList(sessions, 'gymId', gym.key);
 export const getSessionsForUser = (sessions, uid) => filterList(sessions, 'uid', uid);
 export const getSessionsForUserAndGym = (sessions, gym, uid) => getSessionsForUser(getSessionsForGym(sessions, gym), uid);
+export const getSessionsForRoute = (sessions, routeKey) => isEmpty(sessions) ? [] : sessions.filter(session => {
+    let { customRoutes } = session.value;
+    if (!customRoutes || !customRoutes.length) {
+        return false;
+    }
+    return customRoutes.some(route => route.key === routeKey);
+});
 
 export const hasRoutes = (session) => (session.customRoutes && session.customRoutes.length > 0) || (session.standardRoutes && session.standardRoutes.length > 0);
 
