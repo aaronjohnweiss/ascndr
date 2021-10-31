@@ -3,6 +3,7 @@ import { compareGrades, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
 import ReactiveBarGraph from './ReactiveBarGraph';
 import moment from 'moment';
 import { Button, Col, Container, Row } from 'react-bootstrap';
+import { RangeSlider } from 'reactrangeslider';
 import { partialRouteCount, routeCount } from './StatsIndex';
 
 const addCount = (arr, key, count, partialCount, allowSuffixes) => {
@@ -93,27 +94,42 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, a
     // Get session dates for animating
     const validUids = Object.keys(users);
     const sessionDates = Object.values(sessions).filter(session => validUids.includes(session.uid)).map(session => session.startTime).sort();
-    const firstDate = moment(sessionDates[0]).subtract(1, 'month').endOf('month');
+    const firstDate = moment(sessionDates[0]).subtract(1, 'month').startOf('month');
     const lastDate = moment(sessionDates[sessionDates.length - 1]).endOf('month');
+    const numMonths = Math.max(lastDate.diff(firstDate, 'months', false), 1);
+    const [isAnimating, setIsAnimating] = useState(false);
+    // Track date range
+    const [minDateValue, setMinDateValue] = useState(0);
+    const [maxDateValue, setMaxDateValue] = useState(undefined);
 
-    // While animating, track current max date
-    const [maxDate, setMaxDate] = useState(undefined);
+    const minDate = firstDate.clone().add(minDateValue, 'months').startOf('month');
+    const maxDate = maxDateValue === undefined ? undefined : firstDate.clone().add(maxDateValue, 'months').endOf('month');
+
+    const onRangeSliderChange = ({start, end}) => {
+        setMinDateValue(start);
+        setMaxDateValue(end);
+    }
+
+    const startAnimation = () => {
+        setMaxDateValue(minDateValue);
+        setIsAnimating(true);
+    }
 
     useEffect(
         () => {
             let interval;
-            const numMonths = Math.max(lastDate.diff(firstDate, 'months', false), 1);
             const animationInterval = Math.min(ANIMATION_INTERVAL, MAX_ANIMATION_DURATION / numMonths);
-            if (maxDate) {
+            if (maxDateValue !== undefined && isAnimating) {
                 // At each interval tick, set max date range to the next month
                 interval = setInterval(
                     () => {
+                        const newMaxDate = maxDateValue + 1;
                         // Once all sessions are included, cancel animation
-                        if (maxDate.isAfter(lastDate)) {
-                            setMaxDate(undefined);
+                        if (newMaxDate >= numMonths) {
+                            setMaxDateValue(undefined);
+                            setIsAnimating(false);
                         } else {
-                            // Bump to end of next month
-                            setMaxDate(maxDate.clone().add(1, 'day').endOf('month'));
+                            setMaxDateValue(newMaxDate);
                         }
                     },
                     animationInterval
@@ -122,7 +138,7 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, a
             // In case component is unmounted, clear the interval
             return () => clearInterval(interval);
         },
-        [maxDate]
+        [isAnimating, maxDateValue]
     );
 
     // Use full graph data to get domain/range
@@ -131,7 +147,7 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, a
         maxValue
     } = getGraphData(Object.values(users), Object.values(sessions), routes, allowedTypes, allowSuffixes, allowPartials);
 
-    const allowedSessions = maxDate ? Object.values(sessions).filter(session => moment(session.startTime).isBefore(maxDate)) : Object.values(sessions);
+    const allowedSessions = Object.values(sessions).filter(session => !maxDate || moment(session.startTime).isBefore(maxDate)).filter(session => moment(session.startTime).isAfter(minDate));
 
     // Calculate totals for each user
     const {graphData} = getGraphData(Object.values(users), allowedSessions, routes, allowedTypes, allowSuffixes, allowPartials);
@@ -148,14 +164,19 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, a
             <>
                 <Row>
                     <Col xs={12}>
-                        <p style={{textAlign: 'center'}}>{firstDate.format('MMMM YYYY')} to {(maxDate || lastDate).format('MMMM YYYY')}</p>
+                        <p style={{textAlign: 'center'}}>{minDate.format('MMMM YYYY')} to {(maxDate || lastDate).format('MMMM YYYY')}</p>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={12}>
+                        <RangeSlider value={{start: minDateValue, end: maxDateValue}} min={0} max={numMonths} step={1} onChange={onRangeSliderChange} />
                     </Col>
                 </Row>
                 <Row>
                     <Col sm={{span: 6, offset: 3}} className="d-grid d-block">
-                        {maxDate ?
-                            <Button onClick={() => setMaxDate(undefined)}>Stop</Button> :
-                            <Button onClick={() => setMaxDate(firstDate)}>Play</Button>
+                        {isAnimating ?
+                            <Button onClick={() => setMaxDateValue(undefined)}>Stop</Button> :
+                            <Button onClick={() => startAnimation()}>Play</Button>
                         }
                     </Col>
                 </Row>
