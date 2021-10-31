@@ -50,7 +50,7 @@ const StatsIndex = ({gyms, users, routes, sessions, allowSuffixes, allowedTypes,
     // TODO filter to only sessions with <allowedTypes> routes logged?
     const numSessions = sessionValues.length;
     // Figure out total time; for each session do (end - start) but if end doesn't exist (ongoing session) do (now - start)
-    const totalTime = numSessions && sessionValues.map(({startTime, endTime = new Date().getTime()}) => endTime - startTime).reduce(sum);
+    const totalTime = numSessions && sessionValues.filter(session => !!session.endTime).map(({startTime, endTime}) => endTime - startTime).reduce(sum);
     const totalRoutes = numSessions && sessionValues.map(session => routeCountForSession(session, routes, allowedTypes, allowPartials)).reduce(sum);
     const totalDistance = numSessions && sessionValues.map(session => heightForSession(session, routes, gyms[session.gymId], allowedTypes, allowPartials)).reduce(sum);
     // Figure out max grades by type
