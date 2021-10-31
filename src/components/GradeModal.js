@@ -26,7 +26,8 @@ const GradeModal = ({defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, t
     const submitDisabled = percentage <= 0;
 
     const submitGrade = () => {
-        const toSubmit = {style, difficulty, percentage};
+        const toSubmit = {style, difficulty};
+        if (percentage < PARTIAL_MAX) toSubmit.percentage = percentage;
         if (modifier) toSubmit.modifier = modifier;
         handleSubmit(toSubmit);
     }
