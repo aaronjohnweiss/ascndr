@@ -81,8 +81,8 @@ class GymPage extends Component {
 
         // Filter to only routes for this gym
         const routesForGym = getRoutesForGym(routes, {key: id});
-        const currentRoutes = routesForGym.filter(route => !route.value.isRetired)
-        const retiredRoutes = routesForGym.filter(route => route.value.isRetired)
+        const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
+        const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
         const sessionsForUser = getSessionsForUserAndGym(sessions, {key: id}, uid).sort((a, b) => b.value.startTime - a.value.startTime)
 
         const routeListItem = ({ key, value }) => (
@@ -121,7 +121,7 @@ class GymPage extends Component {
                     <Fragment>
                         {/* Only show "Current" header if there are also retired routes */}
                         {retiredRoutes.length > 0 && <h4>Current</h4>}
-                        <TruncatedList pageSize={5}>
+                        <TruncatedList pageSize={5} initialSize={2}>
                             {currentRoutes.map(routeListItem)}
                         </TruncatedList>
                     </Fragment>
@@ -129,7 +129,7 @@ class GymPage extends Component {
                 {retiredRoutes.length > 0 && (
                     <Fragment>
                         <h4>Retired</h4>
-                        <TruncatedList pageSize={5}>
+                        <TruncatedList pageSize={5} initialSize={2}>
                             {retiredRoutes.map(routeListItem)}
                         </TruncatedList>
                     </Fragment>

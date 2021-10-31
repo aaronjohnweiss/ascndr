@@ -1,8 +1,16 @@
 import React, { useState } from 'react'
 import { Button, ListGroup } from 'react-bootstrap'
 
-const TruncatedList = ({ children = [], pageSize }) => {
-    const [numItems, setNumItems] = useState(pageSize || children.length)
+const TruncatedList = ({ children = [], pageSize, initialSize = pageSize }) => {
+    const [numItems, setNumItems] = useState(initialSize || children.length);
+
+    const onShowMore = () => {
+        if (numItems < pageSize) {
+            setNumItems(pageSize);
+        } else {
+            setNumItems(numItems + pageSize);
+        }
+    }
 
     return (
         <>
@@ -10,7 +18,7 @@ const TruncatedList = ({ children = [], pageSize }) => {
                 {children.slice(0, numItems)}
             </ListGroup>
             {numItems < children.length &&
-            <Button variant='link' onClick={() => setNumItems(numItems + pageSize)}>
+            <Button variant='link' onClick={onShowMore}>
                 Show more
             </Button>
             }
