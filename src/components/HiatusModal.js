@@ -4,7 +4,11 @@ import { dateString } from '../helpers/dateUtils';
 
 
 const HiatusListEntry = ({displayNum, hiatus, onChange, onRemove}) => {
-    const handleDateChange = name => evt => onChange({...hiatus, [name]: new Date(evt.target.value).getTime()})
+    const handleDateChange = name => evt => {
+        // Add time so that the date gets set to local time zone instead of utc
+        const date = new Date(`${evt.target.value}T00:00:00`).getTime();
+        onChange({...hiatus, [name]: date});
+    }
     return (
         <>
             <Row>
