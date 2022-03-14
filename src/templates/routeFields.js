@@ -52,6 +52,11 @@ export const routeCreateFields = [
         name: 'color'
     },
     {
+        title: 'Routesetter',
+        placeholder: 'Setter..',
+        name: 'setter'
+    },
+    {
         title: 'Route Image',
         name: 'picture',
         options: {

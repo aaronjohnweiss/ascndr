@@ -143,6 +143,7 @@ class RoutePage extends Component {
                         <h3>{prettyPrint(route.grade) + ' '}
                             <small>({route.color})</small>
                         </h3>
+                        {route.setter && <h3>Set by {route.setter}</h3>}
                         {route.isRetired && <h4>Retired</h4>}
                         {RouteImageComponent}
                         <p>{route.description}</p>
