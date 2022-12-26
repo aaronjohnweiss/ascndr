@@ -1,10 +1,10 @@
 import React from 'react';
-import ActivityCalendar from 'react-activity-calendar';
+import ActivityCalendar from './activity-calendar/ActivityCalendar';
 import moment from 'moment';
-import { routeCountForSession } from './StatsIndex';
-import { ALL_STYLES } from '../helpers/gradeUtils';
-import { dateString } from '../helpers/dateUtils';
-import { percentile } from '../helpers/mathUtils';
+import {routeCountForSession} from './StatsIndex';
+import {ALL_STYLES} from '../helpers/gradeUtils';
+import {dateString} from '../helpers/dateUtils';
+import {percentile} from '../helpers/mathUtils';
 
 const DATE_FORMAT = 'YYYY-MM-DD';
 
