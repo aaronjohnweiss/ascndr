@@ -1,8 +1,21 @@
 .jumbotron {
     color: white;
-    background: url('https://cdn-image.travelandleisure.com/sites/default/files/1460561776/horsetail-fall-ElCapitan0416.jpg') center;
+    background: url('/ElCap-512.png') center;
     text-shadow: 2px 2px 4px #000000;
     padding-bottom: 3px;
+}
+
+.header-left, .header-right {
+    flex-grow: 1;
+    flex-basis: 0;
+}
+
+.nav button {
+    color: white
+}
+
+.settings-offcanvas {
+    max-width: 65%;
 }
 
 .nav li a {
