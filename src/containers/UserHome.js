@@ -1,10 +1,8 @@
 import React from 'react'
-import { connect } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { Button } from 'react-bootstrap';
-import { firebaseConnect, isLoaded } from 'react-redux-firebase';
-import { compose } from 'redux';
-import { findEntry, findUser, getSessionsForUser } from '../helpers/filterUtils';
+import {connect} from 'react-redux'
+import {firebaseConnect, isLoaded} from 'react-redux-firebase';
+import {compose} from 'redux';
+import {findEntry, findUser, getSessionsForUser} from '../helpers/filterUtils';
 import SessionCard from '../components/SessionCard';
 import moment from 'moment';
 import ResponsiveSessionCalendar from '../components/ResponsiveSessionCalendar';
@@ -32,15 +30,6 @@ const UserHome = ({auth: {uid}, gyms, sessions, routes, users}) => {
                 <SessionCard session={latestSession} gym={gym} user={user} routes={routes} />
             </>
             }
-            <Link to="/gyms" className="d-grid d-block">
-                <Button style={{marginBottom: '4px'}}>Your Gyms</Button>
-            </Link>
-            <Link to="/groups" className="d-grid d-block">
-                <Button style={{marginBottom: '4px'}}>Your User</Button>
-            </Link>
-            <Link to={`/stats?uids=${uid}`} className="d-grid d-block mb-4">
-                <Button>Your Stats</Button>
-            </Link>
         </>
     )
 }
