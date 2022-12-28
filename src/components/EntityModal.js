@@ -85,7 +85,7 @@ export default class EntityModal extends Component {
                     <Button variant="secondary" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button variant="primary" disabled={!validateState || validateState(this.state)} onClick={() => handleSubmit(this.state)}>
+                    <Button variant="primary" disabled={!!validateState ? validateState(this.state) : false} onClick={() => handleSubmit(this.state)}>
                         {submitText ? submitText : 'Submit'}
                     </Button>
                 </Modal.Footer>
