@@ -67,7 +67,7 @@ const App = (props) => {
                         <Route exact path='/gyms/:id' component={requireAuth(GymPage)}/>
                         <Route exact path='/routes/:id' component={requireAuth(RoutePage)}/>
                         <Route exact path='/sessions/:id' component={requireAuth(SessionPage)}/>
-                        <Route exact path='/stats' component={requireAuth(StatsPage)}/>
+                        <Route path='/stats' component={requireAuth(StatsPage)}/>
                         <Route exact path='/workouts' component={requireAuth(WorkoutIndex)} />
                         <Route exact path='/login' component={denyAuth(SignIn)}/>
                     </div>

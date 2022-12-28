@@ -1,4 +1,4 @@
-export const categories = [
+export const WORKOUT_CATEGORIES = [
     'Strength',
     'Flexibility',
     'Hangboard',

@@ -29,10 +29,20 @@ const hsl2rgb = (h, s, l) => {
         b: f(4)
     };
 }
+// Magic numbers for color picker
+// Minimum number of colors to pick: means that up to n=4, the first 4 colors will be the same
+const MIN_COLORS = 5;
+// Saturation of the colors (for hsl; in [0,1])
+const SATURATION = 0.75;
+// Lightness of the colors (for hsl; in [0,1])
+const LIGHTNESS = 0.5;
+// Starting color angle (for hsl; in [0,1])
+const STARTING_HUE = 2 / 3; // Blue
 
-export const rainbowColors = (n, s, l, hMin, hMax, hStart) => {
-    return Array(n).fill().map((_, idx) => rainbowColor(idx, n, s, l, hMin, hMax, hStart));
-}
+const numColors = (n) => Math.max(n, MIN_COLORS)
+
+export const rainbowColors = ({n = MIN_COLORS, s = SATURATION, l = LIGHTNESS, hMin, hMax, hStart = STARTING_HUE}) =>
+    Array(numColors(n)).fill().map((_, idx) => rainbowColor(idx, numColors(n), s, l, hMin, hMax, hStart)).slice(0, n)
 
 export const rainbowColor = (i, n, s = 1, l = 0.5, hMin = 0, hMax = 1, hStart = hMin) => {
     const hRange = hMax - hMin;

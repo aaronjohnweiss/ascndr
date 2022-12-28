@@ -7,8 +7,11 @@ import subWeeks from 'date-fns/subWeeks';
 import nextDay from 'date-fns/nextDay';
 import getMonth from 'date-fns/getMonth';
 import color from 'tinycolor2';
+import {rainbowColors} from "../../helpers/rainbowColor";
+import React, {Fragment} from "react";
+import {VictoryTheme} from 'victory'
+import calculateSize from 'calculate-size'
 
-const DEFAULT_THEME = createCalendarTheme('#042a33');
 export const NAMESPACE = 'ActivityCalendar';
 
 
@@ -40,7 +43,31 @@ export const DEFAULT_LABELS = {
     },
 };
 
-export function normalizeCalendarDays(days) {
+const emptyDay = (date, numCategories) => ({
+    date,
+    counts: Array(numCategories).fill(0),
+    levels: Array(numCategories).fill(0),
+})
+
+const flattenDays = (data) => {
+    const flatDays = new Map();
+
+    data.forEach((days, i) => days.forEach(day => {
+        const {date, count, level} = day;
+
+        if (!flatDays.has(date)) {
+            flatDays.set(date, emptyDay(date, data.length))
+        }
+
+        const thisDay = flatDays.get(date)
+        thisDay.counts[i] = count
+        thisDay.levels[i] = level
+    }))
+
+    return [...flatDays.values()]
+}
+
+export function normalizeCalendarDays(days, numCategories) {
     const daysMap = days.reduce((map, day) => {
         map.set(day.date, day);
         return map;
@@ -50,25 +77,23 @@ export function normalizeCalendarDays(days) {
         start: parseISO(days[0].date),
         end: parseISO(days[days.length - 1].date),
     }).map((day) => {
-        const date = formatISO(day, { representation: 'date' });
+        const date = formatISO(day, {representation: 'date'});
 
         if (daysMap.has(date)) {
             return daysMap.get(date);
         }
 
-        return {
-            date,
-            count: 0,
-            level: 0,
-        };
+        return emptyDay(date, numCategories);
     });
 }
 
-export function groupByWeeks(days, weekStart) {
-    if (days.length === 0) return [];
+export function groupByWeeks(data, weekStart) {
+    if (data.length === 0) return [];
+
+    const flattenedDays = flattenDays(data.map(datum => datum.data))
 
     // The calendar expects a continuous sequence of days, so fill gaps with empty activity.
-    const normalizedDays = normalizeCalendarDays(days);
+    const normalizedDays = normalizeCalendarDays(flattenedDays, data.length);
 
     // Determine the first date of the calendar. If the first contribution date is not
     // specified week day the desired day one week earlier will be selected.
@@ -121,32 +146,41 @@ export function getMonthLabels(weeks, monthNames = DEFAULT_MONTH_LABELS) {
         });
 }
 
-export function createCalendarTheme(baseColor, emptyColor = color('white').darken(8).toHslString()) {
-    const base = color(baseColor);
+export const createColorLevels = (baseColor) => ({
+    level4: baseColor.setAlpha(1).toHslString(),
+    level3: baseColor.setAlpha(.8).toHslString(),
+    level2: baseColor.setAlpha(.6).toHslString(),
+    level1: baseColor.setAlpha(.4).toHslString(),
+})
 
-    if (!base.isValid()) {
-        return DEFAULT_THEME;
+export const createCalendarTheme = (numCategories, emptyColor = color('white').darken(8).toHslString()) => ({
+    level0: emptyColor,
+    theme: rainbowColors({n: numCategories}).map(([baseColor]) => createColorLevels(color(baseColor))),
+})
+
+export const getOffset = (i, n) => `${i * 100 / n}%`
+
+export const GradientForDay = ({id, day: {date, levels}, theme, level0}) => {
+    const nonzeroLevels = levels.map((val, index) => [val, index]).filter(([val]) => val !== 0).map(([, index]) => index)
+    const numColors = nonzeroLevels.length
+    if (numColors === 0) {
+        return (
+            <linearGradient id={id}>
+                <stop offset="0%" stopColor={level0}/>
+                <stop offset="100%" stopColor={level0}/>
+            </linearGradient>
+        )
     }
-
-    return {
-        level4: base.setAlpha(1).toHslString(),
-        level3: base.setAlpha(.8).toHslString(),
-        level2: base.setAlpha(.6).toHslString(),
-        level1: base.setAlpha(.4).toHslString(),
-        level0: emptyColor,
-    };
-}
-
-export function getTheme(theme, color) {
-    if (theme) {
-        return Object.assign({}, DEFAULT_THEME, theme);
-    }
-
-    if (color) {
-        return createCalendarTheme(color);
-    }
-
-    return DEFAULT_THEME;
+    return (
+        <linearGradient id={id}>
+            {
+                nonzeroLevels.map((themeIdx, gradientIdx) => <Fragment key={gradientIdx}>
+                    <stop offset={getOffset(gradientIdx, numColors)} stopColor={theme[themeIdx][`level${levels[themeIdx]}`]} />
+                    <stop offset={getOffset(gradientIdx + 1, numColors)} stopColor={theme[themeIdx][`level${levels[themeIdx]}`]} />
+                </Fragment>)
+            }
+        </linearGradient>
+    );
 }
 
 export function getClassName(name, styles) {
@@ -164,9 +198,25 @@ export function generateEmptyData() {
         end: new Date(year, 11, 31),
     });
 
-    return days.map((date) => ({
-        date: formatISO(date, { representation: 'date' }),
-        count: 0,
-        level: 0,
-    }));
+    return days.map((date) => (emptyDay(date, 1)));
 }
+
+export const getNumColumns = ({maxWidth, fontSize = VictoryTheme.grayscale.legend.style.labels.fontSize, fontFamily = VictoryTheme.grayscale.legend.style.labels.fontFamily, labels, padding}) => {
+    let numPerRow = labels.length;
+    const widths = labels.map(({name}) => {
+        const size = calculateSize(name, {fontSize: `${fontSize}px`, font: fontFamily}).width;
+        return size + padding;
+    })
+
+    while (!isValidSlice({numPerRow, widths, maxWidth}) && numPerRow > 1) {
+        numPerRow--;
+    }
+
+    return numPerRow;
+}
+
+const buildSlice = ({numPerRow, widths}) => Array(Math.ceil(widths.length / numPerRow))
+    .fill(undefined)
+    .map((_, idx) => widths.slice(idx * numPerRow, (idx + 1) * numPerRow));
+
+const isValidSlice = ({numPerRow, widths, maxWidth}) => buildSlice({numPerRow, widths}).map(row => row.reduce((acc, x) => acc + x, 0)).every(lineWidth => lineWidth <= maxWidth)

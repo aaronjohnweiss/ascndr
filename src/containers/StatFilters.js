@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { compose } from 'redux';
-import { firebaseConnect } from 'react-redux-firebase';
-import { connect } from 'react-redux';
-import { useLocation } from 'react-router-dom';
-import { Button, Form } from 'react-bootstrap';
+import React, {useState} from 'react';
+import {compose} from 'redux';
+import {firebaseConnect} from 'react-redux-firebase';
+import {connect} from 'react-redux';
+import {useLocation} from 'react-router-dom';
+import {Button, Form} from 'react-bootstrap';
 import resolveUsers from '../helpers/resolveUsers';
-import { ALL_STYLES, printType } from '../helpers/gradeUtils';
-import { getGroupsForUser, getGymsForGroups } from '../helpers/filterUtils';
-import { getBooleanFromQuery } from './StatsContainer';
+import {ALL_STYLES, printType} from '../helpers/gradeUtils';
+import {getGroupsForUser, getGymsForGroups} from '../helpers/filterUtils';
+import {getBooleanFromQuery} from './StatsContainer';
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
 
@@ -30,6 +30,7 @@ const StatFilters = ({auth, groups, users, gyms}) => {
 
     const groupsForUser = getGroupsForUser(groups, auth.uid);
     const allowedUids = [...new Set(groupsForUser.flatMap(group => group.value.users))];
+    console.log(allowedUids);
     const visibleUsers = resolveUsers(users, allowedUids);
     const visibleGyms = getGymsForGroups(gyms, groupsForUser);
     const [gymIds, setGymIds] = useState(defaultIfEmpty(query.getAll('gyms'), visibleGyms.map(gym => gym.key)));

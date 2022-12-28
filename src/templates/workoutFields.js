@@ -1,10 +1,9 @@
 import InputSlider from "../components/InputSlider";
 import React from "react";
-import {categories, MAX_INTENSITY} from "../helpers/workouts";
+import {MAX_INTENSITY, WORKOUT_CATEGORIES} from "../helpers/workouts";
 import {Form} from "react-bootstrap";
 
 const IntensityPicker = ({value, onChange}) => {
-    console.log('intesnity picker', value)
     return <InputSlider min={1} max={MAX_INTENSITY} step={1} value={value} toString={x => x} onChange={onChange}/>
 }
 
@@ -22,7 +21,7 @@ const CategoryPicker = ({value, onChange}) => {
     return (
         <>
             {
-                categories.map((category, idx) => (
+                WORKOUT_CATEGORIES.map((category, idx) => (
                         <Form.Check checked={value.includes(category)} label={category}
                                     onChange={onCategoryChange(category)} key={idx}/>
                     )

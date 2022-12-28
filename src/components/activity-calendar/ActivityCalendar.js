@@ -4,12 +4,13 @@ import getDay from 'date-fns/getDay';
 import getYear from 'date-fns/getYear';
 
 import {
+    createCalendarTheme,
     DEFAULT_LABELS,
     DEFAULT_WEEKDAY_LABELS,
     generateEmptyData,
     getClassName,
     getMonthLabels,
-    getTheme,
+    GradientForDay,
     groupByWeeks,
     MIN_DISTANCE_MONTH_LABELS,
     NAMESPACE,
@@ -17,13 +18,13 @@ import {
 
 import styles from './styles.module.css';
 import tinycolor from 'tinycolor2';
+import WrappedLegend from "../WrappedLegend";
 
 function ActivityCalendar({
                               blockMargin,
                               blockRadius,
                               blockSize,
                               children,
-                              color,
                               data,
                               dateFormat,
                               fontSize,
@@ -34,7 +35,6 @@ function ActivityCalendar({
                               labels: labelsProp,
                               style,
                               showWeekdayLabels,
-                              theme: themeProp,
                               weekStart,
                               ...otherProps
                           }) {
@@ -44,9 +44,9 @@ function ActivityCalendar({
 
     const weeks = groupByWeeks(data, weekStart);
     const textHeight = hideMonthLabels ? 0 : fontSize + 2 * blockMargin;
-    const theme = getTheme(themeProp, color);
+    const {theme, level0} = createCalendarTheme(data.length);
     const labels = Object.assign({}, DEFAULT_LABELS, labelsProp);
-    const totalCount = data.reduce((sum, day) => sum + day.count, 0);
+    const totalCount = data.flatMap(x => x).reduce((sum, day) => sum + day.count, 0);
     const year = getYear(parseISO(data[0].date));
 
     function getDimensions() {
@@ -91,7 +91,7 @@ function ActivityCalendar({
                 )}
                 {!hideMonthLabels && (
                     <g className={getClassName('legend-month')} style={style}>
-                        {getMonthLabels(weeks, labels.months).map(({ text, x }, index, labels) => {
+                        {getMonthLabels(weeks, labels.months).map(({text, x}, index, labels) => {
                             // Skip the first month label if there's not enough space to the next one
                             if (index === 0 && labels[1] && labels[1].x - x <= MIN_DISTANCE_MONTH_LABELS) {
                                 return null;
@@ -125,21 +125,24 @@ function ActivityCalendar({
                         : undefined;
 
                     return (
-                        <rect
-                            // {...getEventHandlers(day)}
-                            x={0}
-                            y={textHeight + (blockSize + blockMargin) * dayIndex}
-                            width={blockSize}
-                            height={blockSize}
-                            fill={theme[`level${day.level}`]}
-                            rx={blockRadius}
-                            ry={blockRadius}
-                            className={styles.block}
-                            data-date={day.date}
-                            // data-tip={children ? getTooltipMessage(day) : undefined}
-                            key={day.date}
-                            style={style}
-                        />
+                        <g key={day.date}>
+                            <GradientForDay id={day.date} day={day} theme={theme} level0={level0} />
+                            <rect
+                                // {...getEventHandlers(day)}
+                                x={0}
+                                y={textHeight + (blockSize + blockMargin) * dayIndex}
+                                width={blockSize}
+                                height={blockSize}
+                                fill={`url(#${day.date})`}
+                                rx={blockRadius}
+                                ry={blockRadius}
+                                className={styles.block}
+                                data-date={day.date}
+                                // data-tip={children ? getTooltipMessage(day) : undefined}
+                                key={day.date}
+                                style={style}
+                            />
+                        </g>
                     );
                 })
             )
@@ -150,13 +153,15 @@ function ActivityCalendar({
             ));
     }
 
+    const {width, height} = getDimensions();
+
     function renderFooter() {
-        if (hideTotalCount && hideColorLegend) {
+        if (hideTotalCount && hideColorLegend && data.length <= 1) {
             return null;
         }
 
         return (
-            <footer className={getClassName('footer', styles.footer)} style={{ marginTop: 2 * blockMargin, fontSize }}>
+            <footer className={getClassName('footer', styles.footer)} style={{marginTop: 2 * blockMargin, fontSize}}>
                 {/* Placeholder */}
                 {loading && <div>&nbsp;</div>}
 
@@ -170,9 +175,9 @@ function ActivityCalendar({
                     </div>
                 )}
 
-                {!loading && !hideColorLegend && (
+                {!loading && !hideColorLegend && data.length <= 1 && (
                     <div className={getClassName('legend-colors', styles.legendColors)}>
-                        <span style={{ marginRight: '0.4em' }}>{labels.legend.less || 'Less'}</span>
+                        <span style={{marginRight: '0.4em'}}>{labels.legend.less || 'Less'}</span>
                         {Array(5)
                             .fill(undefined)
                             .map((_, index) => (
@@ -180,29 +185,32 @@ function ActivityCalendar({
                                     <rect
                                         width={blockSize}
                                         height={blockSize}
-                                        fill={theme[`level${index}`]}
+                                        fill={theme[0][`level${index}`] || level0}
                                         rx={blockRadius}
                                         ry={blockRadius}
                                     />
                                 </svg>
                             ))}
-                        <span style={{ marginLeft: '0.4em' }}>{labels.legend.more || 'More'}</span>
+                        <span style={{marginLeft: '0.4em'}}>{labels.legend.more || 'More'}</span>
                     </div>
+                )}
+
+                {!loading && data.length > 1 && (
+                    <WrappedLegend data={data} width={width} colorScale={theme.map(x => x.level4)} />
                 )}
             </footer>
         );
     }
 
-    const { width, height } = getDimensions();
     const additionalStyles = {
         maxWidth: width,
         // Required for correct colors in CSS loading animation
-        [`--${NAMESPACE}-loading`]: theme.level0,
-        [`--${NAMESPACE}-loading-active`]: tinycolor(theme.level0).darken(8).toString(),
+        [`--${NAMESPACE}-loading`]: level0,
+        [`--${NAMESPACE}-loading-active`]: tinycolor(level0).darken(8).toString(),
     };
 
     return (
-        <article className="ActivityCalendar" style={{ ...style, ...additionalStyles }} {...otherProps}>
+        <article className="ActivityCalendar" style={{...style, ...additionalStyles}} {...otherProps}>
             <svg
                 className={getClassName('calendar', styles.calendar)}
                 width={width}
