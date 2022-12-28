@@ -129,10 +129,10 @@ export function createCalendarTheme(baseColor, emptyColor = color('white').darke
     }
 
     return {
-        level4: base.setAlpha(0.44).toHslString(),
-        level3: base.setAlpha(0.6).toHslString(),
-        level2: base.setAlpha(0.76).toHslString(),
-        level1: base.setAlpha(0.92).toHslString(),
+        level4: base.setAlpha(1).toHslString(),
+        level3: base.setAlpha(.8).toHslString(),
+        level2: base.setAlpha(.6).toHslString(),
+        level1: base.setAlpha(.4).toHslString(),
         level0: emptyColor,
     };
 }
