@@ -17,6 +17,7 @@ import GroupPage from './containers/GroupPage'
 import StatsPage from './containers/StatsContainer'
 import {FaBars} from "react-icons/fa";
 import Sidebar from "./containers/Sidebar";
+import WorkoutIndex from "./containers/WorkoutIndex";
 
 const App = (props) => {
     const [showSidebar, setShowSidebar] = useState(false)
@@ -67,6 +68,7 @@ const App = (props) => {
                         <Route exact path='/routes/:id' component={requireAuth(RoutePage)}/>
                         <Route exact path='/sessions/:id' component={requireAuth(SessionPage)}/>
                         <Route path='/stats' component={requireAuth(StatsPage)}/>
+                        <Route exact path='/workouts' component={requireAuth(WorkoutIndex)} />
                         <Route exact path='/login' component={denyAuth(SignIn)}/>
                     </div>
                 </Container>

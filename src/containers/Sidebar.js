@@ -37,6 +37,10 @@ const loggedInItems = ({auth}) => [
         text: 'Gyms',
     },
     {
+        href: '/workouts',
+        text: 'Workouts',
+    },
+    {
         href: `/stats?uids=${auth.uid}`,
         text: 'Stats',
     },

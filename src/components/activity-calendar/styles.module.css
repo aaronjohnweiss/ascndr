@@ -1,0 +1,39 @@
+.calendar {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    overflow: visible;
+}
+
+.calendar text {
+    fill: currentColor;
+}
+
+.block {
+    stroke: rgba(0, 0, 0, 0.1);
+    stroke-width: 1px;
+    shape-rendering: geometricPrecision;
+}
+
+.footer {
+    display: flex;
+}
+
+.legendColors {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.2em;
+}
+
+@keyframes loadingAnimation {
+    0% {
+        fill: var(--ActivityCalendar-loading);
+    }
+    50% {
+        fill: var(--ActivityCalendar-loading-active);
+    }
+    100% {
+        fill: var(--ActivityCalendar-loading);
+    }
+}

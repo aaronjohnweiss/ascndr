@@ -1,7 +1,7 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
-import { Point, VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLegend, VictoryStack } from 'victory';
-import { rainbowColors } from '../helpers/rainbowColor';
-import { MultiColorPoint } from './MultiColorPoint';
+import React, {useLayoutEffect, useRef, useState} from 'react';
+import {Point, VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLegend, VictoryStack} from 'victory';
+import {numColors, rainbowColors} from '../helpers/rainbowColor';
+import {MultiColorPoint} from './MultiColorPoint';
 
 // Width of each bar
 const GRAPH_BAR_WIDTH = 20;
@@ -10,17 +10,8 @@ const GRAPH_BAR_PADDING = 110;
 // Height of each entry in legend
 const GRAPH_LEGEND_ENTRY_HEIGHT = 30;
 
-// Magic numbers for color picker
-// Minimum number of colors to pick: means that up to n=4, the first 4 colors will be the same
-const MIN_COLORS = 4;
-// Saturation of the colors (for hsl; in [0,1])
-const SATURATION = 0.75;
-// Lightness of the colors (for hsl; in [0,1])
-const LIGHTNESS = 0.5;
-// Starting color angle (for hsl; in [0,1])
-const STARTING_HUE = 2/3; // Blue
 
-const getColors = (numUsers) => rainbowColors(Math.max(numUsers, MIN_COLORS), SATURATION, LIGHTNESS, undefined, undefined, STARTING_HUE).slice(0, numUsers);
+const getColors = (numUsers) => rainbowColors({n: numUsers});
 
 const ReactiveBarGraph = ({data, categories, maxDomain, animate, showLegend = true, isStacked = true}) => {
     // Use div ref to determine screen width (to fit graph to screen)
