@@ -1,5 +1,5 @@
-import React, { Component, Fragment } from 'react'
-import { Button, Form, Modal } from 'react-bootstrap'
+import React, {Component, Fragment} from 'react'
+import {Button, Form, Modal} from 'react-bootstrap'
 
 export default class EntityModal extends Component {
     constructor(props) {
@@ -34,7 +34,7 @@ export default class EntityModal extends Component {
     }
 
     render() {
-        const { handleClose, handleSubmit, show, fields, title, submitText } = this.props
+        const { handleClose, handleSubmit, show, fields, title, submitText, validateState } = this.props
 
         return <Modal show={show} onHide={handleClose}>
             <Form>
@@ -85,7 +85,7 @@ export default class EntityModal extends Component {
                     <Button variant="secondary" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={() => handleSubmit(this.state)}>
+                    <Button variant="primary" disabled={!validateState || validateState(this.state)} onClick={() => handleSubmit(this.state)}>
                         {submitText ? submitText : 'Submit'}
                     </Button>
                 </Modal.Footer>

@@ -1,4 +1,4 @@
-import { isEmpty } from 'react-redux-firebase';
+import {isEmpty} from 'react-redux-firebase';
 
 export const filterList = (arr, field, value) => isEmpty(arr) ? [] : arr.filter(item => {
     let fieldValue = item.value[field];
@@ -32,6 +32,8 @@ export const getSessionsForRoute = (sessions, routeKey) => isEmpty(sessions) ? [
     }
     return customRoutes.some(route => route.key === routeKey);
 });
+
+export const getWorkoutsForUser = (workouts, uid) => filterList(workouts, 'uid', uid);
 
 export const hasRoutes = (session) => (session.customRoutes && session.customRoutes.length > 0) || (session.standardRoutes && session.standardRoutes.length > 0);
 
