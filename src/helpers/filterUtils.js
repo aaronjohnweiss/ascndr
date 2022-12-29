@@ -32,6 +32,10 @@ export const getGymsForUser = (gyms, users, uid) => {
     return filterList(gyms, 'owner', allowedUids);
 }
 
+export const getEditorsForGym = (gym, users) => {
+    return [...findUser(users, gym.owner).friends, gym.owner];
+}
+
 export const getFriendsForUser = (user, users) => user.friends.map(uid => findUser(users, uid))
 
 export const getRoutesForGym = (routes, gym) => filterList(routes, 'gymId', gym.key);
