@@ -50,4 +50,8 @@ export const workoutFields = [
     }
 ]
 
-export const validateWorkoutFields = ({categories}) => !categories || categories.length === 0
+export const validateWorkoutFields = ({categories}) => [{
+    isValid: categories && categories.length > 0,
+    message: 'Must choose at least 1 category',
+    field: 'categories',
+}]
