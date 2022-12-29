@@ -23,7 +23,7 @@ const UserHome = ({auth: {uid}, gyms, sessions, routes, workouts, users}) => {
 
     const calendarCutoffDate = moment().subtract(4, 'months').startOf('week');
 
-    const getCalendarData = (cutoffDate) => [...getSessionData({sessions, routes, cutoffDate}), ...getWorkoutData({workouts: workoutsForUser, cutoffDate})]
+    const getCalendarData = (cutoffDate) => [...getSessionData({sessions: sessionsForUser, routes, cutoffDate}), ...getWorkoutData({workouts: workoutsForUser, cutoffDate})]
     return (
         <>
             <h2>Welcome{user.name ? `, ${user.name}` : ' back'}!</h2>
