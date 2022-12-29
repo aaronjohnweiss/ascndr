@@ -1,14 +1,6 @@
 import HiatusModel from '../components/HiatusModal';
 import {isEmpty} from "react-redux-firebase";
 
-export const groupFields = [
-    {
-        title: 'Group Name',
-        placeholder: 'Name..',
-        name: 'name'
-    }
-]
-
 export const addFriendFields = [
     {
         title: 'User ID or Name',

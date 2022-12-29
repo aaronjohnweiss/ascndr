@@ -3,7 +3,7 @@ import {connect} from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import {Col, ListGroup, Row} from 'react-bootstrap'
-import {addFriendFields, userFields, userIdValidation, userNameValidation} from '../templates/groupFields'
+import {addFriendFields, userFields, userIdValidation, userNameValidation} from '../templates/userFields'
 import {compose} from 'redux'
 import {firebaseConnect, isLoaded} from 'react-redux-firebase'
 import {distinct, findUser, findUserKey, getFriendsForUser, getUserName} from '../helpers/filterUtils';

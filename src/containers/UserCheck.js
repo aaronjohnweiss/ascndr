@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {connect} from 'react-redux'
 import EntityModal from '../components/EntityModal'
-import {userNameField, userNameValidation} from '../templates/groupFields'
+import {userNameField, userNameValidation} from '../templates/userFields'
 import {compose} from 'redux'
 import {firebaseConnect, isLoaded} from 'react-redux-firebase'
 import {findUser, findUserKey} from '../helpers/filterUtils';
