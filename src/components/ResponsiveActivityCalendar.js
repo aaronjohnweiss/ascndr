@@ -2,7 +2,7 @@ import React, {useLayoutEffect, useRef, useState} from 'react';
 import moment from 'moment';
 import ActivityCalendar from "./activity-calendar/ActivityCalendar";
 
-export const ResponsiveSessionCalendar = ({minCutoffDate, getData, blockSize = 12, blockMargin = 4}) => {
+export const ResponsiveActivityCalendar = ({minCutoffDate, getData, blockSize = 12, blockMargin = 4}) => {
     const divRef = useRef();
     const [width, setWidth] = useState(0);
     useLayoutEffect(() => {
@@ -21,4 +21,4 @@ export const ResponsiveSessionCalendar = ({minCutoffDate, getData, blockSize = 1
     </div>
 }
 
-export default ResponsiveSessionCalendar;
+export default ResponsiveActivityCalendar;

@@ -4,6 +4,8 @@ import {routeCountForSession} from "../components/StatsIndex";
 import {ALL_STYLES} from "./gradeUtils";
 import {percentile} from "./mathUtils";
 import {WORKOUT_CATEGORIES} from "./workouts";
+import {CalendarMode, getPreferences} from "../components/ActivityCalendarSettingsModal";
+import {findUser, getSessionsForUser, getUserName, getWorkoutsForUser} from "./filterUtils";
 
 export const getEmptyCounts = cutoffDate => {
     const tmpDate = cutoffDate.clone();
@@ -49,9 +51,11 @@ export const getLevelByPercentile = (data) => {
     }
 }
 
-const getData = (ctx) => Object.entries(buildCounts(ctx))
+const buildArray = map => Object.entries(map)
     .map(([date, {count, level}]) => ({date, count, level}))
     .sort((a, b) => a.date.localeCompare(b.date));
+
+const getData = (ctx) => buildArray(buildCounts(ctx));
 
 const getDataWithPercentiles = (ctx) => {
     const data = getData(ctx)
@@ -64,6 +68,39 @@ const getDataWithPercentiles = (ctx) => {
     }));
 }
 
+const excludeEmpty = data => data.filter(x => x.data.some(day => day.level > 0))
+
+const mergeData = ({data, label}) => {
+    const dataByDay = data.map(x => x.data).flat().reduce((acc, entry) => ({
+        ...acc,
+        [entry.date]: {
+            count: reduceCount(acc[entry.date] && acc[entry.date].count, entry.count),
+            level: reduceLevel(acc[entry.date] && acc[entry.date].level, entry.level)
+        }
+    }), {});
+
+    return [{label, data: buildArray(dataByDay)}];
+}
+
+export const getCalendarData = ({user, users, sessions, routes, workouts, cutoffDate}) => {
+    const preferences = getPreferences(user)
+
+    if (preferences.mode === CalendarMode.FRIENDS) {
+        const usersForCalendar = [user, ...preferences.friends.map(uid => findUser(users, uid))]
+        const userData = usersForCalendar
+            .map(u => mergeData({data: getUserData({user: u, preferences, sessions, routes, workouts, cutoffDate}), label: getUserName(u)}))
+            .flat()
+        return excludeEmpty(userData)
+    } else {
+        return excludeEmpty(getUserData({user, preferences, sessions, routes, workouts, cutoffDate}))
+    }
+}
+
+export const getUserData = ({user, preferences, sessions, routes, workouts, cutoffDate}) => [
+    ...getSessionData({sessions: getSessionsForUser(sessions, user.uid), routes, cutoffDate}),
+    ...getWorkoutData({workouts: getWorkoutsForUser(workouts,  user.uid), cutoffDate, preferences}),
+]
+
 export const getSessionData = ({sessions, routes, cutoffDate}) => {
     const sessionData = getDataWithPercentiles({
         data: sessions.map(x => x.value),
@@ -74,13 +111,18 @@ export const getSessionData = ({sessions, routes, cutoffDate}) => {
     return [{label: 'Climbing', data: sessionData}]
 }
 
-export const getWorkoutData = ({workouts, cutoffDate}) => {
-    return WORKOUT_CATEGORIES.map(category => ({
+export const getWorkoutData = ({workouts, cutoffDate, preferences}) => {
+    if (!preferences.includeWorkouts) return []
+
+    const allWorkoutData = excludeEmpty(WORKOUT_CATEGORIES.map(category => ({
         label: category,
         data: getData({
             data: workouts.map(x => x.value).filter(workout => workout.categories.includes(category)),
             cutoffDate,
             getLevel: workout => workout.intensity
         })
-    })).filter(category => category.data.some(day => day.level > 0))
+    })))
+
+    if (!preferences.splitWorkouts) return mergeData({data: allWorkoutData, label: 'Workout'})
+    return allWorkoutData
 }
