@@ -1,4 +1,6 @@
-import { ALL_STYLES, printType } from '../helpers/gradeUtils';
+import {ALL_STYLES, printType} from '../helpers/gradeUtils';
+import {GymPicker} from "../components/GymPicker";
+import React from "react";
 
 export const gymFields = [
     {
@@ -24,4 +26,15 @@ export const gymFields = [
             }
         }
     })
+]
+
+export const migrateGymFields = ({gyms}) => [
+    {
+        title: 'Gym',
+        name: 'gymId',
+        options: {
+            type: 'custom',
+            component: ({value, onChange})  => <GymPicker gyms={gyms} gymId={value} onChange={onChange} />,
+        }
+    }
 ]

@@ -12,6 +12,7 @@ import TruncatedList from '../components/TruncatedList'
 import {getEditorsForGym, getRoutesForGym, getSessionsForUserAndGym} from '../helpers/filterUtils';
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
+import DeleteGymModal from "./DeleteGymModal";
 
 const GymPage = ({auth: {uid}, match: {params: {id}}, gym, sessions, routes, users, firebase, history}) => {
     const [showRouteModal, openRouteModal, closeRouteModal] = useModalState(false)
@@ -63,6 +64,8 @@ const GymPage = ({auth: {uid}, match: {params: {id}}, gym, sessions, routes, use
     const sessionsForUser = getSessionsForUserAndGym(sessions, {key: id}, uid).sort((a, b) => b.value.startTime - a.value.startTime)
 
     const canEdit = getEditorsForGym(gym, users).includes(uid)
+
+    const canDelete = gym.owner === uid
 
     const routeListItem = ({key, value}) => (
         <Link to={`/routes/${key}`} style={{textDecoration: 'none'}} key={key}>
@@ -143,6 +146,8 @@ const GymPage = ({auth: {uid}, match: {params: {id}}, gym, sessions, routes, use
                     </Link>
                 ))}
             </TruncatedList>
+
+            {canDelete && <DeleteGymModal gymId={id} history={history}/>}
 
             <EntityModal show={showEditModal}
                          handleClose={closeEditModal}
