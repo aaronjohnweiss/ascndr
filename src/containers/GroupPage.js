@@ -1,12 +1,12 @@
-import React, { Component, Fragment } from 'react'
-import { connect } from 'react-redux'
-import { Button, Col, ListGroup, Row } from 'react-bootstrap'
+import React, {Component, Fragment} from 'react'
+import {connect} from 'react-redux'
+import {Button, Col, ListGroup, Row} from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
-import { updateGroupFields } from '../templates/groupFields'
+import {updateGroupFields, userIdValidation} from '../templates/groupFields'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
-import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
-import { compose } from 'redux'
-import resolveUsers from '../helpers/resolveUsers'
+import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
+import {compose} from 'redux'
+import {distinct, getUsersForGroup} from "../helpers/filterUtils";
 
 class GroupPage extends Component {
     constructor(props) {
@@ -29,11 +29,24 @@ class GroupPage extends Component {
         this.setState({ showModal: false })
     }
 
-    addGroupMember({ uid }) {
+    addGroupMember({ userValue }) {
         let group = Object.assign({}, this.props.group)
-        group.users = [...group.users, uid]
 
-        this.props.firebase.update(`groups/${this.props.match.params.id}`, group)
+        const { users } = this.props;
+
+        let uid;
+        if (users.map(user => user.value.uid).includes(userValue)) {
+            uid = userValue
+        } else {
+            uid = (users.map(user => user.value).find(user => user.name === userValue) || {}).uid
+        }
+
+        if (uid) {
+            group.users = distinct([...group.users, uid])
+
+            this.props.firebase.update(`groups/${this.props.match.params.id}`, group)
+        }
+
         this.hideModal()
     }
 
@@ -50,13 +63,14 @@ class GroupPage extends Component {
         if (!isLoaded(group) || !isLoaded(users)) return 'Loading';
         if (!group) return 'Uh oh';
 
-        const usersForGroup = resolveUsers(users, group.users);
+        const usersForGroup = getUsersForGroup(users, group).map(user => user.value);
 
         const newUserModal = () =>
             <EntityModal show={this.state.showModal}
                          handleClose={this.hideModal}
                          handleSubmit={this.addGroupMember}
                          fields={updateGroupFields}
+                         validateState={userIdValidation(users)}
                          title='Add User'
             />
         return (
@@ -69,7 +83,7 @@ class GroupPage extends Component {
                         <ListGroup.Item key={user.uid}>
                             <Row className="m-0 align-items-center">
                                 <Col className="text-truncate">
-                                    {user.name}
+                                    {user.name || user.uid}
                                 </Col>
                                 <Col xs="auto">
                              <ConfirmCancelButton handleConfirm={() => this.removeGroupMember(user.uid)}
@@ -99,7 +113,7 @@ class GroupPage extends Component {
 const mapStateToProps = (state, props) => {
     return {
         group: getVal(state.firebase, `data/groups/${props.match.params.id}`),
-        users: state.firebase.data.users,
+        users: state.firebase.ordered.users,
         auth: state.auth
     }
 }

@@ -12,7 +12,7 @@ const getInitialData = ({initialValues, fields}) => {
 }
 
 const ValidationErrors = ({validationErrors}) => validationErrors.length > 0 && <>
-    {validationErrors.map((error, idx) => <Form.Text muted className='d-block' key={idx}>{error.message}</Form.Text>)}
+    {validationErrors.map((error, idx) => <Form.Text className='d-block text-danger' key={idx}>{error.message}</Form.Text>)}
 </>
 
 const EntityModal = ({handleClose, handleSubmit, show, fields, title, submitText, validateState, initialValues}) => {

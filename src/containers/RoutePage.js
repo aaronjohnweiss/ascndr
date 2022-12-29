@@ -1,15 +1,15 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { Button, Col, Container, Row } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {Button, Col, Container, Row} from 'react-bootstrap'
+import {Link} from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import axios from 'axios'
 import EntityModal from '../components/EntityModal'
-import { routeUpdateFields } from '../templates/routeFields'
-import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
-import { compose } from 'redux'
-import { prettyPrint } from '../helpers/gradeUtils'
-import { findUser, getSessionsForRoute } from '../helpers/filterUtils';
+import {routeUpdateFields} from '../templates/routeFields'
+import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
+import {compose} from 'redux'
+import {prettyPrint} from '../helpers/gradeUtils'
+import {distinct, findUser, getSessionsForRoute} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
 
 export const PENDING_IMAGE = 'PENDING';
@@ -120,7 +120,7 @@ class RoutePage extends Component {
         }
 
         const sessionsForRoute = getSessionsForRoute(sessions, routeId);
-        const uidsForRoute = [...new Set(sessionsForRoute.map(session => session.value.uid))];
+        const uidsForRoute = distinct(sessionsForRoute.map(session => session.value.uid));
         const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
 
         return (

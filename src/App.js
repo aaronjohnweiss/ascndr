@@ -18,6 +18,7 @@ import StatsPage from './containers/StatsContainer'
 import {FaBars} from "react-icons/fa";
 import Sidebar from "./containers/Sidebar";
 import WorkoutIndex from "./containers/WorkoutIndex";
+import UserCheck from "./containers/UserCheck";
 
 const App = (props) => {
     const [showSidebar, setShowSidebar] = useState(false)
@@ -58,6 +59,7 @@ const App = (props) => {
                     </div>
                 </Container>
                 <Sidebar show={showSidebar} onHide={closeSidebar} />
+                <UserCheck />
                 <Container>
                     <div className="px-2">
                         <Route exact path='/' component={Home}/>

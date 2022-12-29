@@ -1,13 +1,13 @@
-import React, { Component, Fragment } from 'react'
-import { connect } from 'react-redux'
+import React, {Component, Fragment} from 'react'
+import {connect} from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
-import { Link } from 'react-router-dom'
-import { Col, ListGroup, Row } from 'react-bootstrap'
-import { groupFields, userFields } from '../templates/groupFields'
-import { compose } from 'redux'
-import { firebaseConnect, isEmpty, isLoaded } from 'react-redux-firebase'
-import { findUser, getGroupsForUser } from '../helpers/filterUtils';
+import {Link} from 'react-router-dom'
+import {Col, ListGroup, Row} from 'react-bootstrap'
+import {groupFields, userFields, userNameValidation} from '../templates/groupFields'
+import {compose} from 'redux'
+import {firebaseConnect, isEmpty, isLoaded} from 'react-redux-firebase'
+import {findUser, getGroupsForUser} from '../helpers/filterUtils';
 
 class GroupIndex extends Component {
     constructor(props) {
@@ -111,9 +111,11 @@ class GroupIndex extends Component {
                              fields={groupFields}/>
 
                  <EntityModal show={this.state.showUserModal}
+                              title='Edit User'
                               handleClose={this.hideUserModal}
                               handleSubmit={this.handleUserUpdate}
                               fields={userFields}
+                              validateState={userNameValidation(users, userName)}
                               initialValues={{...userInfo}} />
             </Fragment>
         )

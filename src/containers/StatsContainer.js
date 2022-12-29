@@ -1,17 +1,18 @@
 import React from 'react'
-import { firebaseConnect, isLoaded } from 'react-redux-firebase'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
+import {firebaseConnect, isLoaded} from 'react-redux-firebase'
+import {compose} from 'redux'
+import {connect} from 'react-redux'
 import GradeHistogram from '../components/GradeHistogram'
-import { Route, Switch, useLocation } from 'react-router-dom'
+import {Route, Switch, useLocation} from 'react-router-dom'
 import resolveUsers from '../helpers/resolveUsers'
 import StatsIndex from '../components/StatsIndex';
-import { toObj } from '../helpers/objectConverters';
-import { FaChevronLeft } from 'react-icons/fa';
-import { ALL_STYLES } from '../helpers/gradeUtils';
+import {toObj} from '../helpers/objectConverters';
+import {FaChevronLeft} from 'react-icons/fa';
+import {ALL_STYLES} from '../helpers/gradeUtils';
 import GradeHistory from '../components/GradeHistory';
-import StatFilters, { filtersLink } from './StatFilters';
-import { Button } from 'react-bootstrap';
+import StatFilters, {filtersLink} from './StatFilters';
+import {Button} from 'react-bootstrap';
+import {distinct} from "../helpers/filterUtils";
 
 const filterByKeys = (data, keys) => {
     if (!data) return [];
@@ -48,7 +49,7 @@ const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
         allowedGroups = allowedGroups.filter(({key}) => groupsForGyms.includes(key));
     }
 
-    let allowedUids = [...new Set(allowedGroups.map(group => group.value).filter(group => group.users.includes(auth.uid)).flatMap(group => group.users))];
+    let allowedUids = distinct(allowedGroups.map(group => group.value).filter(group => group.users.includes(auth.uid)).flatMap(group => group.users));
     if (query.has('uids')) {
         const uidsFromQuery = query.getAll('uids');
         allowedUids = allowedUids.filter(uid => uidsFromQuery.includes(uid));
