@@ -201,22 +201,19 @@ export function generateEmptyData() {
     return days.map((date) => (emptyDay(date, 1)));
 }
 
-export const getNumColumns = ({maxWidth, fontSize = VictoryTheme.grayscale.legend.style.labels.fontSize, fontFamily = VictoryTheme.grayscale.legend.style.labels.fontFamily, labels, padding}) => {
-    let numPerRow = labels.length;
-    const widths = labels.map(({name}) => {
-        const size = calculateSize(name, {fontSize: `${fontSize}px`, font: fontFamily}).width;
-        return size + padding;
-    })
+export const getLegendRows = ({maxWidth, fontSize = VictoryTheme.grayscale.legend.style.labels.fontSize, fontFamily = VictoryTheme.grayscale.legend.style.labels.fontFamily, labels, padding}) => {
+    const rowSize = row => row.map(label => calculateSize(label.name, {fontSize: `${fontSize}px`, font: fontFamily}).width + padding).reduce((acc, x) => acc + x, 0)
 
-    while (!isValidSlice({numPerRow, widths, maxWidth}) && numPerRow > 1) {
-        numPerRow--;
+    const rows = [];
+    let thisRow = [];
+    for (const label of labels) {
+        if (rowSize([...thisRow, label]) < maxWidth) {
+            thisRow.push(label)
+        } else {
+            rows.push(thisRow)
+            thisRow = [label]
+        }
     }
-
-    return numPerRow;
+    rows.push(thisRow);
+    return rows;
 }
-
-const buildSlice = ({numPerRow, widths}) => Array(Math.ceil(widths.length / numPerRow))
-    .fill(undefined)
-    .map((_, idx) => widths.slice(idx * numPerRow, (idx + 1) * numPerRow));
-
-const isValidSlice = ({numPerRow, widths, maxWidth}) => buildSlice({numPerRow, widths}).map(row => row.reduce((acc, x) => acc + x, 0)).every(lineWidth => lineWidth <= maxWidth)

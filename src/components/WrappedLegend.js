@@ -1,7 +1,7 @@
 import {VictoryLegend} from "victory";
 import React from "react";
 import {shorten} from "../helpers/stringUtils";
-import {getNumColumns} from "./activity-calendar/utils";
+import {getLegendRows} from "./activity-calendar/utils";
 
 const LEGEND_ENTRY_HEIGHT = 30;
 const LEGEND_ENTRY_GUTTER = 20;
@@ -10,22 +10,23 @@ const LEGEND_ENTRY_PADDING = LEGEND_ENTRY_GUTTER * 2;
 
 
 export const WrappedLegend = ({data, width, colorScale}) => {
-    const legendData = data.map(datum => ({name: shorten(datum.label, LEGEND_ENTRY_MAX_CHARACTERS)}));
+    const legendData = data.map((datum, idx) => ({name: shorten(datum.label, LEGEND_ENTRY_MAX_CHARACTERS), symbol: { fill: colorScale[idx] }}));
 
-    const numColumns = getNumColumns({maxWidth: width, padding: LEGEND_ENTRY_PADDING, labels: legendData});
+    const rows = getLegendRows({maxWidth: width, padding: LEGEND_ENTRY_PADDING, labels: legendData});
 
     return (
         <div>
-            <svg width={width} height={LEGEND_ENTRY_HEIGHT * Math.ceil(data.length / numColumns)}>
-                <VictoryLegend
+            <svg width={width} height={LEGEND_ENTRY_HEIGHT * rows.length}>
+                {rows.map((row, idx) => <VictoryLegend
+                    key={idx}
+                    y={idx * LEGEND_ENTRY_HEIGHT}
                     standalone={false}
-                    colorScale={colorScale}
                     gutter={LEGEND_ENTRY_GUTTER}
                     orientation="horizontal"
-                    itemsPerRow={numColumns}
                     width={width}
-                    data={legendData}
+                    data={row}
                 />
+                )}
             </svg>
         </div>
     )
