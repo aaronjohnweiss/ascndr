@@ -31,9 +31,12 @@ const App = (props) => {
     let authState
 
     if (props.authenticated) {
-        authState = <li className="nav-item">
-            <Link className="nav-link" to='/' onClick={props.signOut}>Sign Out</Link>
-        </li>
+        authState = <>
+            <li className="nav-item">
+                <Link className="nav-link" to='/' onClick={props.signOut}>Sign Out</Link>
+            </li>
+            <UserCheck/>
+        </>
     } else {
         authState = <li className="nav-item">
             <Link className="nav-link" to='/login'>Sign In</Link>
@@ -57,8 +60,7 @@ const App = (props) => {
                         </p>
                     </div>
                 </Container>
-                <Sidebar show={showSidebar} onHide={closeSidebar} />
-                <UserCheck />
+                <Sidebar show={showSidebar} onHide={closeSidebar}/>
                 <Container>
                     <div className="px-2">
                         <Route exact path='/' component={Home}/>
@@ -68,7 +70,7 @@ const App = (props) => {
                         <Route exact path='/routes/:id' component={requireAuth(RoutePage)}/>
                         <Route exact path='/sessions/:id' component={requireAuth(SessionPage)}/>
                         <Route path='/stats' component={requireAuth(StatsPage)}/>
-                        <Route exact path='/workouts' component={requireAuth(WorkoutIndex)} />
+                        <Route exact path='/workouts' component={requireAuth(WorkoutIndex)}/>
                         <Route exact path='/login' component={denyAuth(SignIn)}/>
                     </div>
                 </Container>
