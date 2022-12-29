@@ -123,7 +123,7 @@ class RoutePage extends Component {
         const uidsForRoute = distinct(sessionsForRoute.map(session => session.value.uid));
         const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
 
-        const canEdit = getEditorsForGym(gym, users).includes(uid)
+        const canEdit = getEditorsForGym(gym.value, users).includes(uid)
 
         return (
             <Container>
