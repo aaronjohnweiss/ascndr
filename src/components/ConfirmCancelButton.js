@@ -1,5 +1,5 @@
-import React, { Component, Fragment } from 'react'
-import { Button, Modal } from 'react-bootstrap';
+import React, {Component, Fragment} from 'react'
+import {Button, Modal} from 'react-bootstrap';
 
 export default class ConfirmCancelButton extends Component {
     state = {
@@ -18,13 +18,23 @@ export default class ConfirmCancelButton extends Component {
         const { handleConfirm, modalTitle, modalBody, buttonText, buttonProps, buttonBlock } = this.props
         const { showModal } = this.state
 
+        const ShowModalButton = () => (
+            <Button variant='danger' {...buttonProps} onClick={this.showModal}>
+            {buttonText}
+        </Button>
+        )
+
+        const WrappedButton = () => buttonBlock ? (
+            <div className={buttonBlock ? "d-grid d-block" : ""}>
+                <ShowModalButton />
+            </div>
+        ) : (
+            <ShowModalButton />
+        )
+
         return (
             <Fragment>
-                <div className={buttonBlock ? "d-grid d-block" : ""}>
-                    <Button variant='danger' {...buttonProps} onClick={this.showModal}>
-                        {buttonText}
-                    </Button>
-                </div>
+                <WrappedButton />
                 <Modal show={showModal} onHide={this.hideModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>

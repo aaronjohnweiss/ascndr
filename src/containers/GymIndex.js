@@ -1,12 +1,12 @@
-import React, { Component, Fragment } from 'react'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
+import React, {Component, Fragment} from 'react'
+import {compose} from 'redux'
+import {connect} from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
-import { gymFields } from '../templates/gymFields'
+import {gymFields} from '../templates/gymFields'
 import Gym from '../components/Gym'
 import ListModal from '../components/ListModal'
-import { firebaseConnect, isLoaded } from 'react-redux-firebase'
+import {firebaseConnect, isLoaded} from 'react-redux-firebase'
 import {
     getGroupsForUser,
     getGymsForGroups,
@@ -14,7 +14,7 @@ import {
     getSessionsForGym,
     getSessionsForUser
 } from '../helpers/filterUtils';
-import { Link } from 'react-router-dom';
+import {Link} from 'react-router-dom';
 
 const getLatestTimeForGym = (gym, sessions) => {
     const latest = getLatestSession(getSessionsForGym(sessions, gym));
@@ -94,7 +94,7 @@ class GymIndex extends Component {
                         Gyms must be associated with a group, but you are not currently part of any groups.
                     </p>
                     <p>
-                        <Link to='/groups'>Click here</Link> to manage your user; either create a group,
+                        <Link to='/user'>Click here</Link> to manage your user; either create a group,
                         or share your uid with someone to have them add you to a group.
                     </p>
             </>

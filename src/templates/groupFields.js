@@ -9,7 +9,7 @@ export const groupFields = [
     }
 ]
 
-export const updateGroupFields = [
+export const addFriendFields = [
     {
         title: 'User ID or Name',
         placeholder: 'User...',
