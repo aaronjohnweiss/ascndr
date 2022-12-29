@@ -1,19 +1,19 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { Button, Col, Container, Row } from 'react-bootstrap'
-import { compareGrades, countPartials, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
-import GradeModal, { PARTIAL_MAX } from '../components/GradeModal'
-import { Link } from 'react-router-dom'
-import { sessionDuration } from '../helpers/durationUtils'
-import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
-import { compose } from 'redux'
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {Button, Col, Container, Row} from 'react-bootstrap'
+import {compareGrades, countPartials, gradeEquals, prettyPrint} from '../helpers/gradeUtils'
+import GradeModal, {PARTIAL_MAX} from '../components/GradeModal'
+import {Link} from 'react-router-dom'
+import {sessionDuration} from '../helpers/durationUtils'
+import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
+import {compose} from 'redux'
 import SessionModal from '../components/SessionModal';
-import { getGymsForUser } from '../helpers/filterUtils';
-import { sum } from '../helpers/mathUtils';
+import {getGymsForUser} from '../helpers/filterUtils';
+import {sum} from '../helpers/mathUtils';
 import CustomRouteModal from '../components/CustomRouteModal';
 import ConfirmCancelButton from '../components/ConfirmCancelButton';
-import { routeCount } from '../components/StatsIndex';
-import { PartialRoutesAccordion } from '../components/PartialRoutesAccordion';
+import {routeCount} from '../components/StatsIndex';
+import {PartialRoutesAccordion} from '../components/PartialRoutesAccordion';
 
 const hasPartialCompletions = ({partials = {}}) => Object.entries(partials).some(([key, val]) => key > 0 && val > 0)
 const hasFullCompletions = ({count = 0}) => count > 0;
@@ -130,9 +130,9 @@ class SessionPage extends Component {
     }
 
     render() {
-        const { auth: {uid}, session, routes, gyms, groups } = this.props
+        const { auth: {uid}, session, routes, gyms, users } = this.props
 
-        if (!isLoaded(session, routes, gyms, groups)) return 'Loading'
+        if (!isLoaded(session, routes, gyms, users)) return 'Loading'
         if (!session || !gyms) return 'Uh oh'
 
         if (!session.customRoutes) session.customRoutes = []
@@ -211,7 +211,7 @@ class SessionPage extends Component {
                             </Col>
                             {isFinished && canEdit &&
                                 <Col xs={2}>
-                                    <SessionModal session={session} gyms={getGymsForUser(gyms, groups, session.uid)} onChange={this.updateSession} buttonProps={{style: {float: 'right'}}}/>
+                                    <SessionModal session={session} gyms={getGymsForUser(gyms, users, session.uid)} onChange={this.updateSession} buttonProps={{style: {float: 'right'}}}/>
                                 </Col>
                             }
                         </Row>
@@ -316,7 +316,7 @@ const mapStateToProps = (state, props) => {
         session: getVal(state.firebase, `data/sessions/${props.match.params.id}`),
         routes: state.firebase.ordered.routes,
         gyms: state.firebase.ordered.gyms,
-        groups: state.firebase.ordered.groups
+        users: state.firebase.ordered.users
     }
 }
 
@@ -325,7 +325,7 @@ export default compose(
         { path: 'sessions' },
         { path: 'routes' },
         { path: 'gyms' },
-        { path: 'groups' }
+        { path: 'users' }
     ]),
     connect(mapStateToProps)
 )(SessionPage)

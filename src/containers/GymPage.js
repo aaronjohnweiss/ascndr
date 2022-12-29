@@ -1,16 +1,16 @@
-import React, { Component, Fragment } from 'react'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
-import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
-import { Button, Col, ListGroup, Row } from 'react-bootstrap'
+import React, {Component, Fragment} from 'react'
+import {compose} from 'redux'
+import {connect} from 'react-redux'
+import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
+import {Button, Col, ListGroup, Row} from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
-import { routeCreateFields } from '../templates/routeFields'
-import { gymFields } from '../templates/gymFields'
-import { Link } from 'react-router-dom'
-import { sessionDuration } from '../helpers/durationUtils'
+import {routeCreateFields} from '../templates/routeFields'
+import {gymFields} from '../templates/gymFields'
+import {Link} from 'react-router-dom'
+import {sessionDuration} from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
-import { getRoutesForGym, getSessionsForUserAndGym } from '../helpers/filterUtils';
-import { PENDING_IMAGE, uploadImage } from './RoutePage';
+import {getEditorsForGym, getRoutesForGym, getSessionsForUserAndGym} from '../helpers/filterUtils';
+import {PENDING_IMAGE, uploadImage} from './RoutePage';
 
 class GymPage extends Component {
     constructor(props) {
@@ -73,10 +73,10 @@ class GymPage extends Component {
     }
 
     render() {
-        const { auth: { uid }, match, gym, sessions, routes } = this.props
+        const { auth: { uid }, match, gym, sessions, routes, users } = this.props
         const id = match.params.id
 
-        if (!isLoaded(gym, sessions, routes)) return 'Loading'
+        if (!isLoaded(gym, sessions, routes, users)) return 'Loading'
         if (!gym) return 'Uh oh'
 
         // Filter to only routes for this gym
@@ -84,6 +84,8 @@ class GymPage extends Component {
         const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
         const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
         const sessionsForUser = getSessionsForUserAndGym(sessions, {key: id}, uid).sort((a, b) => b.value.startTime - a.value.startTime)
+
+        const canEdit = getEditorsForGym(gym, users).includes(uid)
 
         const routeListItem = ({ key, value }) => (
             <Link to={`/routes/${key}`} style={{ textDecoration: 'none' }} key={key}>
@@ -100,7 +102,7 @@ class GymPage extends Component {
                         <h2>{gym.name}</h2>
                     </Col>
                     <Col xs={2}>
-                        <Button onClick={this.showModal('showEditGymModal')} style={{ float: 'right' }}>Edit</Button>
+                        {canEdit && <Button onClick={this.showModal('showEditGymModal')} style={{ float: 'right' }}>Edit</Button>}
                     </Col>
                 </Row>
                 <h4>
@@ -112,9 +114,9 @@ class GymPage extends Component {
                         <h3>Routes</h3>
                     </Col>
                     <Col xs={6}>
-                        <Button variant='primary' onClick={this.showModal('showAddRouteModal')} style={{ float: 'right' }}>
+                        { canEdit && <Button variant='primary' onClick={this.showModal('showAddRouteModal')} style={{ float: 'right' }}>
                             Add Route
-                        </Button>
+                        </Button> }
                     </Col>
                 </Row>
                 {currentRoutes.length > 0 && (
@@ -182,7 +184,8 @@ const mapStateToProps = (state, props) => {
         auth: state.auth,
         gym: getVal(state.firebase, `data/gyms/${props.match.params.id}`),
         routes: state.firebase.ordered.routes,
-        sessions: state.firebase.ordered.sessions
+        sessions: state.firebase.ordered.sessions,
+        users: state.firebase.ordered.users,
     }
 }
 
@@ -190,7 +193,8 @@ export default compose(
     firebaseConnect([
         { path: 'gyms' },
         { path: 'routes' },
-        { path: 'sessions' }
+        { path: 'sessions' },
+        { path: 'users' },
     ]),
     connect(mapStateToProps)
 )(GymPage)

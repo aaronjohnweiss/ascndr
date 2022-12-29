@@ -45,7 +45,7 @@ const loggedInItems = ({auth}) => [
         text: 'Stats',
     },
     {
-        href: '/groups',
+        href: '/user',
         text: 'User Settings',
     },
 ]

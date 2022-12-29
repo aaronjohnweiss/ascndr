@@ -4,9 +4,8 @@ import {firebaseConnect} from 'react-redux-firebase';
 import {connect} from 'react-redux';
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
-import resolveUsers from '../helpers/resolveUsers';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
-import {getGroupsForUser, getGymsForGroups} from '../helpers/filterUtils';
+import {findUser, getFriendsForUser, getGymsForUser, getUserName} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
@@ -25,16 +24,14 @@ const defaultIfEmpty = (a1, a2) => {
     return a1;
 };
 
-const StatFilters = ({auth, groups, users, gyms}) => {
+const StatFilters = ({auth: {uid}, users, gyms}) => {
     const query = new URLSearchParams(useLocation().search);
 
-    const groupsForUser = getGroupsForUser(groups, auth.uid);
-    const allowedUids = [...new Set(groupsForUser.flatMap(group => group.value.users))];
-    console.log(allowedUids);
-    const visibleUsers = resolveUsers(users, allowedUids);
-    const visibleGyms = getGymsForGroups(gyms, groupsForUser);
+    const user = findUser(users, uid);
+    const visibleUsers = [user, ...getFriendsForUser(user, users)];
+    const visibleGyms = getGymsForUser(gyms, users, uid);
     const [gymIds, setGymIds] = useState(defaultIfEmpty(query.getAll('gyms'), visibleGyms.map(gym => gym.key)));
-    const [uids, setUids] = useState(defaultIfEmpty(query.getAll('uids'), allowedUids));
+    const [uids, setUids] = useState(defaultIfEmpty(query.getAll('uids'), visibleUsers.map(u => u.uid)));
 
     const [allowSuffixes, setAllowSuffixes] = useState(getBooleanFromQuery(query, 'allowSuffixes'));
     const [allowPartials, setAllowPartials] = useState(getBooleanFromQuery(query, 'allowPartials', true));
@@ -52,10 +49,10 @@ const StatFilters = ({auth, groups, users, gyms}) => {
         }
     });
 
-    const userOptions = visibleUsers.map(({name, uid}) => ({
-        key: uid,
-        label: name,
-        checked: uids.includes(uid)
+    const userOptions = visibleUsers.map(u => ({
+        key: u.uid,
+        label: getUserName(u),
+        checked: uids.includes(u.uid)
     }));
 
     const gymOptions = visibleGyms.map(({key, value}) => ({
@@ -110,15 +107,13 @@ const mapStateToProps = (state) => {
     return {
         auth: state.auth,
         gyms: state.firebase.ordered.gyms,
-        groups: state.firebase.ordered.groups,
-        users: state.firebase.data.users
+        users: state.firebase.ordered.users
     }
 };
 
 export default compose(
     firebaseConnect([
         {path: 'gyms'},
-        {path: 'groups'},
         {path: 'users'}
     ]),
     connect(mapStateToProps)

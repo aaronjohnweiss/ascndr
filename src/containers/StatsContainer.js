@@ -1,17 +1,17 @@
 import React from 'react'
-import { firebaseConnect, isLoaded } from 'react-redux-firebase'
-import { compose } from 'redux'
-import { connect } from 'react-redux'
+import {firebaseConnect, isLoaded} from 'react-redux-firebase'
+import {compose} from 'redux'
+import {connect} from 'react-redux'
 import GradeHistogram from '../components/GradeHistogram'
-import { Route, Switch, useLocation } from 'react-router-dom'
-import resolveUsers from '../helpers/resolveUsers'
+import {Route, Switch, useLocation} from 'react-router-dom'
 import StatsIndex from '../components/StatsIndex';
-import { toObj } from '../helpers/objectConverters';
-import { FaChevronLeft } from 'react-icons/fa';
-import { ALL_STYLES } from '../helpers/gradeUtils';
+import {toObj} from '../helpers/objectConverters';
+import {FaChevronLeft} from 'react-icons/fa';
+import {ALL_STYLES} from '../helpers/gradeUtils';
 import GradeHistory from '../components/GradeHistory';
-import StatFilters, { filtersLink } from './StatFilters';
-import { Button } from 'react-bootstrap';
+import StatFilters, {filtersLink} from './StatFilters';
+import {Button} from 'react-bootstrap';
+import {filterList, findUser, getGymsForUser} from "../helpers/filterUtils";
 
 const filterByKeys = (data, keys) => {
     if (!data) return [];
@@ -28,27 +28,23 @@ const StatsHeader = ({location}) => (
 
 export const getBooleanFromQuery = (query, name, valueIfMissing = false) => query.has(name) ? query.get(name) === 'true' : valueIfMissing;
 
-const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
+const StatsContainer = ({auth: {uid}, routes, sessions, users, gyms}) => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
-    if (!isLoaded(routes, sessions, groups, users, gyms)) return 'Loading';
-
-    let allowedGroups = filterByKeys(groups, query.getAll('groups')); // TODO keep?
+    if (!isLoaded(routes, sessions, users, gyms)) return 'Loading';
 
     let allowedSessions = sessions;
-    let allowedGyms = gyms;
+    let allowedGyms = getGymsForUser(gyms, users, uid);
     if (query.has('gyms')) {
         const gymsFromQuery = query.getAll('gyms');
-        // Filter sessions based on gym ids
+        // Filter sessions and gyms based on gym ids
         allowedSessions = allowedSessions.filter(session => gymsFromQuery.includes(session.value.gymId));
-        // Filter groups so that they are for the provided gyms
+
         allowedGyms = filterByKeys(gyms, gymsFromQuery);
-        const groupsForGyms = allowedGyms.map(gym => gym.value.groupId);
-        allowedGroups = allowedGroups.filter(({key}) => groupsForGyms.includes(key));
     }
 
-    let allowedUids = [...new Set(allowedGroups.map(group => group.value).filter(group => group.users.includes(auth.uid)).flatMap(group => group.users))];
+    let allowedUids = [uid, ...findUser(users, uid).friends];
     if (query.has('uids')) {
         const uidsFromQuery = query.getAll('uids');
         allowedUids = allowedUids.filter(uid => uidsFromQuery.includes(uid));
@@ -56,11 +52,11 @@ const StatsContainer = ({auth, routes, sessions, groups, users, gyms}) => {
 
     allowedSessions = allowedSessions.filter(session => allowedUids.includes(session.value.uid));
 
-    const allowedUsers = resolveUsers(users && users.map(user => user.value) || [], allowedUids);
+    const allowedUsers = filterList(users, 'uid', allowedUids);
 
     const filterProps = {
         gyms: toObj(allowedGyms),
-        users: allowedUsers.reduce((obj, user) => ({...obj, [user.uid]: user}), {}),
+        users: allowedUsers.reduce((obj, user) => ({...obj, [user.value.uid]: user.value}), {}),
         routes,
         sessions: toObj(allowedSessions)
     };
@@ -93,7 +89,6 @@ const mapStateToProps = (state) => {
         gyms: state.firebase.ordered.gyms,
         routes: state.firebase.data.routes,
         sessions: state.firebase.ordered.sessions,
-        groups: state.firebase.ordered.groups,
         users: state.firebase.ordered.users
     }
 };
@@ -103,7 +98,6 @@ export default compose(
         {path: 'gyms'},
         {path: 'routes'},
         {path: 'sessions'},
-        {path: 'groups'},
         {path: 'users'}
     ]),
     connect(mapStateToProps)

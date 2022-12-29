@@ -1,15 +1,15 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { Button, Col, Container, Row } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {Button, Col, Container, Row} from 'react-bootstrap'
+import {Link} from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import axios from 'axios'
 import EntityModal from '../components/EntityModal'
-import { routeUpdateFields } from '../templates/routeFields'
-import { firebaseConnect, getVal, isLoaded } from 'react-redux-firebase'
-import { compose } from 'redux'
-import { prettyPrint } from '../helpers/gradeUtils'
-import { findUser, getSessionsForRoute } from '../helpers/filterUtils';
+import {routeUpdateFields} from '../templates/routeFields'
+import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
+import {compose} from 'redux'
+import {prettyPrint} from '../helpers/gradeUtils'
+import {distinct, findUser, getEditorsForGym, getSessionsForRoute} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
 
 export const PENDING_IMAGE = 'PENDING';
@@ -94,7 +94,7 @@ class RoutePage extends Component {
     }
 
     render() {
-        const { match, gyms, sessions, route, users } = this.props
+        const { match, auth: { uid }, gyms, sessions, route, users } = this.props
         const routeId = match.params.id
         if (!isLoaded(route, gyms, sessions, users)) return 'Loading'
         if (!route) return 'Uh oh'
@@ -120,8 +120,10 @@ class RoutePage extends Component {
         }
 
         const sessionsForRoute = getSessionsForRoute(sessions, routeId);
-        const uidsForRoute = [...new Set(sessionsForRoute.map(session => session.value.uid))];
+        const uidsForRoute = distinct(sessionsForRoute.map(session => session.value.uid));
         const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
+
+        const canEdit = getEditorsForGym(gym, users).includes(uid)
 
         return (
             <Container>
@@ -137,7 +139,7 @@ class RoutePage extends Component {
                                 </h2>
                             </Col>
                             <Col xs={2}>
-                                <Button onClick={this.showModal} style={{ float: 'right' }}>Edit</Button>
+                                { canEdit && <Button onClick={this.showModal} style={{ float: 'right' }}>Edit</Button> }
                             </Col>
                         </Row>
                         <h3>{prettyPrint(route.grade) + ' '}
@@ -149,7 +151,7 @@ class RoutePage extends Component {
                         <p>{route.description}</p>
                         <RouteHistory routeKey={routeId} users={usersForRoute} sessions={sessionsForRoute} />
                         <br />
-                        {!route.isRetired && (
+                        {!route.isRetired && canEdit && (
                             <ConfirmCancelButton handleConfirm={this.retireRoute}
                                                  modalTitle='Retire route?'
                                                  modalBody='Retiring this route will prevent it from being added to any sessions.'
@@ -168,6 +170,7 @@ class RoutePage extends Component {
 
 const mapStateToProps = (state, props) => {
     return {
+        auth: state.auth,
         route: getVal(state.firebase, `data/routes/${props.match.params.id}`),
         gyms: state.firebase.ordered.gyms,
         sessions: state.firebase.ordered.sessions,

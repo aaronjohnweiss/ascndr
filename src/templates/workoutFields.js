@@ -2,6 +2,7 @@ import InputSlider from "../components/InputSlider";
 import React from "react";
 import {MAX_INTENSITY, WORKOUT_CATEGORIES} from "../helpers/workouts";
 import {Form} from "react-bootstrap";
+import {distinct} from "../helpers/filterUtils";
 
 const IntensityPicker = ({value, onChange}) => {
     return <InputSlider min={1} max={MAX_INTENSITY} step={1} value={value} toString={x => x} onChange={onChange}/>
@@ -10,7 +11,7 @@ const IntensityPicker = ({value, onChange}) => {
 const CategoryPicker = ({value, onChange}) => {
     const onCategoryChange = (category) => ({target: {checked}}) => {
         if (checked) {
-            const newCategories = [...new Set([...value, category])]
+            const newCategories = distinct([...value, category])
             onChange(newCategories)
         } else {
             const newCategories = [...value].filter(c => c !== category)
@@ -50,4 +51,8 @@ export const workoutFields = [
     }
 ]
 
-export const validateWorkoutFields = ({categories}) => !categories || categories.length === 0
+export const validateWorkoutFields = ({categories}) => [{
+    isValid: categories && categories.length > 0,
+    message: 'Must choose at least 1 category',
+    field: 'categories',
+}]
