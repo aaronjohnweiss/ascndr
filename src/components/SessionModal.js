@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
-import { Button, Form, Modal } from 'react-bootstrap'
-import { localDateTimeString } from '../helpers/dateUtils';
+import React, {useState} from 'react'
+import {Button, Form, Modal} from 'react-bootstrap'
+import {localDateTimeString} from '../helpers/dateUtils';
+import {GymPicker} from "./GymPicker";
 
 
 const SessionModal = ({session, gyms, onChange, buttonProps}) => {
@@ -42,11 +43,7 @@ const SessionModal = ({session, gyms, onChange, buttonProps}) => {
                     </Modal.Header>
                     <Modal.Body>
                         <Form.Label>Gym</Form.Label>
-                        <Form.Control as='select' defaultValue={session.gymId} onChange={evt => updateSession('gymId')(evt.target.value)}>
-                            {
-                                gyms.map((gym, idx) => <option key={idx} value={gym.key} className="text-truncate">{gym.value.name + " - " + gym.value.location}</option>)
-                            }
-                        </Form.Control>
+                        <GymPicker gymId={session.gymId} gyms={gyms} onChange={updateSession('gymId')} />
                         <Form.Label>Start Time</Form.Label>
                         <Form.Control onChange={handleDateTimeChange('startTime')}
                                       value={updatedSession && updatedSession.startTime ? localDateTimeString(updatedSession.startTime) : ''}

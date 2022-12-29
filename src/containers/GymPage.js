@@ -1,4 +1,4 @@
-import React, {Component, Fragment} from 'react'
+import React, {Fragment} from 'react'
 import {compose} from 'redux'
 import {connect} from 'react-redux'
 import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
@@ -11,171 +11,152 @@ import {sessionDuration} from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
 import {getEditorsForGym, getRoutesForGym, getSessionsForUserAndGym} from '../helpers/filterUtils';
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
+import {useModalState} from "../helpers/useModalState";
+import DeleteGymModal from "./DeleteGymModal";
 
-class GymPage extends Component {
-    constructor(props) {
-        super(props)
+const GymPage = ({auth: {uid}, match: {params: {id}}, gym, sessions, routes, users, firebase, history}) => {
+    const [showRouteModal, openRouteModal, closeRouteModal] = useModalState(false)
+    const [showEditModal, openEditModal, closeEditModal] = useModalState(false)
 
-        this.state = {
-            showAddRouteModal: false,
-            showEditGymModal: false
-        }
+    if (!isLoaded(gym, sessions, routes, users)) return 'Loading'
+    if (!gym) return 'Uh oh'
 
-        this.handleNewRoute = this.handleNewRoute.bind(this)
-        this.handleEditedGym = this.handleEditedGym.bind(this)
-    }
-
-    showModal = (name) => () => {
-        this.setState({ [name]: true })
-    }
-
-    hideModal = (name) => () => {
-        this.setState({ [name]: false })
-    }
-
-    handleNewRoute(route) {
+    const handleNewRoute = (route) => {
         if (route && route.picture) {
-            this.hideModal('showAddRouteModal')();
+            closeRouteModal()
             // Push route with picture pending; after imgur upload, update route with image link
-            this.props.firebase.push('routes', { ...route, picture: PENDING_IMAGE, gymId: this.props.match.params.id })
+            firebase.push('routes', {...route, picture: PENDING_IMAGE, gymId: id})
                 .then(routeRef => uploadImage(routeRef, route.picture))
                 .catch(err => {
                     console.log(err);
                 })
         } else {
-            this.props.firebase.push('routes', { ...route, gymId: this.props.match.params.id })
-            this.hideModal('showAddRouteModal')()
+            firebase.push('routes', {...route, gymId: id})
+            closeRouteModal()
         }
     }
 
-    createSession() {
-        const { auth: { uid }, match, firebase } = this.props
-        const gymId = match.params.id
+    const createSession = () => {
 
         const session = {
-            gymId: gymId,
+            gymId: id,
             uid: uid,
             startTime: new Date().getTime(),
             standardRoutes: [],
             customRoutes: []
         }
 
-        const { key } = firebase.push('sessions', session)
+        const {key} = firebase.push('sessions', session)
         if (key) {
-            this.props.history.push('/sessions/' + key);
+            history.push('/sessions/' + key);
         }
     }
 
-    handleEditedGym(gym) {
-        const { firebase, match } = this.props
-        firebase.update(`gyms/${match.params.id}`, gym)
-        this.hideModal('showEditGymModal')()
+    const handleEditedGym = (gym) => {
+        firebase.update(`gyms/${id}`, gym)
+        closeEditModal()
     }
 
-    render() {
-        const { auth: { uid }, match, gym, sessions, routes, users } = this.props
-        const id = match.params.id
+    // Filter to only routes for this gym
+    const routesForGym = getRoutesForGym(routes, {key: id});
+    const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
+    const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
+    const sessionsForUser = getSessionsForUserAndGym(sessions, {key: id}, uid).sort((a, b) => b.value.startTime - a.value.startTime)
 
-        if (!isLoaded(gym, sessions, routes, users)) return 'Loading'
-        if (!gym) return 'Uh oh'
+    const canEdit = getEditorsForGym(gym, users).includes(uid)
 
-        // Filter to only routes for this gym
-        const routesForGym = getRoutesForGym(routes, {key: id});
-        const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
-        const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
-        const sessionsForUser = getSessionsForUserAndGym(sessions, {key: id}, uid).sort((a, b) => b.value.startTime - a.value.startTime)
+    const canDelete = gym.owner === uid
 
-        const canEdit = getEditorsForGym(gym, users).includes(uid)
+    const routeListItem = ({key, value}) => (
+        <Link to={`/routes/${key}`} style={{textDecoration: 'none'}} key={key}>
+            <ListGroup.Item action>
+                {value.name}
+            </ListGroup.Item>
+        </Link>
+    )
 
-        const routeListItem = ({ key, value }) => (
-            <Link to={`/routes/${key}`} style={{ textDecoration: 'none' }} key={key}>
-                <ListGroup.Item action>
-                    {value.name}
-                </ListGroup.Item>
-            </Link>
-        )
+    return (
+        <Fragment>
+            <Row>
+                <Col xs={10}>
+                    <h2>{gym.name}</h2>
+                </Col>
+                <Col xs={2}>
+                    {canEdit && <Button onClick={openEditModal} style={{float: 'right'}}>Edit</Button>}
+                </Col>
+            </Row>
+            <h4>
+                <small>{gym.location}</small>
+            </h4>
+            <Link to={`/stats?gyms=${id}`}>View stats</Link>
+            <Row>
+                <Col xs={6}>
+                    <h3>Routes</h3>
+                </Col>
+                <Col xs={6}>
+                    {canEdit && <Button variant='primary' onClick={openRouteModal} style={{float: 'right'}}>
+                        Add Route
+                    </Button>}
+                </Col>
+            </Row>
+            {currentRoutes.length > 0 && (
+                <Fragment>
+                    {/* Only show "Current" header if there are also retired routes */}
+                    {retiredRoutes.length > 0 && <h4>Current</h4>}
+                    <TruncatedList pageSize={5} initialSize={2}>
+                        {currentRoutes.map(routeListItem)}
+                    </TruncatedList>
+                </Fragment>
+            )}
+            {retiredRoutes.length > 0 && (
+                <Fragment>
+                    <h4>Retired</h4>
+                    <TruncatedList pageSize={5} initialSize={2}>
+                        {retiredRoutes.map(routeListItem)}
+                    </TruncatedList>
+                </Fragment>
+            )}
 
-        return (
-            <Fragment>
-                <Row>
-                    <Col xs={10}>
-                        <h2>{gym.name}</h2>
-                    </Col>
-                    <Col xs={2}>
-                        {canEdit && <Button onClick={this.showModal('showEditGymModal')} style={{ float: 'right' }}>Edit</Button>}
-                    </Col>
-                </Row>
-                <h4>
-                    <small>{gym.location}</small>
-                </h4>
-                <Link to={`/stats?gyms=${id}`}>View stats</Link>
-                <Row>
-                    <Col xs={6}>
-                        <h3>Routes</h3>
-                    </Col>
-                    <Col xs={6}>
-                        { canEdit && <Button variant='primary' onClick={this.showModal('showAddRouteModal')} style={{ float: 'right' }}>
-                            Add Route
-                        </Button> }
-                    </Col>
-                </Row>
-                {currentRoutes.length > 0 && (
-                    <Fragment>
-                        {/* Only show "Current" header if there are also retired routes */}
-                        {retiredRoutes.length > 0 && <h4>Current</h4>}
-                        <TruncatedList pageSize={5} initialSize={2}>
-                            {currentRoutes.map(routeListItem)}
-                        </TruncatedList>
-                    </Fragment>
-                )}
-                {retiredRoutes.length > 0 && (
-                    <Fragment>
-                        <h4>Retired</h4>
-                        <TruncatedList pageSize={5} initialSize={2}>
-                            {retiredRoutes.map(routeListItem)}
-                        </TruncatedList>
-                    </Fragment>
-                )}
+            <br/>
 
-                <br/>
+            <EntityModal show={showRouteModal}
+                         handleClose={closeRouteModal}
+                         handleSubmit={handleNewRoute}
+                         fields={routeCreateFields}/>
 
-                <EntityModal show={this.state.showAddRouteModal}
-                             handleClose={this.hideModal('showAddRouteModal')}
-                             handleSubmit={this.handleNewRoute}
-                             fields={routeCreateFields}/>
+            <br/>
+            <Row>
+                <Col xs={6}>
+                    <h3>Sessions</h3>
+                </Col>
+                <Col xs={6}>
+                    <Button variant='primary' onClick={createSession} style={{float: 'right'}}>
+                        Add Session
+                    </Button>
+                </Col>
+            </Row>
 
-                <br/>
-                <Row>
-                    <Col xs={6}>
-                        <h3>Sessions</h3>
-                    </Col>
-                    <Col xs={6}>
-                        <Button variant='primary' onClick={this.createSession.bind(this)} style={{ float: 'right' }}>
-                            Add Session
-                        </Button>
-                    </Col>
-                </Row>
+            <TruncatedList pageSize={5}>
+                {sessionsForUser.map(session => (
+                    <Link to={`/sessions/${session.key}`} style={{textDecoration: 'none'}}
+                          key={session.key}>
+                        <ListGroup.Item action>
+                            {new Date(session.value.startTime).toDateString() + (session.value.endTime ? `, duration: ${sessionDuration(session.value)}` : ' (ongoing)')}
+                        </ListGroup.Item>
+                    </Link>
+                ))}
+            </TruncatedList>
 
-                <TruncatedList pageSize={5}>
-                    {sessionsForUser.map(session => (
-                        <Link to={`/sessions/${session.key}`} style={{ textDecoration: 'none' }}
-                              key={session.key}>
-                            <ListGroup.Item action>
-                                {new Date(session.value.startTime).toDateString() + (session.value.endTime ? `, duration: ${sessionDuration(session.value)}` : ' (ongoing)')}
-                            </ListGroup.Item>
-                        </Link>
-                    ))}
-                </TruncatedList>
+            {canDelete && <DeleteGymModal gymId={id} history={history}/>}
 
-                <EntityModal show={this.state.showEditGymModal}
-                             handleClose={this.hideModal('showEditGymModal')}
-                             handleSubmit={this.handleEditedGym}
-                             fields={gymFields}
-                             title='Edit route'
-                             initialValues={{ ...gym }}/>
-            </Fragment>
-        )
-    }
+            <EntityModal show={showEditModal}
+                         handleClose={closeEditModal}
+                         handleSubmit={handleEditedGym}
+                         fields={gymFields}
+                         title='Edit route'
+                         initialValues={{...gym}}/>
+        </Fragment>
+    )
 }
 
 
@@ -191,10 +172,10 @@ const mapStateToProps = (state, props) => {
 
 export default compose(
     firebaseConnect([
-        { path: 'gyms' },
-        { path: 'routes' },
-        { path: 'sessions' },
-        { path: 'users' },
+        {path: 'gyms'},
+        {path: 'routes'},
+        {path: 'sessions'},
+        {path: 'users'},
     ]),
     connect(mapStateToProps)
 )(GymPage)
