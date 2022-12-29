@@ -23,10 +23,14 @@ export const findUserKey = (users, uid) => {
 
 export const getUserName = user => user.name || user.uid
 
-export const getGroupsForUser = (groups, uid) => filterList(groups, 'users', uid);
-export const getGymsForGroups = (gyms, groups) => filterList(gyms, 'groupId', groups.map(group => group.key));
-export const getGymsForUser = (gyms, groups, uid) => getGymsForGroups(gyms, getGroupsForUser(groups, uid));
-export const getUsersForGroup = (users, group) => users.filter(user => group.users.includes(user.value.uid))
+
+export const getGymsForUser = (gyms, users, uid) => {
+    const friends = findUser(users, uid).friends;
+
+    const allowedUids = [...friends, uid];
+
+    return filterList(gyms, 'owner', allowedUids);
+}
 
 export const getFriendsForUser = (user, users) => user.friends.map(uid => findUser(users, uid))
 

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { compareGrades, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
+import React, {useEffect, useState} from 'react'
+import {compareGrades, gradeEquals, prettyPrint} from '../helpers/gradeUtils'
 import ReactiveBarGraph from './ReactiveBarGraph';
 import moment from 'moment';
-import { Button, Col, Container, Row } from 'react-bootstrap';
-import { RangeSlider } from 'reactrangeslider';
-import { partialRouteCount, routeCount } from './StatsIndex';
+import {Button, Col, Container, Row} from 'react-bootstrap';
+import {RangeSlider} from 'reactrangeslider';
+import {partialRouteCount, routeCount} from './StatsIndex';
+import {getUserName} from "../helpers/filterUtils";
 
 const addCount = (arr, key, count, partialCount, allowSuffixes) => {
     const entry = arr.find(val => gradeEquals(val.key, key, allowSuffixes));
@@ -25,8 +26,8 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
     let maxValue = 0;
 
     // Aggregate session data for each user
-    const data = users.map(({uid, name}) => {
-        const sessionsForUser = allowedSessions.filter(session => session.uid === uid);
+    const data = users.map((user) => {
+        const sessionsForUser = allowedSessions.filter(session => session.uid === user.uid);
 
         // Go through all sessions, aggregating routes by grade
         const countByGrade = sessionsForUser.reduce((acc, session) => {
@@ -61,7 +62,7 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
             maxValue = Math.max(maxValue, count + partialCount);
         });
 
-        return {uid, name, countByGrade};
+        return {uid: user.uid, name: getUserName(user), countByGrade};
     }, {});
 
     const sortedGrades = [...allGrades].sort(compareGrades).reverse();
