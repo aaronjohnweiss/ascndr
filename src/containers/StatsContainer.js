@@ -11,7 +11,7 @@ import {ALL_STYLES} from '../helpers/gradeUtils';
 import GradeHistory from '../components/GradeHistory';
 import StatFilters, {filtersLink} from './StatFilters';
 import {Button} from 'react-bootstrap';
-import {filterList, findUser, getGymsForUser} from "../helpers/filterUtils";
+import {filterList, findFriends, getGymsForUser} from "../helpers/filterUtils";
 
 const filterByKeys = (data, keys) => {
     if (!data) return [];
@@ -44,7 +44,7 @@ const StatsContainer = ({auth: {uid}, routes, sessions, users, gyms}) => {
         allowedGyms = filterByKeys(gyms, gymsFromQuery);
     }
 
-    let allowedUids = [uid, ...findUser(users, uid).friends];
+    let allowedUids = findFriends(users, uid)
     if (query.has('uids')) {
         const uidsFromQuery = query.getAll('uids');
         allowedUids = allowedUids.filter(uid => uidsFromQuery.includes(uid));

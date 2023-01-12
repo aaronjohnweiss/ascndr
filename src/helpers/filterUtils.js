@@ -23,11 +23,14 @@ export const findUserKey = (users, uid) => {
 
 export const getUserName = user => user.name || user.uid
 
+export const findFriends = (users, uid, includeSelf = true) => {
+    const friends = findUser(users, uid).friends || []
+
+    return includeSelf ? [uid, ...friends] : friends
+}
 
 export const getGymsForUser = (gyms, users, uid) => {
-    const friends = findUser(users, uid).friends;
-
-    const allowedUids = [...friends, uid];
+    const allowedUids = findFriends(users, uid);
 
     return filterList(gyms, 'owner', allowedUids);
 }
@@ -35,12 +38,12 @@ export const getGymsForUser = (gyms, users, uid) => {
 export const getEditGymsForUser = (gyms, users, uid) => gyms.filter(gym => canEditGym(gym.value, users, uid))
 
 export const getEditorsForGym = (gym, users) => {
-    return [...findUser(users, gym.owner).friends, gym.owner];
+    return findFriends(users, gym.owner);
 }
 
 export const canEditGym = (gym, users, uid) => getEditorsForGym(gym, users).includes(uid)
 
-export const getFriendsForUser = (user, users) => user.friends.map(uid => findUser(users, uid))
+export const getFriendsForUser = (user, users) => findFriends(users, user.uid, false).map(uid => findUser(users, uid))
 
 export const getRoutesForGym = (routes, gym) => filterList(routes, 'gymId', gym.key);
 export const getSessionsForGym = (sessions, gym) => filterList(sessions, 'gymId', gym.key);

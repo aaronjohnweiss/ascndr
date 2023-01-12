@@ -8,7 +8,7 @@ export const CalendarMode = {
     FRIENDS: 'Include friends',
 }
 
-export const getPreferences = user => user && user.preferences && user.preferences.activityCalendar || defaultPreferences
+export const getPreferences = user => ({...defaultPreferences, ...(user && user.preferences && user.preferences.activityCalendar || {})})
 
 const defaultPreferences = {
     mode: CalendarMode.USER_ONLY,

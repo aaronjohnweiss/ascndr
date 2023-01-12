@@ -15,7 +15,7 @@ const UserCheck = ({auth: {uid}, users, firebase}) => {
         const userInfo = findUser(users, uid, null);
 
         if (!userInfo) {
-            firebase.push('users', {uid});
+            firebase.push('users', {uid, friends: []});
         }
 
         const userName = userInfo && userInfo.name;

@@ -48,13 +48,13 @@ const UserPage = ({auth: {uid}, users, firebase}) => {
 
 
         if (uidToAdd !== uid) {
-            handleUserUpdate({...userInfo, friends: distinct([...userInfo.friends, uidToAdd])})
+            handleUserUpdate({...userInfo, friends: distinct([...(userInfo.friends || []), uidToAdd])})
         }
         closeFriendModal();
     }
 
     const removeFriend = uidToRemove => {
-        handleUserUpdate({...userInfo, friends: userInfo.friends.filter(friendUid => friendUid !== uidToRemove)});
+        handleUserUpdate({...userInfo, friends: (userInfo.friends || []).filter(friendUid => friendUid !== uidToRemove)});
         closeFriendModal();
     }
 
