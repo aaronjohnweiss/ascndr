@@ -35,30 +35,39 @@ export default class ConfirmCancelButton extends Component {
         return (
             <Fragment>
                 <WrappedButton />
-                <Modal show={showModal} onHide={this.hideModal}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>
-                            {modalTitle}
-                        </Modal.Title>
-                    </Modal.Header>
-                    {modalBody && (
-                        <Modal.Body>
-                            {modalBody}
-                        </Modal.Body>
-                    )}
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={this.hideModal}>
-                            Cancel
-                        </Button>
-                        <Button variant="primary" onClick={() => {
-                            handleConfirm()
-                            this.hideModal()
-                        }}>
-                            Confirm
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
+                <ConfirmCancelModal showModal={showModal}
+                                    hideModal={this.hideModal}
+                                    modalTitle={modalTitle}
+                                    modalBody={modalBody}
+                                    handleConfirm={handleConfirm}
+                />
             </Fragment>
         )
     }
 }
+
+export const ConfirmCancelModal = ({showModal, hideModal, modalTitle, modalBody, handleConfirm}) => (
+    <Modal show={showModal} onHide={hideModal}>
+        <Modal.Header closeButton>
+            <Modal.Title>
+                {modalTitle}
+            </Modal.Title>
+        </Modal.Header>
+        {modalBody && (
+            <Modal.Body>
+                {modalBody}
+            </Modal.Body>
+        )}
+        <Modal.Footer>
+            <Button variant="secondary" onClick={hideModal}>
+                Cancel
+            </Button>
+            <Button variant="primary" onClick={() => {
+                handleConfirm()
+                hideModal()
+            }}>
+                Confirm
+            </Button>
+        </Modal.Footer>
+    </Modal>
+)

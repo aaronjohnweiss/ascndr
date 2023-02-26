@@ -153,7 +153,7 @@ const GymPage = ({auth: {uid}, match: {params: {id}}, gym, sessions, routes, use
                          handleClose={closeEditModal}
                          handleSubmit={handleEditedGym}
                          fields={gymFields}
-                         title='Edit route'
+                         title='Edit gym'
                          initialValues={{...gym}}/>
         </Fragment>
     )

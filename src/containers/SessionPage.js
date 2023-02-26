@@ -7,13 +7,14 @@ import {Link} from 'react-router-dom'
 import {sessionDuration} from '../helpers/durationUtils'
 import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
 import {compose} from 'redux'
-import SessionModal from '../components/SessionModal';
 import {getGymsForUser} from '../helpers/filterUtils';
 import {sum} from '../helpers/mathUtils';
 import CustomRouteModal from '../components/CustomRouteModal';
 import ConfirmCancelButton from '../components/ConfirmCancelButton';
 import {routeCount} from '../components/StatsIndex';
 import {PartialRoutesAccordion} from '../components/PartialRoutesAccordion';
+import EntityModal from "../components/EntityModal";
+import {sessionFields} from "../templates/sessionFields";
 
 const hasPartialCompletions = ({partials = {}}) => Object.entries(partials).some(([key, val]) => key > 0 && val > 0)
 const hasFullCompletions = ({count = 0}) => count > 0;
@@ -24,10 +25,12 @@ class SessionPage extends Component {
 
         this.state = {
             customRoutes: false,
-            standardRoutes: false
+            standardRoutes: false,
+            editSession: false,
         }
 
         this.updateSession = this.updateSession.bind(this)
+        this.deleteSession = this.deleteSession.bind(this)
         this.showModal = this.showModal.bind(this)
         this.hideModal = this.hideModal.bind(this)
         this.endSession = this.endSession.bind(this)
@@ -35,14 +38,22 @@ class SessionPage extends Component {
 
     updateSession(session) {
         this.props.firebase.update(`sessions/${this.props.match.params.id}`, session)
+        this.hideModal('editSession')
+    }
+
+
+    deleteSession() {
+        this.props.firebase.remove(`sessions/${this.props.match.params.id}`)
+        this.hideModal('editSession')
+        this.props.history.push('/')
     }
 
     showModal(name) {
-        this.setState({ [name]: true })
+        this.setState({[name]: true})
     }
 
     hideModal(name) {
-        this.setState({ [name]: false })
+        this.setState({[name]: false})
     }
 
     addRoute = (type, key, percentage, keyEquals = (a, b) => a === b) => {
@@ -130,7 +141,7 @@ class SessionPage extends Component {
     }
 
     render() {
-        const { auth: {uid}, session, routes, gyms, users } = this.props
+        const {auth: {uid}, session, routes, gyms, users} = this.props
 
         if (!isLoaded(session, routes, gyms, users)) return 'Loading'
         if (!session || !gyms) return 'Uh oh'
@@ -139,7 +150,7 @@ class SessionPage extends Component {
         if (!session.standardRoutes) session.standardRoutes = []
 
         // Convert to maps for easier consumption
-        const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({ ...acc, [entry.key]: entry }), {})
+        const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({...acc, [entry.key]: entry}), {})
         const standardRoutesMap = session.standardRoutes.reduce((acc, entry) => ({
             ...acc,
             [prettyPrint(entry.key)]: entry
@@ -162,15 +173,15 @@ class SessionPage extends Component {
         const routesForGym = this.props.routes.filter(route => route.value.gymId === gym.key && !route.value.isRetired)
 
         const customModal = <CustomRouteModal show={this.state.customRoutes}
-                                       handleClose={() => this.hideModal('customRoutes')}
-                                       handleSubmit={this.addCustomRoute}
-                                       customRoutes={routesForGym}
+                                              handleClose={() => this.hideModal('customRoutes')}
+                                              handleSubmit={this.addCustomRoute}
+                                              customRoutes={routesForGym}
         />
 
         const standardModal = <GradeModal show={this.state.standardRoutes}
-                                         handleClose={() => this.hideModal('standardRoutes')}
-                                         handleSubmit={this.addStandardRoute}
-                                         title='Add generic route'
+                                          handleClose={() => this.hideModal('standardRoutes')}
+                                          handleSubmit={this.addStandardRoute}
+                                          title='Add generic route'
         />
 
         const addRouteButton = (key, isCustom = false) => {
@@ -210,9 +221,10 @@ class SessionPage extends Component {
                                 </h2>
                             </Col>
                             {isFinished && canEdit &&
-                                <Col xs={2}>
-                                    <SessionModal session={session} gyms={getGymsForUser(gyms, users, session.uid)} onChange={this.updateSession} buttonProps={{style: {float: 'right'}}}/>
-                                </Col>
+                            <Col xs={2}>
+                                <Button onClick={() => this.showModal('editSession')}
+                                        style={{float: 'right'}}>Edit</Button>
+                            </Col>
                             }
                         </Row>
                         <h5 className="fw-normal mb-3">
@@ -232,7 +244,7 @@ class SessionPage extends Component {
                             const partialCountForGrade = standardPartialCount + customPartialCount;
                             return (
                                 <div key={gradeLabel}>
-                                    <Row className='align-items-center session-grade-row' key={gradeLabel} >
+                                    <Row className='align-items-center session-grade-row' key={gradeLabel}>
                                         <Col>
                                             <h5 className="session-grade-header">{gradeLabel} ({countForGrade})</h5>
                                         </Col>
@@ -255,16 +267,17 @@ class SessionPage extends Component {
                                         </Row>
                                     ))}
                                     {partialCountForGrade > 0 &&
-                                        <Row className='align-items-center session-grade-row' key={gradeLabel + '-partials'}>
-                                            <PartialRoutesAccordion grade={grade}
-                                                                    partialsForGrade={partialsForGrade}
-                                                                    partialCountForGrade={partialCountForGrade}
-                                                                    standardPartialCount={standardPartialCount}
-                                                                    customPartialCount={customPartialCount}
-                                                                    customsWithPartials={customsWithPartials}
-                                                                    customRoutesMap={customRoutesMap}
-                                                                    quickEditButtons={quickEditButtons} />
-                                        </Row>
+                                    <Row className='align-items-center session-grade-row'
+                                         key={gradeLabel + '-partials'}>
+                                        <PartialRoutesAccordion grade={grade}
+                                                                partialsForGrade={partialsForGrade}
+                                                                partialCountForGrade={partialCountForGrade}
+                                                                standardPartialCount={standardPartialCount}
+                                                                customPartialCount={customPartialCount}
+                                                                customsWithPartials={customsWithPartials}
+                                                                customRoutesMap={customRoutesMap}
+                                                                quickEditButtons={quickEditButtons}/>
+                                    </Row>
                                     }
                                 </div>
                             )
@@ -304,6 +317,14 @@ class SessionPage extends Component {
                     </Col>
                     <Col md='2'/>
                 </Row>
+                <EntityModal show={this.state.editSession}
+                             handleClose={() => this.hideModal('editSession')}
+                             handleSubmit={this.updateSession}
+                             handleDelete={this.deleteSession}
+                             fields={sessionFields({gyms: getGymsForUser(gyms, users, session.uid)})}
+                             title='Edit session'
+                             initialValues={{...session}}
+                />
             </Container>
 
         )
@@ -322,10 +343,10 @@ const mapStateToProps = (state, props) => {
 
 export default compose(
     firebaseConnect([
-        { path: 'sessions' },
-        { path: 'routes' },
-        { path: 'gyms' },
-        { path: 'users' }
+        {path: 'sessions'},
+        {path: 'routes'},
+        {path: 'gyms'},
+        {path: 'users'}
     ]),
     connect(mapStateToProps)
 )(SessionPage)
