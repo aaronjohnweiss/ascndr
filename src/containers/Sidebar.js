@@ -45,6 +45,10 @@ const loggedInItems = ({auth}) => [
         text: 'Stats',
     },
     {
+        href: '/routeGallery',
+        text: 'Routes'
+    },
+    {
         href: '/user',
         text: 'User Settings',
     },
