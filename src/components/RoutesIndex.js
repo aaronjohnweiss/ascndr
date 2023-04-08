@@ -5,6 +5,7 @@ import {useHistory, useLocation} from 'react-router-dom';
 import {printSplitRouteCount, routeCount, splitRouteCount} from "./StatsIndex";
 import {sumByKey} from "../helpers/mathUtils";
 import {PARTIAL_MAX} from "./GradeModal";
+import {FAILED_IMAGE, PENDING_IMAGE} from "../containers/RoutePage";
 
 
 const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) => {
@@ -39,7 +40,7 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) =>
     })
 
     const cards = stats.map(([key,route], idx) => <Card key={idx}>
-        <Card.Img variant='top' src={route.picture || '/ElCap-512.png'} onClick={() => history.push(`/routes/${key}`)} />
+        <Card.Img variant='top' src={(route.picture && route.picture !== FAILED_IMAGE && route.picture !== PENDING_IMAGE) ? route.picture : '/ElCap-512.png'} onClick={() => history.push(`/routes/${key}`)} />
         <Card.Body>
             <Card.Title>{route.name || 'Unnamed'} {prettyPrint(route.grade)}</Card.Title>
             <Card.Text>
