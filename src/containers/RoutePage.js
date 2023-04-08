@@ -153,7 +153,7 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
                     <p>{route.description}</p>
                     <RouteHistory routeKey={routeId} users={usersForRoute} sessions={sessionsForRoute}/>
                     <br/>
-                    <h3>Videos <Button onClick={openVideoModal} className='float-end'>Add video</Button></h3>
+                    <div className='d-flex align-items-center mb-1'><h3 className='me-auto'>Videos</h3> <Button onClick={openVideoModal}>Add video</Button></div>
                     <ListGroup>
                         {(route.videos || []).map((video, idx) => <ListGroup.Item className='d-flex align-items-center'
                                                                                   key={idx}>
