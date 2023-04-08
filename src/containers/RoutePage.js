@@ -1,16 +1,17 @@
 import React, {useState} from 'react'
 import {connect} from 'react-redux'
-import {Button, Col, Container, Row} from 'react-bootstrap'
+import {Button, Col, Container, ListGroup, Row} from 'react-bootstrap'
 import {Link} from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import axios from 'axios'
 import EntityModal from '../components/EntityModal'
-import {routeUpdateFields} from '../templates/routeFields'
+import {routeUpdateFields, routeVideoFields} from '../templates/routeFields'
 import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
 import {compose} from 'redux'
 import {prettyPrint} from '../helpers/gradeUtils'
-import {distinct, findUser, getEditorsForGym, getSessionsForRoute} from '../helpers/filterUtils';
+import {distinct, findUser, getEditorsForGym, getSessionsForRoute, getUserName} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
+import {dateString} from "../helpers/dateUtils";
 import {useModalState} from "../helpers/useModalState";
 
 export const PENDING_IMAGE = 'PENDING';
@@ -41,6 +42,7 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
 
     const [rotation, setRotation] = useState(0)
     const [showEditModal, openEditModal, closeEditModal] = useModalState()
+    const [showVideoModal, openVideoModal, closeVideoModal] = useModalState()
 
     const updateRoute = (route) => {
         firebase.update(`routes/${match.params.id}`, route)
@@ -72,6 +74,21 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
         }
     }
 
+    const handleNewVideo = ({url, date}) => {
+        updateRoute({
+            ...route,
+            videos: [...(route.videos || []), {uid, url, date: date || new Date().getTime()}].sort((a, b) => b.date - a.date)
+        })
+        closeVideoModal()
+    }
+
+    const removeVideo = url => {
+        updateRoute({
+            ...route,
+            videos: [...(route.videos || []).filter(vid => vid.url !== url)]
+        })
+    }
+
     const routeId = match.params.id
     if (!isLoaded(route, gyms, sessions, users)) return 'Loading'
     if (!route) return 'Uh oh'
@@ -85,6 +102,14 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
                      fields={routeUpdateFields}
                      title='Edit route'
                      initialValues={{...route}}/>
+
+    const renderVideoModal = () =>
+        <EntityModal show={showVideoModal}
+                     handleClose={closeVideoModal}
+                     handleSubmit={handleNewVideo}
+                     fields={routeVideoFields}
+                     title='Add video'
+                     initialValues={{date: new Date().getTime()}}/>
 
     let RouteImageComponent;
     if (route.picture === FAILED_IMAGE) {
@@ -128,6 +153,20 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
                     <p>{route.description}</p>
                     <RouteHistory routeKey={routeId} users={usersForRoute} sessions={sessionsForRoute}/>
                     <br/>
+                    <h3>Videos <Button onClick={openVideoModal} className='float-end'>Add video</Button></h3>
+                    <ListGroup>
+                        {(route.videos || []).map((video, idx) => <ListGroup.Item className='d-flex align-items-center'
+                                                                                  key={idx}>
+                            <div className='me-auto'>{getUserName(findUser(users, video.uid))}:&nbsp;
+                                <a href={video.url} target="_blank" rel="noopener noreferrer">
+                                    {dateString(video.date)}
+                                </a>
+                            </div>
+                            <Button size='sm' onClick={() => removeVideo(video.url)}
+                                    style={{visibility: (uid === video.uid) ? 'visible' : 'hidden'}}>-</Button>
+                        </ListGroup.Item>)}
+                    </ListGroup>
+                    <br/>
                     {!route.isRetired && canEdit && (
                         <ConfirmCancelButton handleConfirm={retireRoute}
                                              modalTitle='Retire route?'
@@ -137,6 +176,7 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
                                              buttonBlock={true}/>
                     )}
                     {showEditModal && renderEditModal()}
+                    {showVideoModal && renderVideoModal()}
                 </Col>
                 <Col md='2'/>
             </Row>

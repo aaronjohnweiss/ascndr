@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import GradeModal from '../components/GradeModal'
-import { Button } from 'react-bootstrap'
-import { prettyPrint } from '../helpers/gradeUtils'
+import {Button, Form} from 'react-bootstrap'
+import {prettyPrint} from '../helpers/gradeUtils'
+import {dateString} from "../helpers/dateUtils";
 
 const SetRouteGrade = ({ value, onChange }) => {
     const [show, setShow] = useState(false)
@@ -23,6 +24,11 @@ const SetRouteGrade = ({ value, onChange }) => {
         </div>
     )
 }
+
+export const DatePicker = ({value, onChange}) => (<Form.Control
+    onChange={(evt) => onChange(new Date(evt.target.value).getTime())}
+    value={value ? dateString(value) : ''}
+    type='date'/>)
 
 export const routeCreateFields = [
     {
@@ -72,6 +78,22 @@ export const routeUpdateFields = [...routeCreateFields,
         name: 'isRetired',
         options: {
             type: 'checkbox'
+        }
+    }
+]
+
+export const routeVideoFields = [
+    {
+        title: 'URL',
+        name: 'url',
+        placeholder: 'https://...'
+    },
+    {
+        title: 'Date',
+        name: 'date',
+        options: {
+            type: 'custom',
+            component: DatePicker
         }
     }
 ]
