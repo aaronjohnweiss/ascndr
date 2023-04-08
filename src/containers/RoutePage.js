@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {useState} from 'react'
 import {connect} from 'react-redux'
 import {Button, Col, Container, Row} from 'react-bootstrap'
 import {Link} from 'react-router-dom'
@@ -11,6 +11,7 @@ import {compose} from 'redux'
 import {prettyPrint} from '../helpers/gradeUtils'
 import {distinct, findUser, getEditorsForGym, getSessionsForRoute} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
+import {useModalState} from "../helpers/useModalState";
 
 export const PENDING_IMAGE = 'PENDING';
 export const FAILED_IMAGE = 'FAILED';
@@ -36,136 +37,111 @@ export const uploadImage = (routeRef, picture) => {
         });
 }
 
-class RoutePage extends Component {
+const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users}) => {
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            rotation: 0,
-            showModal: false
-        }
+    const [rotation, setRotation] = useState(0)
+    const [showEditModal, openEditModal, closeEditModal] = useModalState()
 
-        this.updateRoute = this.updateRoute.bind(this)
-        this.showModal = this.showModal.bind(this)
-        this.hideModal = this.hideModal.bind(this)
-        this.retireRoute = this.retireRoute.bind(this)
-        this.handleRotate = this.handleRotate.bind(this)
-        this.handleEditedRoute = this.handleEditedRoute.bind(this)
+    const updateRoute = (route) => {
+        firebase.update(`routes/${match.params.id}`, route)
     }
 
-    updateRoute(route) {
-        this.props.firebase.update(`routes/${this.props.match.params.id}`, route)
+    const handleRotate = () => {
+        setRotation(r => r + 90)
     }
 
-    showModal() {
-        this.setState({ showModal: true })
-    }
-
-    hideModal() {
-        this.setState({ showModal: false })
-    }
-
-    handleRotate() {
-        this.setState({ rotation: this.state.rotation + 90 })
-    }
-
-    retireRoute() {
-        const route = Object.assign({}, this.props.route)
+    const retireRoute = () => {
+        const route = Object.assign({}, route)
 
         route.isRetired = true
 
-        this.updateRoute(route)
+        updateRoute(route)
     }
 
-    handleEditedRoute(route) {
+    const handleEditedRoute = (route) => {
         if (route && route.picture && route.picture instanceof File) {
-
-
-            this.hideModal()
-            this.props.firebase.update(`routes/${this.props.match.params.id}`, {...route, picture: PENDING_IMAGE})
-                .then(() => uploadImage(this.props.firebase.ref(`routes/${this.props.match.params.id}`), route.picture))
+            closeEditModal()
+            firebase.update(`routes/${match.params.id}`, {...route, picture: PENDING_IMAGE})
+                .then(() => uploadImage(firebase.ref(`routes/${match.params.id}`), route.picture))
                 .catch(err => {
                     console.log(err);
                 })
         } else {
-            this.updateRoute({ ...route })
-            this.hideModal()
+            updateRoute({...route})
+            closeEditModal()
         }
     }
 
-    render() {
-        const { match, auth: { uid }, gyms, sessions, route, users } = this.props
-        const routeId = match.params.id
-        if (!isLoaded(route, gyms, sessions, users)) return 'Loading'
-        if (!route) return 'Uh oh'
+    const routeId = match.params.id
+    if (!isLoaded(route, gyms, sessions, users)) return 'Loading'
+    if (!route) return 'Uh oh'
 
-        const gym = gyms.find(gym => gym.key === route.gymId)
+    const gym = gyms.find(gym => gym.key === route.gymId)
 
-        const renderEditModal = () =>
-            <EntityModal show={this.state.showModal}
-                         handleClose={this.hideModal}
-                         handleSubmit={this.handleEditedRoute}
-                         fields={routeUpdateFields}
-                         title='Edit route'
-                         initialValues={{ ...route }}/>
+    const renderEditModal = () =>
+        <EntityModal show={showEditModal}
+                     handleClose={closeEditModal}
+                     handleSubmit={handleEditedRoute}
+                     fields={routeUpdateFields}
+                     title='Edit route'
+                     initialValues={{...route}}/>
 
-        let RouteImageComponent;
-        if (route.picture === FAILED_IMAGE) {
-            RouteImageComponent = <p>(Image upload failed)</p>;
-        } else if (route.picture === PENDING_IMAGE) {
-            RouteImageComponent = <p>(Image upload in progress)</p>
-        } else {
-            RouteImageComponent = <img className='img-fluid' alt='' style={{transform: `rotate(${this.state.rotation}deg)`}}
-                              src={route.picture} onClick={this.handleRotate} />;
-        }
-
-        const sessionsForRoute = getSessionsForRoute(sessions, routeId);
-        const uidsForRoute = distinct(sessionsForRoute.map(session => session.value.uid));
-        const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
-
-        const canEdit = getEditorsForGym(gym.value, users).includes(uid)
-
-        return (
-            <Container>
-                <Row>
-                    <Col md='2'/>
-                    <Col md='8'>
-                        <Row>
-                            <Col xs={10}>
-                                <h2>{route.name}
-                                    <small className='text-muted'> @ <Link
-                                        to={`/gyms/${route.gymId}`}>{gym.value.name}</Link>
-                                    </small>
-                                </h2>
-                            </Col>
-                            <Col xs={2}>
-                                { canEdit && <Button onClick={this.showModal} style={{ float: 'right' }}>Edit</Button> }
-                            </Col>
-                        </Row>
-                        <h3>{prettyPrint(route.grade) + ' '}
-                            <small>({route.color})</small>
-                        </h3>
-                        {route.setter && <h3>Set by {route.setter}</h3>}
-                        {route.isRetired && <h4>Retired</h4>}
-                        {RouteImageComponent}
-                        <p>{route.description}</p>
-                        <RouteHistory routeKey={routeId} users={usersForRoute} sessions={sessionsForRoute} />
-                        <br />
-                        {!route.isRetired && canEdit && (
-                            <ConfirmCancelButton handleConfirm={this.retireRoute}
-                                                 modalTitle='Retire route?'
-                                                 modalBody='Retiring this route will prevent it from being added to any sessions.'
-                                                 buttonText='Retire route'
-                                                 buttonProps={{ variant: 'danger'}}
-                                                 buttonBlock={true} />
-                        )}
-                        {this.state.showModal && renderEditModal()}
-                    </Col>
-                    <Col md='2'/>
-                </Row>
-            </Container>
-        )
+    let RouteImageComponent;
+    if (route.picture === FAILED_IMAGE) {
+        RouteImageComponent = <p>(Image upload failed)</p>;
+    } else if (route.picture === PENDING_IMAGE) {
+        RouteImageComponent = <p>(Image upload in progress)</p>
+    } else {
+        RouteImageComponent = <img className='img-fluid' alt='' style={{transform: `rotate(${rotation}deg)`}}
+                                   src={route.picture} onClick={handleRotate}/>;
     }
+
+    const sessionsForRoute = getSessionsForRoute(sessions, routeId);
+    const uidsForRoute = distinct(sessionsForRoute.map(session => session.value.uid));
+    const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
+
+    const canEdit = getEditorsForGym(gym.value, users).includes(uid)
+
+    return (
+        <Container>
+            <Row>
+                <Col md='2'/>
+                <Col md='8'>
+                    <Row>
+                        <Col xs={10}>
+                            <h2>{route.name}
+                                <small className='text-muted'> @ <Link
+                                    to={`/gyms/${route.gymId}`}>{gym.value.name}</Link>
+                                </small>
+                            </h2>
+                        </Col>
+                        <Col xs={2}>
+                            {canEdit && <Button onClick={openEditModal} style={{float: 'right'}}>Edit</Button>}
+                        </Col>
+                    </Row>
+                    <h3>{prettyPrint(route.grade) + ' '}
+                        <small>({route.color})</small>
+                    </h3>
+                    {route.setter && <h3>Set by {route.setter}</h3>}
+                    {route.isRetired && <h4>Retired</h4>}
+                    {RouteImageComponent}
+                    <p>{route.description}</p>
+                    <RouteHistory routeKey={routeId} users={usersForRoute} sessions={sessionsForRoute}/>
+                    <br/>
+                    {!route.isRetired && canEdit && (
+                        <ConfirmCancelButton handleConfirm={retireRoute}
+                                             modalTitle='Retire route?'
+                                             modalBody='Retiring this route will prevent it from being added to any sessions.'
+                                             buttonText='Retire route'
+                                             buttonProps={{variant: 'danger'}}
+                                             buttonBlock={true}/>
+                    )}
+                    {showEditModal && renderEditModal()}
+                </Col>
+                <Col md='2'/>
+            </Row>
+        </Container>
+    )
 }
 
 const mapStateToProps = (state, props) => {
@@ -180,10 +156,10 @@ const mapStateToProps = (state, props) => {
 
 export default compose(
     firebaseConnect([
-        { path: 'routes' },
-        { path: 'gyms' },
-        { path: 'sessions' },
-        { path: 'users' }
+        {path: 'routes'},
+        {path: 'gyms'},
+        {path: 'sessions'},
+        {path: 'users'}
     ]),
     connect(mapStateToProps)
 )(RoutePage)
