@@ -1,8 +1,10 @@
 import React from 'react';
-import {compareGrades, prettyPrint} from '../helpers/gradeUtils';
+import {compareGrades, compareSplitCounts, prettyPrint} from '../helpers/gradeUtils';
 import {Button, Card, Col, Row} from 'react-bootstrap';
 import {useHistory, useLocation} from 'react-router-dom';
-import {routeCount} from "./StatsIndex";
+import {printSplitRouteCount, routeCount, splitRouteCount} from "./StatsIndex";
+import {sumByKey} from "../helpers/mathUtils";
+import {PARTIAL_MAX} from "./GradeModal";
 
 
 const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) => {
@@ -24,7 +26,7 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) =>
                     compareResult = r1.time - r2.time
                     break
                 case 'count':
-                    compareResult = r1.count - r2.count
+                    compareResult = compareSplitCounts(r1.count, r2.count)
                     break
                 case 'grade':
                     compareResult = compareGrades(r1.grade, r2.grade)
@@ -41,7 +43,7 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) =>
         <Card.Body>
             <Card.Title>{route.name || 'Unnamed'} {prettyPrint(route.grade)}</Card.Title>
             <Card.Text>
-                Climbed {route.count} time{route.count !== 1 ? 's' : ''}{route.time && `, most recently on ${new Date(route.time).toDateString()}` || ''}
+                Climbed {printSplitRouteCount(route.count, allowPartials)}{route.time && `, most recently on ${new Date(route.time).toDateString()}` || ''}
             </Card.Text>
         </Card.Body>
     </Card>)
@@ -63,9 +65,9 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) =>
 const statsForRoute = (routeKey, route, sessions, allowPartials) => {
     const sessionStats = Object.values(sessions).flatMap(session => (session.customRoutes || []).map(rt => [rt, session.startTime]))
         .filter(([customRoute]) => customRoute.key === routeKey)
-        .map(([customRoute, time]) => [routeCount(customRoute, allowPartials), time])
-        .reduce((acc, [count, time]) => ({count: acc.count + count, times: [...acc.times, time]}), {
-            count: 0,
+        .map(([customRoute, time]) => [allowPartials ? splitRouteCount(customRoute) : ({[PARTIAL_MAX]: routeCount(customRoute, allowPartials)}), time])
+        .reduce((acc, [count, time]) => ({count: sumByKey(acc.count, count), times: [...acc.times, time]}), {
+            count: {},
             times: []
         });
 

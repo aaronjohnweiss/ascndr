@@ -1,9 +1,9 @@
 import React from 'react';
-import { Accordion, ListGroup, ListGroupItem } from 'react-bootstrap';
-import { routeCount } from './StatsIndex';
-import { sum } from '../helpers/mathUtils';
-import { getSessionsForUser } from '../helpers/filterUtils';
-import { Link } from 'react-router-dom';
+import {Accordion, ListGroup, ListGroupItem} from 'react-bootstrap';
+import {printSplitRouteCount, splitRouteCount} from './StatsIndex';
+import {sumByKey} from '../helpers/mathUtils';
+import {getSessionsForUser} from '../helpers/filterUtils';
+import {Link} from 'react-router-dom';
 
 const RouteHistory = ({routeKey, users, sessions}) => {
     return (
@@ -19,7 +19,7 @@ const RouteHistory = ({routeKey, users, sessions}) => {
 const UserRouteHistory = ({routeKey, user, sessions}) => {
     const name = user.name || user.uid;
     const sessionsForUser = getSessionsForUser(sessions, user.uid).sort((a, b) => b.value.startTime - a.value.startTime);
-    const overallCount = countForRoute(routeKey, sessionsForUser);
+    const overallCount = countForRoute(routeKey, sessionsForUser, true);
     return (
         <Accordion>
             <Accordion.Item eventKey={'0'}>
@@ -42,16 +42,19 @@ const SessionCountItem = ({routeKey, session}) => {
         <Link to={`/sessions/${session.key}`} style={{ textDecoration: 'none' }}
               key={session.key}>
             <ListGroupItem action>
-                {new Date(session.value.startTime).toDateString() + (`: ${count} time${count === 1 ? '' : 's'}`)}
+                {new Date(session.value.startTime).toDateString() + (`: ${count}`)}
             </ListGroupItem>
         </Link>
     )
 }
 
-const countForRoute = (routeKey, sessions) =>
-    sessions.flatMap(session => session.value.customRoutes)
+const countForRoute = (routeKey, sessions, highestOnly = false) => {
+    const splitCount = sessions.flatMap(session => session.value.customRoutes)
         .filter(customRoute => customRoute.key === routeKey)
-        .map(customRoute => routeCount(customRoute, true))
-        .reduce(sum);
+        .map(customRoute => splitRouteCount(customRoute))
+        .reduce(sumByKey);
+
+    return printSplitRouteCount(splitCount, highestOnly);
+};
 
 export default RouteHistory;

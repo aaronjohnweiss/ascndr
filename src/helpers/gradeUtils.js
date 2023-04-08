@@ -1,5 +1,6 @@
-import { sum } from './mathUtils';
-import { PARTIAL_MAX } from '../components/GradeModal';
+import {sum} from './mathUtils';
+import {PARTIAL_MAX} from '../components/GradeModal';
+import {distinct} from "./filterUtils";
 
 export const TOP_ROPE = 'TOP_ROPE';
 export const BOULDER = 'BOULDER';
@@ -90,4 +91,16 @@ export const gradeEquals = (g1, g2, useModifier = true) => {
     if (!g1 && !g2) return true;
     if (!g1 || !g2) return false;
     return compareGrades(g1, g2, useModifier) === 0;
+}
+
+export const compareSplitCounts = (s1, s2) => {
+    const percents = distinct([...Object.keys(s1), ...Object.keys(s2)]).map(pct => Number(pct)).sort((a, b) => b - a);
+    for (const pct of percents) {
+        const s1Pct = s1[pct] || 0
+        const s2Pct = s2[pct] || 0
+        if (s1Pct != s2Pct) {
+            return s1Pct - s2Pct
+        }
+    }
+    return 0
 }

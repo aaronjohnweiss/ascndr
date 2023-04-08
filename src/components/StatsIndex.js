@@ -1,12 +1,12 @@
 import React from 'react';
-import { compareGrades, prettyPrint } from '../helpers/gradeUtils';
-import { Button, Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
-import { FaChevronRight } from 'react-icons/fa'
-import { useLocation } from 'react-router-dom';
-import { durationString } from '../helpers/durationUtils';
-import { filtersLink } from '../containers/StatFilters';
-import { sum } from '../helpers/mathUtils';
-import { PARTIAL_MAX } from './GradeModal';
+import {compareGrades, prettyPrint, printPercentage} from '../helpers/gradeUtils';
+import {Button, Col, ListGroup, ListGroupItem, Row} from 'react-bootstrap';
+import {FaChevronRight} from 'react-icons/fa'
+import {useLocation} from 'react-router-dom';
+import {durationString} from '../helpers/durationUtils';
+import {filtersLink} from '../containers/StatFilters';
+import {max, pluralize, sum} from '../helpers/mathUtils';
+import {PARTIAL_MAX} from './GradeModal';
 
 export const StatItem = ({label, value, link}) => {
     const itemProps = link ? {action: true, href: link} : {};
@@ -29,6 +29,28 @@ export const StatItem = ({label, value, link}) => {
 export const partialRouteCount = route => route.partials && Object.entries(route.partials).map(([key, val]) => key * val / PARTIAL_MAX).reduce(sum, 0) || 0;
 
 export const routeCount = (route, allowPartials = false) => (route.count || 0) + (allowPartials && partialRouteCount(route));
+
+export const splitRouteCount = route => {
+    const percentageCounts = {
+        [PARTIAL_MAX]: route.count || 0,
+        ...(route.partials || {})
+    };
+    return Object.fromEntries(Object.entries(percentageCounts).filter(([, count]) => count > 0));
+}
+
+export const printSplitRouteCount = (splitCount, maxOnly = false) => {
+    const percentages = Object.entries(splitCount)
+        .sort(([pctA], [pctB]) => pctB - pctA)
+        .filter(([, count]) => count > 0)
+        .filter(([pct]) => !maxOnly || pct == maxSplitPct(splitCount));
+    if (percentages.length === 0) {
+        return '0 times'
+    }
+
+    return percentages.map(([percentage, count]) => percentage == PARTIAL_MAX ? `${count} ${pluralize('time', count)}` : `${count} x ${printPercentage(percentage)}`).join(', ');
+}
+
+export const maxSplitPct = splitCount => Object.keys(splitCount).map(pct => Number(pct)).reduce(max, 0)
 
 export const routeCountForSession = ({customRoutes = [], standardRoutes = []}, routes, allowedTypes, allowPartials = false) => [
     ...customRoutes.filter(customRoute => allowedTypes.includes(routes[customRoute.key].grade.style)),
