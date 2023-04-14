@@ -1,4 +1,4 @@
-var CACHE_NAME = 'pwa-ascndr-v5.11';
+var CACHE_NAME = 'pwa-ascndr-v5.12';
 var urlsToCache = [
     '/'
 ];
@@ -17,17 +17,17 @@ self.addEventListener('install', event => {
 
 // Cache and return requests
 self.addEventListener('fetch', event => {
-    event.respondWith(
-        caches.match(event.request)
-            .then(function(response) {
-                    // Cache hit - return response
-                    if (response) {
-                        return response;
-                    }
-                    return fetch(event.request);
-                }
-            )
-    );
+    event.respondWith(caches.open(cacheName).then((cache) => {
+        return cache.match(event.request).then((cachedResponse) => {
+            const fetchedResponse = fetch(event.request).then((networkResponse) => {
+                cache.put(event.request, networkResponse.clone());
+
+                return networkResponse;
+            });
+
+            return cachedResponse || fetchedResponse;
+        });
+    }));
 });
 
 // Update a service worker
