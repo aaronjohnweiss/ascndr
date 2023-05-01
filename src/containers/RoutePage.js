@@ -1,13 +1,12 @@
 import React, {useState} from 'react'
-import {connect} from 'react-redux'
+import {useSelector} from 'react-redux'
 import {Button, Col, Container, ListGroup, Row} from 'react-bootstrap'
 import {Link} from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import axios from 'axios'
 import EntityModal from '../components/EntityModal'
 import {routeUpdateFields, routeVideoFields} from '../templates/routeFields'
-import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
-import {compose} from 'redux'
+import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {prettyPrint} from '../helpers/gradeUtils'
 import {distinct, findUser, getEditorsForGym, getSessionsForRoute, getUserName} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
@@ -38,14 +37,28 @@ export const uploadImage = (routeRef, picture) => {
         });
 }
 
-const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users}) => {
+const RoutePage = ({match: {params: {id}}}) => {
+    useFirebaseConnect([
+        'gyms',
+        'routes',
+        'sessions',
+        'users'
+    ])
+
+    const { uid } = useSelector(state => state.auth)
+    const gyms = useSelector(state => state.firebase.ordered.gyms)
+    const route = useSelector(({firebase: {data}}) => data.routes && data.routes[id])
+    const sessions = useSelector(state => state.firebase.ordered.sessions)
+    const users = useSelector(state => state.firebase.ordered.users)
+
+    const firebase = useFirebase()
 
     const [rotation, setRotation] = useState(0)
     const [showEditModal, openEditModal, closeEditModal] = useModalState()
     const [showVideoModal, openVideoModal, closeVideoModal] = useModalState()
 
     const updateRoute = (route) => {
-        firebase.update(`routes/${match.params.id}`, route)
+        firebase.update(`routes/${id}`, route)
     }
 
     const handleRotate = () => {
@@ -63,8 +76,8 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
     const handleEditedRoute = (route) => {
         if (route && route.picture && route.picture instanceof File) {
             closeEditModal()
-            firebase.update(`routes/${match.params.id}`, {...route, picture: PENDING_IMAGE})
-                .then(() => uploadImage(firebase.ref(`routes/${match.params.id}`), route.picture))
+            firebase.update(`routes/${id}`, {...route, picture: PENDING_IMAGE})
+                .then(() => uploadImage(firebase.ref(`routes/${id}`), route.picture))
                 .catch(err => {
                     console.log(err);
                 })
@@ -89,7 +102,6 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
         })
     }
 
-    const routeId = match.params.id
     if (!isLoaded(route, gyms, sessions, users)) return 'Loading'
     if (!route) return 'Uh oh'
 
@@ -121,7 +133,7 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
                                    src={route.picture} onClick={handleRotate}/>;
     }
 
-    const sessionsForRoute = getSessionsForRoute(sessions, routeId);
+    const sessionsForRoute = getSessionsForRoute(sessions, id);
     const uidsForRoute = distinct(sessionsForRoute.map(session => session.value.uid));
     const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
 
@@ -151,7 +163,7 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
                     {route.isRetired && <h4>Retired</h4>}
                     {RouteImageComponent}
                     <p>{route.description}</p>
-                    <RouteHistory routeKey={routeId} users={usersForRoute} sessions={sessionsForRoute}/>
+                    <RouteHistory routeKey={id} users={usersForRoute} sessions={sessionsForRoute}/>
                     <br/>
                     <div className='d-flex align-items-center mb-1'><h3 className='me-auto'>Videos</h3> <Button onClick={openVideoModal}>Add video</Button></div>
                     <ListGroup>
@@ -184,22 +196,4 @@ const RoutePage = ({firebase, match, auth: {uid}, gyms, sessions, route, users})
     )
 }
 
-const mapStateToProps = (state, props) => {
-    return {
-        auth: state.auth,
-        route: getVal(state.firebase, `data/routes/${props.match.params.id}`),
-        gyms: state.firebase.ordered.gyms,
-        sessions: state.firebase.ordered.sessions,
-        users: state.firebase.ordered.users
-    }
-}
-
-export default compose(
-    firebaseConnect([
-        {path: 'routes'},
-        {path: 'gyms'},
-        {path: 'sessions'},
-        {path: 'users'}
-    ]),
-    connect(mapStateToProps)
-)(RoutePage)
+export default RoutePage

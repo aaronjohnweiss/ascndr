@@ -3,14 +3,29 @@ import EntityModal from "../components/EntityModal";
 import {migrateGymFields} from "../templates/gymFields";
 import React, {useState} from "react";
 import {useModalState} from "../helpers/useModalState";
-import {firebaseConnect, isLoaded} from "react-redux-firebase";
+import {isLoaded, useFirebase, useFirebaseConnect} from "react-redux-firebase";
 import {getEditGymsForUser, getRoutesForGym, getSessionsForGym} from "../helpers/filterUtils";
-import {compose} from "redux";
-import {connect} from "react-redux";
+import {useSelector} from "react-redux";
 import {Form} from "react-bootstrap";
 
 
-export const DeleteGymModal = ({auth: {uid}, gymId, gyms, sessions, routes, users, firebase, history}) => {
+export const DeleteGymModal = ({gymId, history}) => {
+    useFirebaseConnect([
+        'gyms',
+        'routes',
+        'sessions',
+        'users'
+    ])
+
+    const { uid } = useSelector(state => state.auth)
+    const gyms = useSelector(state => state.firebase.ordered.gyms)
+    const routes = useSelector(state => state.firebase.ordered.routes)
+    const sessions = useSelector(state => state.firebase.ordered.sessions)
+    const users = useSelector(state => state.firebase.ordered.users)
+
+    const firebase = useFirebase()
+
+
     const [showMigrateModal, openMigrateModal, closeMigrateModal] = useModalState(false)
     const [shouldMigrate, setShouldMigrate] = useState(true)
 
@@ -94,22 +109,4 @@ export const DeleteGymModal = ({auth: {uid}, gymId, gyms, sessions, routes, user
     )
 }
 
-const mapStateToProps = (state) => {
-    return {
-        auth: state.auth,
-        gyms: state.firebase.ordered.gyms,
-        routes: state.firebase.ordered.routes,
-        sessions: state.firebase.ordered.sessions,
-        users: state.firebase.ordered.users,
-    }
-}
-
-export default compose(
-    firebaseConnect([
-        {path: 'gyms'},
-        {path: 'routes'},
-        {path: 'sessions'},
-        {path: 'users'},
-    ]),
-    connect(mapStateToProps)
-)(DeleteGymModal)
+export default DeleteGymModal

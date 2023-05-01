@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
-import {compose} from 'redux';
-import {firebaseConnect} from 'react-redux-firebase';
-import {connect} from 'react-redux';
+import {useFirebaseConnect} from 'react-redux-firebase';
+import {useSelector} from 'react-redux';
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
@@ -16,7 +15,16 @@ const defaultIfEmpty = (a1, a2) => {
     return a1;
 };
 
-const RouteFilters = ({auth: {uid}, users, gyms}) => {
+const RouteFilters = () => {
+    useFirebaseConnect([
+        'gyms',
+        'users'
+    ])
+
+    const { uid } = useSelector(state => state.auth)
+    const gyms = useSelector(state => state.firebase.ordered.gyms)
+    const users = useSelector(state => state.firebase.ordered.users)
+
     const query = new URLSearchParams(useLocation().search);
 
     const visibleGyms = getGymsForUser(gyms, users, uid);
@@ -102,18 +110,4 @@ const RouteFilters = ({auth: {uid}, users, gyms}) => {
     );
 };
 
-const mapStateToProps = (state) => {
-    return {
-        auth: state.auth,
-        gyms: state.firebase.ordered.gyms,
-        users: state.firebase.ordered.users
-    }
-};
-
-export default compose(
-    firebaseConnect([
-        {path: 'gyms'},
-        {path: 'users'}
-    ]),
-    connect(mapStateToProps)
-)(RouteFilters)
+export default RouteFilters

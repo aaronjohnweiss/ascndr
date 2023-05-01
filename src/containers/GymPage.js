@@ -1,7 +1,6 @@
 import React, {Fragment} from 'react'
-import {compose} from 'redux'
-import {connect} from 'react-redux'
-import {firebaseConnect, getVal, isLoaded} from 'react-redux-firebase'
+import {useSelector} from 'react-redux'
+import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {Button, Col, ListGroup, Row} from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
 import {routeCreateFields} from '../templates/routeFields'
@@ -14,7 +13,22 @@ import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
 import DeleteGymModal from "./DeleteGymModal";
 
-const GymPage = ({auth: {uid}, match: {params: {id}}, gym, sessions, routes, users, firebase, history}) => {
+const GymPage = ({match: {params: {id}}, history}) => {
+    useFirebaseConnect([
+        'gyms',
+        'routes',
+        'sessions',
+        'users'
+    ])
+
+    const { uid } = useSelector(state => state.auth)
+    const gym = useSelector(({firebase: {data}}) => data.gyms && data.gyms[id])
+    const routes = useSelector(state => state.firebase.ordered.routes)
+    const sessions = useSelector(state => state.firebase.ordered.sessions)
+    const users = useSelector(state => state.firebase.ordered.users)
+
+    const firebase = useFirebase()
+
     const [showRouteModal, openRouteModal, closeRouteModal] = useModalState(false)
     const [showEditModal, openEditModal, closeEditModal] = useModalState(false)
 
@@ -159,23 +173,4 @@ const GymPage = ({auth: {uid}, match: {params: {id}}, gym, sessions, routes, use
     )
 }
 
-
-const mapStateToProps = (state, props) => {
-    return {
-        auth: state.auth,
-        gym: getVal(state.firebase, `data/gyms/${props.match.params.id}`),
-        routes: state.firebase.ordered.routes,
-        sessions: state.firebase.ordered.sessions,
-        users: state.firebase.ordered.users,
-    }
-}
-
-export default compose(
-    firebaseConnect([
-        {path: 'gyms'},
-        {path: 'routes'},
-        {path: 'sessions'},
-        {path: 'users'},
-    ]),
-    connect(mapStateToProps)
-)(GymPage)
+export default GymPage

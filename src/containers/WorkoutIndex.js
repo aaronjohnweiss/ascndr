@@ -1,14 +1,21 @@
 import React, {useState} from 'react'
-import {compose} from 'redux'
-import {connect} from 'react-redux'
+import {useSelector} from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
-import {firebaseConnect, isLoaded} from 'react-redux-firebase'
+import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {getWorkoutsForUser} from '../helpers/filterUtils';
 import Workout from "../components/Workout";
 import {validateWorkoutFields, workoutFields} from "../templates/workoutFields";
 
-const WorkoutIndex = ({auth: {uid}, workouts, firebase}) => {
+const WorkoutIndex = () => {
+    useFirebaseConnect([
+        'workouts'
+    ])
+
+    const { uid } = useSelector(state => state.auth)
+    const workouts = useSelector(state => state.firebase.ordered.workouts)
+
+    const firebase = useFirebase()
 
     const [showModal, setShowModal] = useState(false)
 
@@ -44,16 +51,4 @@ const WorkoutIndex = ({auth: {uid}, workouts, firebase}) => {
     )
 }
 
-const mapStateToProps = state => {
-    return {
-        workouts: state.firebase.ordered.workouts,
-        auth: state.auth
-    }
-}
-
-export default compose(
-    firebaseConnect([
-        {path: 'workouts'},
-    ]),
-    connect(mapStateToProps)
-)(WorkoutIndex)
+export default WorkoutIndex

@@ -1,12 +1,20 @@
 import React, {useEffect, useState} from 'react'
-import {connect} from 'react-redux'
+import {useSelector} from 'react-redux'
 import EntityModal from '../components/EntityModal'
 import {userNameField, userNameValidation} from '../templates/userFields'
-import {compose} from 'redux'
-import {firebaseConnect, isLoaded} from 'react-redux-firebase'
+import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {findUser, findUserKey} from '../helpers/filterUtils';
 
-const UserCheck = ({auth: {uid}, users, firebase}) => {
+const UserCheck = () => {
+    useFirebaseConnect([
+        'users'
+    ])
+
+    const { uid } = useSelector(state => state.auth)
+    const users = useSelector(state => state.firebase.ordered.users)
+
+    const firebase = useFirebase()
+
     const [showModal, setShowModal] = useState(false)
 
     useEffect(() => {
@@ -51,16 +59,4 @@ const UserCheck = ({auth: {uid}, users, firebase}) => {
     )
 }
 
-const mapStateToProps = state => {
-    return {
-        users: state.firebase.ordered.users,
-        auth: state.auth
-    }
-}
-
-export default compose(
-    firebaseConnect([
-        {path: 'users'}
-    ]),
-    connect(mapStateToProps)
-)(UserCheck)
+export default UserCheck

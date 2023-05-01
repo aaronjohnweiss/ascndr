@@ -1,8 +1,10 @@
 import {ListGroup, Offcanvas} from "react-bootstrap";
 import React from "react";
-import {connect} from "react-redux";
+import {useSelector} from "react-redux";
 
-export const Sidebar = ({show, onHide, auth}) => {
+export const Sidebar = ({show, onHide}) => {
+    const auth = useSelector(state => state.auth)
+
     const listItems = auth ? loggedInItems({auth}) : loggedOutItems()
     return (
         <Offcanvas show={show} onHide={onHide} className="settings-offcanvas">
@@ -54,10 +56,4 @@ const loggedInItems = ({auth}) => [
     },
 ]
 
-const mapStateToProps = state => {
-    return {
-        auth: state.auth
-    }
-}
-
-export default connect(mapStateToProps)(Sidebar)
+export default Sidebar

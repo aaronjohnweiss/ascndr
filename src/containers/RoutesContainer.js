@@ -1,7 +1,6 @@
 import React from 'react'
-import {firebaseConnect, isLoaded} from 'react-redux-firebase'
-import {compose} from 'redux'
-import {connect} from 'react-redux'
+import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
+import {useSelector} from 'react-redux'
 import {Route, Switch, useLocation} from 'react-router-dom'
 import {toObj} from '../helpers/objectConverters';
 import {ALL_STYLES} from '../helpers/gradeUtils';
@@ -25,7 +24,18 @@ export const parseSort = query => {
 
 export const getBooleanFromQuery = (query, name, valueIfMissing = false) => query.has(name) ? query.get(name) === 'true' : valueIfMissing;
 
-const StatsContainer = ({auth: {uid}, routes, sessions, users}) => {
+const StatsContainer = () => {
+    useFirebaseConnect([
+        'routes',
+        'sessions',
+        'users'
+    ])
+
+    const { uid } = useSelector(state => state.auth)
+    const routes = useSelector(state => state.firebase.data.routes)
+    const sessions = useSelector(state => state.firebase.ordered.sessions)
+    const users = useSelector(state => state.firebase.ordered.users)
+
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
@@ -66,20 +76,4 @@ const StatsContainer = ({auth: {uid}, routes, sessions, users}) => {
     );
 };
 
-const mapStateToProps = (state) => {
-    return {
-        auth: state.auth,
-        routes: state.firebase.data.routes,
-        sessions: state.firebase.ordered.sessions,
-        users: state.firebase.ordered.users
-    }
-};
-
-export default compose(
-    firebaseConnect([
-        {path: 'routes'},
-        {path: 'sessions'},
-        {path: 'users'}
-    ]),
-    connect(mapStateToProps)
-)(StatsContainer)
+export default StatsContainer

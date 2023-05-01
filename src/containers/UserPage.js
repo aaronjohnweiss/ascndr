@@ -1,17 +1,25 @@
 import React, {Fragment} from 'react'
-import {connect} from 'react-redux'
+import {useSelector} from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import {Col, ListGroup, Row} from 'react-bootstrap'
 import {addFriendFields, userFields, userIdValidation, userNameValidation} from '../templates/userFields'
-import {compose} from 'redux'
-import {firebaseConnect, isLoaded} from 'react-redux-firebase'
+import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {distinct, findUser, findUserKey, getFriendsForUser, getUserName} from '../helpers/filterUtils';
 import ConfirmCancelButton from "../components/ConfirmCancelButton";
 import {useModalState} from "../helpers/useModalState";
 import {ActivityCalendarSettingsModal} from "../components/ActivityCalendarSettingsModal";
 
-const UserPage = ({auth: {uid}, users, firebase}) => {
+const UserPage = () => {
+    useFirebaseConnect([
+        'users'
+    ])
+
+    const { uid } = useSelector(state => state.auth)
+    const users = useSelector(state => state.firebase.ordered.users)
+
+    const firebase = useFirebase()
+
     const [showUserModal, openUserModal, closeUserModal] = useModalState(false);
 
     const [showFriendModal, openFriendModal, closeFriendModal] = useModalState(false);
@@ -125,16 +133,4 @@ const UserPage = ({auth: {uid}, users, firebase}) => {
     )
 }
 
-const mapStateToProps = state => {
-    return {
-        users: state.firebase.ordered.users,
-        auth: state.auth
-    }
-}
-
-export default compose(
-    firebaseConnect([
-        {path: 'users'}
-    ]),
-    connect(mapStateToProps)
-)(UserPage)
+export default UserPage
