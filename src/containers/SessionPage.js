@@ -87,7 +87,9 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
     }
 
     const removeRoute = (type, key, percentage, keyEquals = (a, b) => a === b) => {
-        const session = Object.assign({}, session)
+        if (!session[type]) {
+            session[type] = []
+        }
 
         const routeIndex = session[type].findIndex(rt => keyEquals(rt.key, key))
 
