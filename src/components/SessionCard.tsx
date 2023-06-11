@@ -11,7 +11,7 @@ const SessionCard = ({session, gym, user, routes}) => {
             <h4><Link to={`/gyms/${gym.key}`}>{gym.value.name}</Link> {session.value.endTime ? `, ${timeFromNow(session.value.startTime)}` : '(ongoing)'}</h4>
             {hasRoutes(session.value) ?
                 <GradeHistogram users={{[user.uid]: user}} sessions={{[session.key]: session.value}} routes={routes}
-                            allowedTypes={ALL_STYLES} allowSuffixes={true} allowPartials={true} canAnimate={false} />
+                            allowedTypes={[...ALL_STYLES]} allowSuffixes={true} allowPartials={true} canAnimate={false} />
                 :
                 <p>No routes in this session</p>
             }

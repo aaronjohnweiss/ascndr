@@ -8,7 +8,11 @@ const hemisphere = (x, y, size, mult) => `M ${x}, ${y}
 const leftHemishpere = (x, y, size) => hemisphere(x, y, size, 1);
 const rightHemishpere = (x, y, size) => hemisphere(x, y, size, -1);
 
-export const MultiColorPoint = ({index, legendColors, ...props}) => {
+interface Props {
+    index?: number
+    legendColors: string[][]
+}
+export const MultiColorPoint = ({index = 0, legendColors, ...props}: Props) => {
     return (
         <>
             <Point {...props} getPath={leftHemishpere} style={{fill: legendColors[index][0]}} />

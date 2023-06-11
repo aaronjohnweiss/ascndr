@@ -11,6 +11,7 @@ import {rainbowColors} from "../../helpers/rainbowColor";
 import React, {Fragment} from "react";
 import {VictoryTheme} from 'victory'
 import calculateSize from 'calculate-size'
+import {CountForDate, LabeledData, MultiCountForDate} from "../../helpers/activityCalendarEntries";
 
 export const NAMESPACE = 'ActivityCalendar';
 
@@ -33,7 +34,17 @@ export const DEFAULT_MONTH_LABELS = [
 
 export const DEFAULT_WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export const DEFAULT_LABELS = {
+export interface CalendarLabels {
+    months: string[]
+    weekdays: string[]
+    totalCount: string
+    legend: {
+        less: string
+        more: string
+    }
+}
+
+export const DEFAULT_LABELS: CalendarLabels = {
     months: DEFAULT_MONTH_LABELS,
     weekdays: DEFAULT_WEEKDAY_LABELS,
     totalCount: '{{count}} contributions in {{year}}',
@@ -49,8 +60,8 @@ const emptyDay = (date, numCategories) => ({
     levels: Array(numCategories).fill(0),
 })
 
-const flattenDays = (data) => {
-    const flatDays = new Map();
+const flattenDays = (data: CountForDate[][]) => {
+    const flatDays = new Map<string, MultiCountForDate>();
 
     data.forEach((days, i) => days.forEach(day => {
         const {date, count, level} = day;
@@ -59,7 +70,8 @@ const flattenDays = (data) => {
             flatDays.set(date, emptyDay(date, data.length))
         }
 
-        const thisDay = flatDays.get(date)
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const thisDay = flatDays.get(date)!
         thisDay.counts[i] = count
         thisDay.levels[i] = level
     }))
@@ -67,11 +79,11 @@ const flattenDays = (data) => {
     return [...flatDays.values()]
 }
 
-export function normalizeCalendarDays(days, numCategories) {
+export function normalizeCalendarDays(days: MultiCountForDate[], numCategories: number): MultiCountForDate[] {
     const daysMap = days.reduce((map, day) => {
         map.set(day.date, day);
         return map;
-    }, new Map());
+    }, new Map<string, MultiCountForDate>());
 
     return eachDayOfInterval({
         start: parseISO(days[0].date),
@@ -79,15 +91,15 @@ export function normalizeCalendarDays(days, numCategories) {
     }).map((day) => {
         const date = formatISO(day, {representation: 'date'});
 
-        if (daysMap.has(date)) {
-            return daysMap.get(date);
-        }
-
-        return emptyDay(date, numCategories);
+        return daysMap.get(date) || emptyDay(date, numCategories);
     });
 }
 
-export function groupByWeeks(data, weekStart) {
+export const getLatestDate = (data: LabeledData[]): string => {
+    return data.flatMap(x => x.data).map(x => x.date).reduce((maxDate: string | undefined, currentDate) => maxDate && maxDate > currentDate ? maxDate : currentDate, undefined) || new Date().toDateString()
+}
+
+export function groupByWeeks(data: LabeledData[], weekStart): (MultiCountForDate | undefined)[][] {
     if (data.length === 0) return [];
 
     const flattenedDays = flattenDays(data.map(datum => datum.data))
@@ -102,7 +114,7 @@ export function groupByWeeks(data, weekStart) {
 
     // In order to correctly group contributions by week it is necessary to left pad the list,
     // because the first date might not be desired week day.
-    const paddedDays = [
+    const paddedDays: (MultiCountForDate | undefined)[] = [
         ...Array(differenceInCalendarDays(firstDate, firstCalendarDate)).fill(undefined),
         ...normalizedDays,
     ];
@@ -175,15 +187,17 @@ export const GradientForDay = ({id, day: {date, levels}, theme, level0}) => {
         <linearGradient id={id}>
             {
                 nonzeroLevels.map((themeIdx, gradientIdx) => <Fragment key={gradientIdx}>
-                    <stop offset={getOffset(gradientIdx, numColors)} stopColor={theme[themeIdx][`level${levels[themeIdx]}`]} />
-                    <stop offset={getOffset(gradientIdx + 1, numColors)} stopColor={theme[themeIdx][`level${levels[themeIdx]}`]} />
+                    <stop offset={getOffset(gradientIdx, numColors)}
+                          stopColor={theme[themeIdx][`level${levels[themeIdx]}`]}/>
+                    <stop offset={getOffset(gradientIdx + 1, numColors)}
+                          stopColor={theme[themeIdx][`level${levels[themeIdx]}`]}/>
                 </Fragment>)
             }
         </linearGradient>
     );
 }
 
-export function getClassName(name, styles) {
+export function getClassName(name: string, styles?: string) {
     if (styles) {
         return `${NAMESPACE}__${name} ${styles}`;
     }
@@ -191,21 +205,41 @@ export function getClassName(name, styles) {
     return `${NAMESPACE}__${name}`;
 }
 
-export function generateEmptyData() {
-    const year = new Date().getFullYear();
-    const days = eachDayOfInterval({
-        start: new Date(year, 0, 1),
-        end: new Date(year, 11, 31),
-    });
-
-    return days.map((date) => (emptyDay(date, 1)));
+interface LegendDatum {
+    name: string,
+    symbol: { fill: string }
 }
 
-export const getLegendRows = ({maxWidth, fontSize = VictoryTheme.grayscale.legend.style.labels.fontSize, fontFamily = VictoryTheme.grayscale.legend.style.labels.fontFamily, labels, padding}) => {
-    const rowSize = row => row.map(label => calculateSize(label.name, {fontSize: `${fontSize}px`, font: fontFamily}).width + padding).reduce((acc, x) => acc + x, 0)
+export const getLegendRows = ({
+                                  maxWidth,
+                                  fontSize,
+                                  fontFamily,
+                                  labels,
+                                  padding
+                              }: {
+    maxWidth: number,
+    padding: number,
+    fontSize?: string,
+    fontFamily?: string,
+    labels: LegendDatum[]
+}): LegendDatum[][] => {
+    if (!fontSize) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        fontSize = VictoryTheme.grayscale.legend.style.labels.fontSize
+    }
+    if (!fontFamily) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        fontFamily = VictoryTheme.grayscale.legend.style.labels.fontFamily
+    }
+    const rowSize = row => row.map(label => calculateSize(label.name, {
+        fontSize: `${fontSize}px`,
+        font: fontFamily
+    }).width + padding).reduce((acc, x) => acc + x, 0)
 
-    const rows = [];
-    let thisRow = [];
+    const rows: LegendDatum[][] = [];
+    let thisRow: LegendDatum[] = [];
     for (const label of labels) {
         if (rowSize([...thisRow, label]) < maxWidth) {
             thisRow.push(label)

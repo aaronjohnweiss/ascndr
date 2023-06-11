@@ -6,3 +6,5 @@ export interface Gym {
     TOP_ROPE_HEIGHT: string
     location?: string
 }
+
+type x = keyof Gym

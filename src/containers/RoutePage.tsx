@@ -1,5 +1,4 @@
 import React, {useState} from 'react'
-import {useSelector} from 'react-redux'
 import {Button, Col, Container, ListGroup, Row} from 'react-bootstrap'
 import {Link} from 'react-router-dom'
 import ConfirmCancelButton from '../components/ConfirmCancelButton'
@@ -12,7 +11,8 @@ import {distinct, findUser, getEditorsForGym, getSessionsForRoute, getUserName} 
 import RouteHistory from '../components/RouteHistory';
 import {dateString} from "../helpers/dateUtils";
 import {useModalState} from "../helpers/useModalState";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index";
+import {getUser} from "../redux/selectors";
 
 export const PENDING_IMAGE = 'PENDING';
 export const FAILED_IMAGE = 'FAILED';
@@ -20,7 +20,7 @@ export const FAILED_IMAGE = 'FAILED';
 export const uploadImage = (routeRef, picture) => {
     // Post to imgur
     const pictureData = new FormData()
-    pictureData.set('album', process.env.REACT_APP_ALBUM_ID)
+    pictureData.set('album', process.env.REACT_APP_ALBUM_ID || '')
     pictureData.append('image', picture)
     const headers = {
         'Authorization': 'Client-ID ' + process.env.REACT_APP_CLIENT_ID,
@@ -46,11 +46,11 @@ const RoutePage = ({match: {params: {id}}}) => {
         'users'
     ])
 
-    const { uid } = useSelector((state: AppState) => state.auth)
-    const gyms = useSelector((state: AppState) => state.firebase.ordered.gyms)
-    const route = useSelector(({firebase: {data}}: AppState) => data.routes && data.routes[id])
-    const sessions = useSelector((state: AppState) => state.firebase.ordered.sessions)
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
+    const { uid } = getUser()
+    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
+    const route = useAppSelector(({firebase: {data}}) => data.routes && data.routes[id])
+    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
+    const users = useAppSelector(state => state.firebase.ordered.users)
 
     const firebase = useFirebase()
 
@@ -67,11 +67,11 @@ const RoutePage = ({match: {params: {id}}}) => {
     }
 
     const retireRoute = () => {
-        const route = Object.assign({}, route)
+        const routeCopy = Object.assign({}, route)
 
-        route.isRetired = true
+        routeCopy.isRetired = true
 
-        updateRoute(route)
+        updateRoute(routeCopy)
     }
 
     const handleEditedRoute = (route) => {
@@ -103,10 +103,11 @@ const RoutePage = ({match: {params: {id}}}) => {
         })
     }
 
-    if (!isLoaded(route, gyms, sessions, users)) return 'Loading'
-    if (!route) return 'Uh oh'
+    if (!isLoaded(route, gyms, sessions, users)) return <>Loading</>
+    if (!route) return <>Uh oh</>
 
     const gym = gyms.find(gym => gym.key === route.gymId)
+    if (!gym) return <>Uh oh</>
 
     const renderEditModal = () =>
         <EntityModal show={showEditModal}

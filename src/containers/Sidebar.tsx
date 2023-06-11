@@ -1,10 +1,9 @@
 import {ListGroup, Offcanvas} from "react-bootstrap";
 import React from "react";
-import {useSelector} from "react-redux";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
 
 export const Sidebar = ({show, onHide}) => {
-    const auth = useSelector((state: AppState) => state.auth)
+    const auth = useAppSelector(state => state.auth)
 
     const listItems = auth ? loggedInItems({auth}) : loggedOutItems()
     return (

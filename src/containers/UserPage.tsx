@@ -1,5 +1,4 @@
 import React, {Fragment} from 'react'
-import {useSelector} from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import {Col, ListGroup, Row} from 'react-bootstrap'
@@ -9,15 +8,16 @@ import {distinct, findUser, findUserKey, getFriendsForUser, getUserName} from '.
 import ConfirmCancelButton from "../components/ConfirmCancelButton";
 import {useModalState} from "../helpers/useModalState";
 import {ActivityCalendarSettingsModal} from "../components/ActivityCalendarSettingsModal";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
+import {getUser} from "../redux/selectors";
 
 const UserPage = () => {
     useFirebaseConnect([
         'users'
     ])
 
-    const { uid } = useSelector((state: AppState) => state.auth)
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
+    const { uid } = getUser()
+    const users = useAppSelector(state => state.firebase.ordered.users)
 
     const firebase = useFirebase()
 
@@ -27,7 +27,7 @@ const UserPage = () => {
 
     const [showCalendarModal, openCalendarModal, closeCalendarModal] = useModalState(false);
 
-    if (!isLoaded(users)) return 'Loading'
+    if (!isLoaded(users)) return <>Loading</>
 
     const userInfo = findUser(users, uid);
 

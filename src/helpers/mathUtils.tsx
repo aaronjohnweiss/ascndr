@@ -17,6 +17,6 @@ export const percentile = (arr, p) => {
 
 export const max = (x, y) => x > y ? x : y
 
-export const sumByKey = (o1, o2) => [...new Set([...Object.keys(o1), ...Object.keys(o2)])].reduce((acc, key) => ({...acc, [key]: (o1[key] || 0) + (o2[key] || 0)}), {})
+export const sumByKey = (o1: Record<string, number>, o2: Record<string, number>) => [...new Set([...Object.keys(o1), ...Object.keys(o2)])].reduce((acc, key) => ({...acc, [key]: (o1[key] || 0) + (o2[key] || 0)}), {})
 
 export const pluralize = (str, count, plural = `${str}s`) => count == 1 ? str : plural

@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {useFirebaseConnect} from 'react-redux-firebase';
-import {useSelector} from 'react-redux';
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
@@ -8,7 +7,8 @@ import {getGymsForUser} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
 import {parseSort} from "./RoutesContainer";
 import {MultiSelect} from "./StatFilters";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
+import {getUser} from "../redux/selectors";
 
 
 const defaultIfEmpty = (a1, a2) => {
@@ -22,9 +22,9 @@ const RouteFilters = () => {
         'users'
     ])
 
-    const { uid } = useSelector((state: AppState) => state.auth)
-    const gyms = useSelector((state: AppState) => state.firebase.ordered.gyms)
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
+    const { uid } = getUser()
+    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
+    const users = useAppSelector(state => state.firebase.ordered.users)
 
     const query = new URLSearchParams(useLocation().search);
 
@@ -59,8 +59,8 @@ const RouteFilters = () => {
         const queryParams = new URLSearchParams();
         gymIds.forEach(id => queryParams.append('gyms', id));
         allowedTypes.forEach(type => queryParams.append('allowedTypes', type));
-        queryParams.append('selfOnly', selfOnly);
-        queryParams.append('allowPartials', allowPartials);
+        queryParams.append('selfOnly', `${selfOnly}`);
+        queryParams.append('allowPartials', `${allowPartials}`);
         queryParams.append('sortBy', (sortDesc ? '-' : '+') + sortKey)
         return queryParams.toString();
     };

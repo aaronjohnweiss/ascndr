@@ -1,9 +1,11 @@
 import {Grade} from "./Grade";
 
+
+export type PartialCount = Record<number, number>
 export interface RouteCount<KeyType> {
     count: number
     key: KeyType
-    partials: Record<number, number>
+    partials: PartialCount
 }
 
 export interface Session {

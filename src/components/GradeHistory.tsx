@@ -5,16 +5,20 @@ import {toArray} from '../helpers/objectConverters';
 import {StatItem} from './StatsIndex';
 import {sortHiatuses} from './HiatusModal';
 import {dateString} from '../helpers/dateUtils';
+import {GradeChartProps} from "./GradeHistogram";
+import {Persisted} from "../types/Firebase";
+import {Session} from "../types/Session";
+import {entries} from "../helpers/recordUtils";
 
 const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes, allowPartials) => {
     // Given hiatuses: Split up and section off data around the hiatuses
     if (hiatuses && hiatuses.length > 0) {
-        const components = [];
+        const components: JSX.Element[] = [];
         const sortedHiatuses = sortHiatuses(hiatuses);
         for (let i = 0; i <= sortedHiatuses.length; i++) {
             // For each hiatus, window the sessions to all sessions that were after the hiatus (but before the next one)
             const rangeStartDate = (i === hiatuses.length) ? null : sortedHiatuses[i].endDate;
-            const rangeEndDate = (i === 0) ? null : sortedHiatuses[i-1].startDate;
+            const rangeEndDate = (i === 0) ? null : sortedHiatuses[i - 1].startDate;
 
             const sessionsInRange = sessionsForUser.filter(session => (rangeStartDate === null || session.value.startTime >= rangeStartDate) && (rangeEndDate === null || session.value.startTime < rangeEndDate));
             const progression = calculateProgression(sessionsInRange, routes, allowSuffixes, allowedTypes, allowPartials, 'h4');
@@ -32,7 +36,7 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
                 components.push(
                     <Accordion key={i} defaultActiveKey={'0'}>
                         <Accordion.Item eventKey={`${components.length}`}>
-                            <Accordion.Header >
+                            <Accordion.Header>
                                 {headerString}
                             </Accordion.Header>
                             <Accordion.Body>
@@ -50,18 +54,22 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
     return calculateProgression(sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials)
 }
 
-const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials, Header = 'h3') => {
+const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials, Header: keyof JSX.IntrinsicElements = 'h3') => {
     // For each style of climb...
     return allowedTypes.map((type, j) => {
         // Go through all sessions, oldest to newest
         const firsts = sessionsForUser.sort((a, b) => b.value.startTime - a.value.startTime)
-            .reduce((arr, {key, value: {startTime, customRoutes = [], standardRoutes = []}}) => {
+            .reduce((arr, {key, value: {startTime, customRoutes = [], standardRoutes = []}}: Persisted<Session>) => {
                 // Get all grades climbed in that session
                 let maxFullGrade = null;
                 let maxPartialGrade = null;
 
                 // Get the max difficulty for this session
-                [...customRoutes.map(({key, count, partials}) => ({grade: routes[key].grade, count, partials})), ...standardRoutes.map(({key, count, partials}) => ({grade: key, count, partials}))]
+                [...customRoutes.map(({key, count, partials}) => ({
+                    grade: routes[key].grade,
+                    count,
+                    partials
+                })), ...standardRoutes.map(({key, count, partials}) => ({grade: key, count, partials}))]
                     // Filter down to the current type
                     .filter(route => type === route.grade.style)
                     .forEach(({grade, count, partials}) => {
@@ -73,7 +81,7 @@ const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTyp
                         } else {
                             if (partials && allowPartials) {
                                 // Make sure a valid partial climb was logged; find highest partial percentage for this grade
-                                const highestPercentage = Object.entries(partials).filter(([, val]) => val > 0).map(([key,]) => key).reduce((a, b) => Math.max(a, b), 0)
+                                const highestPercentage = entries(partials).filter(([, val]) => val > 0).map(([key,]) => key).reduce((a, b) => Math.max(a, b), 0)
                                 if (highestPercentage > 0) {
                                     // Keep track of max grade for partial completions
                                     const partialGrade = {
@@ -116,7 +124,7 @@ const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTyp
                     {firsts.map(({date, grade, key}, k) => (
                         <StatItem key={k}
                                   label={`${prettyPrint(grade, allowSuffixes, allowPartials)}: ${new Date(date).toDateString()}`}
-                                  link={`/sessions/${key}`} />
+                                  link={`/sessions/${key}`}/>
                     ))}
                 </ListGroup>
             </Fragment>
@@ -124,24 +132,28 @@ const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTyp
     });
 }
 
-const GradeHistory = ({users, routes, sessions, allowSuffixes, allowedTypes, allowPartials}) => {
+const GradeHistory = ({users, routes, sessions, allowSuffixes, allowedTypes, allowPartials}: GradeChartProps) => {
     const sessionsArray = toArray(sessions);
 
     // Build history per user
-    return Object.values(users).map(({name, uid, hiatuses}, i) => {
-        const sessionsForUser = sessionsArray.filter(session => session.value.uid === uid);
+    return (
+        <>
+            {Object.values(users).map(({name, uid, hiatuses}, i) => {
+                const sessionsForUser = sessionsArray.filter(session => session.value.uid === uid);
 
-        const firstsByType = calculateAllProgressions(sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes, allowPartials)
+                const firstsByType = calculateAllProgressions(sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes, allowPartials)
 
-        // Show user name and their grade history
-        return (
-            <Fragment key={i}>
-                <h2>{name}</h2>
-                {firstsByType}
-                <br />
-            </Fragment>
-        );
-    });
+                // Show user name and their grade history
+                return (
+                    <Fragment key={i}>
+                        <h2>{name}</h2>
+                        {firstsByType}
+                        <br/>
+                    </Fragment>
+                );
+            })
+            }
+        </>)
 };
 
 export default GradeHistory;

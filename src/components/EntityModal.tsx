@@ -5,25 +5,55 @@ import {ConfirmCancelModal} from "./ConfirmCancelButton";
 const getInitialData = ({initialValues, fields}) => {
     const data = {...initialValues}
 
-    for (let field of fields) {
+    for (const field of fields) {
         if (data[field.name] === undefined) data[field.name] = ''
     }
 
     return data
 }
 
-const ValidationErrors = ({validationErrors}) => validationErrors.length > 0 && <>
+const ValidationErrors = ({validationErrors}) => validationErrors.length > 0 ? <>
     {validationErrors.map((error, idx) => <Form.Text className='d-block text-danger'
                                                      key={idx}>{error.message}</Form.Text>)}
-</>
+</>: <></>
 
-const EntityModal = ({handleClose, handleSubmit, handleDelete, show, fields, title, submitText, validateState, initialValues}) => {
+export interface ValidationError {
+    isValid: boolean,
+    message: string,
+    field: string
+}
+export interface Field<T> {
+    title: string,
+    placeholder?: string,
+    name: keyof T,
+    options?: {
+        type: 'custom',
+        component: <U,>({value, onChange}: {value: U, onChange: (val: U) => void}) => JSX.Element
+    } | {
+        type: 'file'
+        accept?: string
+    } | {
+        type: 'number' | 'text' | 'checkbox'
+    }
+}
+interface Props<T> {
+    handleClose: () => void
+    handleSubmit: (data: T) => void
+    handleDelete?: () => void
+    show: boolean
+    fields: Field<T>[]
+    title?: string
+    submitText?: string
+    validateState?: (data: T) => ValidationError[]
+    initialValues?: object
+}
+const EntityModal = <T,>({handleClose, handleSubmit, handleDelete, show, fields, title, submitText, validateState, initialValues}: Props<T>) => {
 
     const [data, setData] = useState(getInitialData({initialValues, fields}) || {})
 
     const [doHotValidation, setDoHotValidation] = useState(false)
 
-    const [validationErrors, setValidationErrors] = useState([])
+    const [validationErrors, setValidationErrors] = useState([] as ValidationError[])
 
     const [confirmDelete, setConfirmDelete] = useState(false)
 
@@ -142,7 +172,7 @@ const EntityModal = ({handleClose, handleSubmit, handleDelete, show, fields, tit
                             modalTitle={'Delete session?'}
                             handleConfirm={() => {
                                 setConfirmDelete(false)
-                                handleDelete()
+                                handleDelete && handleDelete()
                             }}
                             />
         </>

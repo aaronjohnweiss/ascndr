@@ -1,12 +1,12 @@
 import React from 'react'
-import {useSelector} from 'react-redux'
 import {isLoaded, useFirebaseConnect} from 'react-redux-firebase';
 import {findEntry, findUser, getSessionsForUser} from '../helpers/filterUtils';
 import SessionCard from '../components/SessionCard';
 import moment from 'moment';
 import ResponsiveActivityCalendar from '../components/ResponsiveActivityCalendar';
 import {getCalendarData} from "../helpers/activityCalendarEntries";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
+import {getUser} from "../redux/selectors";
 
 const UserHome = () => {
     useFirebaseConnect([
@@ -17,14 +17,14 @@ const UserHome = () => {
         'workouts'
     ])
 
-    const {uid} = useSelector((state: AppState) => state.auth)
-    const gyms = useSelector((state: AppState) => state.firebase.ordered.gyms)
-    const sessions = useSelector((state: AppState) => state.firebase.ordered.sessions)
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
-    const routes = useSelector((state: AppState) => state.firebase.data.routes)
-    const workouts = useSelector((state: AppState) => state.firebase.ordered.workouts)
+    const {uid} = getUser()
+    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
+    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
+    const users = useAppSelector(state => state.firebase.ordered.users)
+    const routes = useAppSelector(state => state.firebase.data.routes)
+    const workouts = useAppSelector(state => state.firebase.ordered.workouts)
 
-    if (!isLoaded(gyms, sessions, routes, users, workouts)) return 'Loading'
+    if (!isLoaded(gyms, sessions, routes, users, workouts)) return <>Loading</>
 
     const sessionsForUser = getSessionsForUser(sessions, uid);
 

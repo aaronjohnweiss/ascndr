@@ -6,12 +6,35 @@ import {percentile} from "./mathUtils";
 import {WORKOUT_CATEGORIES} from "./workouts";
 import {getPreferences} from "../components/ActivityCalendarSettingsModal";
 import {findUser, getSessionsForUser, getUserName, getWorkoutsForUser} from "./filterUtils";
-import {CalendarMode} from "../types/User";
+import {ActivityCalendarPreferences, CalendarMode, User} from "../types/User";
+import {Data, OrderedList} from "../types/Firebase";
+import {Session} from "../types/Session";
+import {Route} from "../types/Route";
+import {Workout} from "../types/Workout";
 
-export const getEmptyCounts = cutoffDate => {
+interface Count {
+    count: number,
+    level: number,
+}
+
+export interface CountForDate extends Count {
+    date: string
+}
+
+export interface MultiCountForDate {
+    date: string
+    counts: number[]
+    levels: number[]
+}
+
+export interface LabeledData {
+    label: string,
+    data: CountForDate[]
+}
+export const getEmptyCounts = (cutoffDate: moment.Moment) => {
     const tmpDate = cutoffDate.clone();
     const now = moment();
-    const emptyCounts = {};
+    const emptyCounts: Record<string, Count> = {};
     while (tmpDate.isBefore(now)) {
         emptyCounts[dateString(tmpDate.valueOf())] = {count: 0, level: 0};
         tmpDate.add(1, 'day');
@@ -22,7 +45,14 @@ export const getEmptyCounts = cutoffDate => {
 export const reduceCount = (acc = 0, count = 0) => count + acc
 export const reduceLevel = (acc = 0, level = 0) => Math.max(level, acc)
 
-export const buildCounts = ({data, getTime = x => x.startTime, getCount = () => 1, getLevel = () => 0, cutoffDate}) =>
+interface BuildCountCtx<T> {
+    data: T[]
+    getTime: (x: T) => number,
+    getCount?: (x: T) => number,
+    getLevel?: (x: T) => number,
+    cutoffDate: moment.Moment
+}
+export const buildCounts = <T,>({data, getTime, getCount = () => 1, getLevel = () => 0, cutoffDate}: BuildCountCtx<T>): Record<string, Count> =>
     data.filter(x => cutoffDate.isBefore(moment(getTime(x))))
         .map(x => ({
             date: dateString(getTime(x)),
@@ -37,13 +67,13 @@ export const buildCounts = ({data, getTime = x => x.startTime, getCount = () => 
             }
         }), getEmptyCounts(cutoffDate));
 
-export const getLevelByPercentile = (data) => {
+export const getLevelByPercentile = (data: CountForDate[]) => {
     const allCounts = data.map(x => x.count).filter(val => val > 0).sort((a, b) => a - b);
     const q25 = percentile(allCounts, 0.25);
     const q50 = percentile(allCounts, 0.50);
     const q75 = percentile(allCounts, 0.75);
 
-    return count => {
+    return (count: number) => {
         if (count === 0) return 0;
         if (count <= q25) return 1;
         if (count <= q50) return 2;
@@ -52,13 +82,13 @@ export const getLevelByPercentile = (data) => {
     }
 }
 
-const buildArray = map => Object.entries(map)
+const buildArray = (map: Record<string, Count>): CountForDate[] => Object.entries(map)
     .map(([date, {count, level}]) => ({date, count, level}))
     .sort((a, b) => a.date.localeCompare(b.date));
 
-const getData = (ctx) => buildArray(buildCounts(ctx));
+const getData = <T,> (ctx: BuildCountCtx<T>): CountForDate[] => buildArray(buildCounts(ctx));
 
-const getDataWithPercentiles = (ctx) => {
+const getDataWithPercentiles = <T,> (ctx: BuildCountCtx<T>) => {
     const data = getData(ctx)
 
     const getLevel = getLevelByPercentile(data)
@@ -69,21 +99,31 @@ const getDataWithPercentiles = (ctx) => {
     }));
 }
 
-const excludeEmpty = data => data.filter(x => x.data.some(day => day.level > 0))
+const excludeEmpty = (arr: LabeledData[]) => arr.filter(x => x.data.some(day => day.level > 0))
 
-const mergeData = ({data, label}) => {
+const mergeData = ({data, label}: {data: LabeledData[], label: string}): LabeledData[] => {
     const dataByDay = data.map(x => x.data).flat().reduce((acc, entry) => ({
         ...acc,
         [entry.date]: {
             count: reduceCount(acc[entry.date] && acc[entry.date].count, entry.count),
             level: reduceLevel(acc[entry.date] && acc[entry.date].level, entry.level)
         }
-    }), {});
+    }), {} as Record<string, Count>);
 
     return [{label, data: buildArray(dataByDay)}];
 }
 
-export const getCalendarData = ({user, users, sessions, routes, workouts, cutoffDate}) => {
+export interface Ctx {
+    user: User
+    users: OrderedList<User>
+    sessions: OrderedList<Session>
+    routes: Data<Route>
+    workouts: OrderedList<Workout>
+    cutoffDate: moment.Moment
+    preferences: ActivityCalendarPreferences
+}
+
+export const getCalendarData = ({user, users, sessions, routes, workouts, cutoffDate}: Omit<Ctx, 'preferences'>): LabeledData[] => {
     const preferences = getPreferences(user)
 
     if (preferences.mode === CalendarMode.FRIENDS) {
@@ -97,22 +137,23 @@ export const getCalendarData = ({user, users, sessions, routes, workouts, cutoff
     }
 }
 
-export const getUserData = ({user, preferences, sessions, routes, workouts, cutoffDate}) => [
+export const getUserData = ({user, preferences, sessions, routes, workouts, cutoffDate}: Pick<Ctx, 'user' | 'preferences' | 'sessions' | 'routes' | 'workouts' | 'cutoffDate'>) => [
     ...getSessionData({sessions: getSessionsForUser(sessions, user.uid), routes, cutoffDate}),
     ...getWorkoutData({workouts: getWorkoutsForUser(workouts,  user.uid), cutoffDate, preferences}),
 ]
 
-export const getSessionData = ({sessions, routes, cutoffDate}) => {
+export const getSessionData = ({sessions, routes, cutoffDate}: Pick<Ctx, 'sessions' | 'routes' | 'cutoffDate'>) => {
     const sessionData = getDataWithPercentiles({
         data: sessions.map(x => x.value),
         cutoffDate,
-        getCount: session => routeCountForSession(session, routes, ALL_STYLES, true)
+        getTime: session => session.startTime,
+        getCount: session => routeCountForSession(session, routes, [...ALL_STYLES], true)
     })
 
     return [{label: 'Climbing', data: sessionData}]
 }
 
-export const getWorkoutData = ({workouts, cutoffDate, preferences}) => {
+export const getWorkoutData = ({workouts, cutoffDate, preferences}: Pick<Ctx, 'workouts' | 'cutoffDate' | 'preferences'>) => {
     if (!preferences.includeWorkouts) return []
 
     const allWorkoutData = excludeEmpty(WORKOUT_CATEGORIES.map(category => ({
@@ -120,7 +161,8 @@ export const getWorkoutData = ({workouts, cutoffDate, preferences}) => {
         data: getData({
             data: workouts.map(x => x.value).filter(workout => workout.categories.includes(category)),
             cutoffDate,
-            getLevel: workout => workout.intensity
+            getTime: workout => workout.startTime,
+            getLevel: workout => workout.intensity,
         })
     })))
 

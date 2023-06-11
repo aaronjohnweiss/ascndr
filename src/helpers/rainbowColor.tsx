@@ -15,7 +15,7 @@ const rgb2hex = ({r, g, b}) =>
         .map(x =>
             Math.round(x * 255)
                 .toString(16)
-                .padStart(2, 0)
+                .padStart(2, '0')
         )
         .join('');
 
@@ -41,8 +41,16 @@ const STARTING_HUE = 2 / 3; // Blue
 
 const numColors = (n) => Math.max(n, MIN_COLORS)
 
-export const rainbowColors = ({n = MIN_COLORS, s = SATURATION, l = LIGHTNESS, hMin, hMax, hStart = STARTING_HUE}) =>
-    Array(numColors(n)).fill().map((_, idx) => rainbowColor(idx, numColors(n), s, l, hMin, hMax, hStart)).slice(0, n)
+interface I {
+    n?: number
+    s?: number
+    l?: number,
+    hMin?: number,
+    hMax?: number,
+    hStart?: number
+}
+export const rainbowColors = ({n = MIN_COLORS, s = SATURATION, l = LIGHTNESS, hMin, hMax, hStart = STARTING_HUE}: I) =>
+    Array(numColors(n)).fill(null).map((_, idx) => rainbowColor(idx, numColors(n), s, l, hMin, hMax, hStart)).slice(0, n)
 
 export const rainbowColor = (i, n, s = 1, l = 0.5, hMin = 0, hMax = 1, hStart = hMin) => {
     const hRange = hMax - hMin;

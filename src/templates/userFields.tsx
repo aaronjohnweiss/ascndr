@@ -1,7 +1,9 @@
 import HiatusModel from '../components/HiatusModal';
 import {isEmpty} from "react-redux-firebase";
+import {Field, ValidationError} from "../components/EntityModal";
+import {User} from "../types/User";
 
-export const addFriendFields = [
+export const addFriendFields: Field<{userValue: string}>[] = [
     {
         title: 'User ID or Name',
         placeholder: 'User...',
@@ -17,7 +19,7 @@ export const userIdValidation = (users) => ({userValue}) => [
     }
 ]
 
-export const userNameField = [
+export const userNameField: Field<Pick<User, 'name'>>[] = [
     {
         title: 'User Name',
         placeholder: 'Name..',
@@ -30,20 +32,20 @@ const getTakenUserNames = (users, currentUserName) => isEmpty(users) ? [] : user
     .filter(name => !!name)
     .filter(name => name !== currentUserName)
 
-export const userNameValidation = (users, currentUserName) => ({name}) => [
+export const userNameValidation = (users, currentUserName) => ({name}: Pick<User, 'name'>): ValidationError[] => [
     {
         isValid: !getTakenUserNames(users, currentUserName).includes(name),
         message: `The name ${name} is already taken`,
         field: 'name',
     },
     {
-        isValid: name && name.length > 0,
+        isValid: !!(name && name.length > 0),
         message: 'Name can not be blank',
         field: 'name',
     }
 ]
 
-export const userFields = [
+export const userFields: Field<User>[] = [
     ...userNameField,
     {
         title: 'Hiatuses',

@@ -1,5 +1,4 @@
 import React, {Fragment} from 'react'
-import {useSelector} from 'react-redux'
 import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {Button, Col, ListGroup, Row} from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
@@ -12,7 +11,8 @@ import {getEditorsForGym, getRoutesForGym, getSessionsForUserAndGym} from '../he
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
 import DeleteGymModal from "./DeleteGymModal";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
+import {getUser} from "../redux/selectors";
 
 const GymPage = ({match: {params: {id}}, history}) => {
     useFirebaseConnect([
@@ -22,19 +22,19 @@ const GymPage = ({match: {params: {id}}, history}) => {
         'users'
     ])
 
-    const { uid } = useSelector((state: AppState) => state.auth)
-    const gym = useSelector(({ firebase: {data}}: AppState) => data.gyms && data.gyms[id])
-    const routes = useSelector((state: AppState) => state.firebase.ordered.routes)
-    const sessions = useSelector((state: AppState) => state.firebase.ordered.sessions)
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
+    const { uid } = getUser()
+    const gym = useAppSelector(({ firebase: {data}}) => data.gyms && data.gyms[id])
+    const routes = useAppSelector(state => state.firebase.ordered.routes)
+    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
+    const users = useAppSelector(state => state.firebase.ordered.users)
 
     const firebase = useFirebase()
 
     const [showRouteModal, openRouteModal, closeRouteModal] = useModalState(false)
     const [showEditModal, openEditModal, closeEditModal] = useModalState(false)
 
-    if (!isLoaded(gym, sessions, routes, users)) return 'Loading'
-    if (!gym) return 'Uh oh'
+    if (!isLoaded(gym, sessions, routes, users)) return <>Loading</>
+    if (!gym) return <>Uh oh</>
 
     const handleNewRoute = (route) => {
         if (route && route.picture) {
@@ -51,7 +51,7 @@ const GymPage = ({match: {params: {id}}, history}) => {
         }
     }
 
-    const createSession = () => {
+    const createSession = async () => {
 
         const session = {
             gymId: id,
@@ -61,7 +61,7 @@ const GymPage = ({match: {params: {id}}, history}) => {
             customRoutes: []
         }
 
-        const {key} = firebase.push('sessions', session)
+        const {key} = await firebase.push('sessions', session)
         if (key) {
             history.push('/sessions/' + key);
         }
@@ -73,10 +73,10 @@ const GymPage = ({match: {params: {id}}, history}) => {
     }
 
     // Filter to only routes for this gym
-    const routesForGym = getRoutesForGym(routes, {key: id});
+    const routesForGym = getRoutesForGym(routes, id);
     const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
     const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
-    const sessionsForUser = getSessionsForUserAndGym(sessions, {key: id}, uid).sort((a, b) => b.value.startTime - a.value.startTime)
+    const sessionsForUser = getSessionsForUserAndGym(sessions, id, uid).sort((a, b) => b.value.startTime - a.value.startTime)
 
     const canEdit = getEditorsForGym(gym, users).includes(uid)
 

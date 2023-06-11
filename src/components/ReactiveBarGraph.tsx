@@ -1,6 +1,6 @@
 import React, {useLayoutEffect, useRef, useState} from 'react';
 import {Point, VictoryAxis, VictoryBar, VictoryChart, VictoryGroup, VictoryLegend, VictoryStack} from 'victory';
-import {numColors, rainbowColors} from '../helpers/rainbowColor';
+import {rainbowColors} from '../helpers/rainbowColor';
 import {MultiColorPoint} from './MultiColorPoint';
 
 // Width of each bar
@@ -11,14 +11,14 @@ const GRAPH_BAR_PADDING = 110;
 const GRAPH_LEGEND_ENTRY_HEIGHT = 30;
 
 
-const getColors = (numUsers) => rainbowColors({n: numUsers});
+const getColors = (numUsers: number) => rainbowColors({n: numUsers});
 
 const ReactiveBarGraph = ({data, categories, maxDomain, animate, showLegend = true, isStacked = true}) => {
     // Use div ref to determine screen width (to fit graph to screen)
-    const divRef = useRef();
+    const divRef = useRef<HTMLDivElement | null>(null);
     const [width, setWidth] = useState(0);
     useLayoutEffect(() => {
-        setWidth(divRef.current.clientWidth)
+        setWidth(divRef?.current?.clientWidth || 100)
     }, [divRef.current]);
 
     const numUsers = data.length;

@@ -3,9 +3,11 @@ import React from "react";
 import {MAX_INTENSITY, WORKOUT_CATEGORIES} from "../helpers/workouts";
 import {Form} from "react-bootstrap";
 import {distinct} from "../helpers/filterUtils";
+import {Field} from "../components/EntityModal";
+import {Workout} from "../types/Workout";
 
 const IntensityPicker = ({value, onChange}) => {
-    return <InputSlider min={1} max={MAX_INTENSITY} step={1} value={value} toString={x => x} onChange={onChange}/>
+    return <InputSlider min={1} max={MAX_INTENSITY} step={1} value={value} onChange={onChange}/>
 }
 
 const CategoryPicker = ({value, onChange}) => {
@@ -32,7 +34,7 @@ const CategoryPicker = ({value, onChange}) => {
     )
 }
 
-export const workoutFields = [
+export const workoutFields: Field<Workout>[] = [
     {
         title: 'Intensity',
         name: 'intensity',

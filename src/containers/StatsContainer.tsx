@@ -1,9 +1,8 @@
 import React from 'react'
 import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
-import {useSelector} from 'react-redux'
-import GradeHistogram from '../components/GradeHistogram'
+import GradeHistogram, {GradeChartProps} from '../components/GradeHistogram'
 import {Route, Switch, useLocation} from 'react-router-dom'
-import StatsIndex from '../components/StatsIndex';
+import StatsIndex, {StatsFilterProps} from '../components/StatsIndex';
 import {toObj} from '../helpers/objectConverters';
 import {FaChevronLeft} from 'react-icons/fa';
 import {ALL_STYLES} from '../helpers/gradeUtils';
@@ -11,7 +10,9 @@ import GradeHistory from '../components/GradeHistory';
 import StatFilters, {filtersLink} from './StatFilters';
 import {Button} from 'react-bootstrap';
 import {filterList, findFriends, getGymsForUser} from "../helpers/filterUtils";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
+import {getUser} from "../redux/selectors";
+import {isStyle, RouteStyle} from "../types/Grade";
 
 const filterByKeys = (data, keys) => {
     if (!data) return [];
@@ -36,16 +37,16 @@ const StatsContainer = () => {
         'users'
     ])
 
-    const { uid } = useSelector((state: AppState) => state.auth)
-    const gyms = useSelector((state: AppState) => state.firebase.ordered.gyms)
-    const routes = useSelector((state: AppState) => state.firebase.data.routes)
-    const sessions = useSelector((state: AppState) => state.firebase.ordered.sessions)
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
+    const { uid } = getUser()
+    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
+    const routes = useAppSelector(state => state.firebase.data.routes)
+    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
+    const users = useAppSelector(state => state.firebase.ordered.users)
 
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
-    if (!isLoaded(routes, sessions, users, gyms)) return 'Loading';
+    if (!isLoaded(routes, sessions, users, gyms)) return <>Loading</>;
 
     let allowedSessions = sessions;
     let allowedGyms = getGymsForUser(gyms, users, uid);
@@ -65,23 +66,24 @@ const StatsContainer = () => {
 
     allowedSessions = allowedSessions.filter(session => allowedUids.includes(session.value.uid));
 
+    let allowedTypes: RouteStyle[]
+    if (query.has('allowedTypes')) {
+        allowedTypes = query.getAll('allowedTypes').filter(type => isStyle(type)) as RouteStyle[];
+    } else {
+        allowedTypes = [...ALL_STYLES];
+    }
+
     const allowedUsers = filterList(users, 'uid', allowedUids);
 
-    const filterProps = {
+    const filterProps: StatsFilterProps & GradeChartProps = {
         gyms: toObj(allowedGyms),
         users: allowedUsers.reduce((obj, user) => ({...obj, [user.value.uid]: user.value}), {}),
         routes,
-        sessions: toObj(allowedSessions)
+        sessions: toObj(allowedSessions),
+        allowSuffixes: getBooleanFromQuery(query, 'allowSuffixes'),
+        allowPartials: getBooleanFromQuery(query, 'allowPartials', true),
+        allowedTypes
     };
-
-    if (query.has('allowedTypes')) {
-        filterProps.allowedTypes = query.getAll('allowedTypes');
-    } else {
-        filterProps.allowedTypes = ALL_STYLES;
-    }
-
-    filterProps.allowSuffixes = getBooleanFromQuery(query, 'allowSuffixes');
-    filterProps.allowPartials = getBooleanFromQuery(query, 'allowPartials', true);
 
     return (
         <Switch>

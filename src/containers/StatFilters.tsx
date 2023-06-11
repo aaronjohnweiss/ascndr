@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import {useFirebaseConnect} from 'react-redux-firebase';
-import {useSelector} from 'react-redux';
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
 import {findUser, getFriendsForUser, getGymsForUser, getUserName} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
+import {getUser} from "../redux/selectors";
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
 
@@ -39,9 +39,9 @@ const StatFilters = () => {
         'users'
     ])
 
-    const { uid } = useSelector((state: AppState) => state.auth)
-    const gyms = useSelector((state: AppState) => state.firebase.ordered.gyms)
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
+    const { uid } = getUser()
+    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
+    const users = useAppSelector(state => state.firebase.ordered.users)
 
     const query = new URLSearchParams(useLocation().search);
 
@@ -81,8 +81,8 @@ const StatFilters = () => {
         gymIds.forEach(id => queryParams.append('gyms', id));
         uids.forEach(id => queryParams.append('uids', id));
         allowedTypes.forEach(type => queryParams.append('allowedTypes', type));
-        queryParams.append('allowSuffixes', allowSuffixes);
-        queryParams.append('allowPartials', allowPartials);
+        queryParams.append('allowSuffixes', `${allowSuffixes}`);
+        queryParams.append('allowPartials', `${allowPartials}`);
         return queryParams.toString();
     };
 

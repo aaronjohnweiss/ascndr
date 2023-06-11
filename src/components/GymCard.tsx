@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 import {timeFromNow} from '../helpers/dateUtils';
 import {getLatestSession} from '../helpers/filterUtils';
 
-const Gym = ({gym, sessions}) => {
+const GymCard = ({gym, sessions}) => {
     const latestSession = getLatestSession(sessions);
     return (
         <Card>
@@ -28,4 +28,4 @@ const Gym = ({gym, sessions}) => {
     )
 }
 
-export default Gym
+export default GymCard

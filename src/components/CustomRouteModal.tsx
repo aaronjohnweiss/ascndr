@@ -1,11 +1,20 @@
 import React, {useState} from 'react'
 import {Button, Form, Modal} from 'react-bootstrap'
 import InputSlider from './InputSlider';
+import {OrderedList} from "../types/Firebase";
+import {Route} from "../types/Route";
 
-const CustomRouteModal = ({ handleClose, handleSubmit, show, customRoutes = [], allowPartial = true}) => {
-    const [selected, setSelected] = useState(undefined);
+interface Props {
+    handleClose: () => void
+    handleSubmit: ({key, percentage}: {key: string, percentage: number}) => void
+    show: boolean
+    customRoutes?: OrderedList<Route>
+    allowPartial?: boolean
+}
+const CustomRouteModal = ({ handleClose, handleSubmit, show, customRoutes = [], allowPartial = true}: Props) => {
+    const [selected, setSelected] = useState<string | null>(null);
     const [percentage, setPercentage] = useState(100);
-    const submitDisabled = selected === undefined || percentage <= 0;
+    const submitDisabled = selected === null || percentage <= 0;
     return (
         <Modal show={show} onHide={handleClose}>
             <Form>
@@ -29,7 +38,7 @@ const CustomRouteModal = ({ handleClose, handleSubmit, show, customRoutes = [], 
                         <>
                             <Form.Label className='grade-modal-label'>Progress</Form.Label>
                             <InputSlider min={0} max={100} step={25} value={percentage} onChange={setPercentage}
-                                         toString={p => `${p}%`} />
+                                         printValue={p => `${p}%`} />
                         </>
                     )}
                 </Modal.Body>
@@ -37,7 +46,8 @@ const CustomRouteModal = ({ handleClose, handleSubmit, show, customRoutes = [], 
                     <Button variant="secondary" onClick={handleClose}>
                         Cancel
                     </Button>
-                    <Button variant="primary" disabled={submitDisabled} onClick={() => handleSubmit({key: selected, percentage})}>
+                    {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
+                    <Button variant="primary" disabled={submitDisabled} onClick={() => handleSubmit({key: selected!, percentage})}>
                         Confirm
                     </Button>
                 </Modal.Footer>

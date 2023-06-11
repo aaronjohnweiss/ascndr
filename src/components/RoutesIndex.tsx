@@ -6,18 +6,31 @@ import {printSplitRouteCount, routeCount, splitRouteCount} from "./StatsIndex";
 import {sumByKey} from "../helpers/mathUtils";
 import {PARTIAL_MAX} from "./GradeModal";
 import {FAILED_IMAGE, PENDING_IMAGE} from "../containers/RoutePage";
+import {Data} from "../types/Firebase";
+import {Route} from "../types/Route";
+import {Session} from "../types/Session";
+import {RouteStyle} from "../types/Grade";
 
-
-const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) => {
+export interface RoutesFilterProps {
+    routes: Data<Route>
+    sessions: Data<Session>
+    allowedTypes: RouteStyle[]
+    allowPartials: boolean
+    sortBy: {
+        key: string,
+        desc: boolean
+    }[]
+}
+const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: RoutesFilterProps) => {
     const location = useLocation();
     const history = useHistory();
     const filterParams = location.search;
 
     const stats = Object.entries(routes)
         .filter(([, route]) => route.grade && allowedTypes.includes(route.grade.style))
-        .map(([key, route]) => [key, statsForRoute(key, route, sessions, allowPartials)])
+        .map(([key, route]) => [key, statsForRoute(key, route, sessions, allowPartials)] as const)
         .sort(([k1, r1], [k2, r2]) => {
-        for (let {key, desc} of sortBy) {
+        for (const {key, desc} of sortBy) {
             let compareResult = 0
             switch(key) {
                 case 'created':
@@ -33,7 +46,7 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) =>
                     compareResult = compareGrades(r1.grade, r2.grade)
                     break
             }
-            compareResult *= (desc === true) ? -1 : 1
+            compareResult *= desc ? -1 : 1
             if (compareResult !== 0) return compareResult
         }
         return 0
@@ -51,7 +64,7 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) =>
 
     return (
         <>
-            <Row noGutters>
+            <Row>
                 <Col xs={6}><h2>Routes</h2></Col>
                 <Col><Button href={`/routeGallery/filters${filterParams}`} style={{float: 'right'}}>Filters</Button></Col>
             </Row>
@@ -63,19 +76,19 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}) =>
     )
 };
 
-const statsForRoute = (routeKey, route, sessions, allowPartials) => {
-    const sessionStats = Object.values(sessions).flatMap(session => (session.customRoutes || []).map(rt => [rt, session.startTime]))
+const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, allowPartials: boolean): Route & {count: Record<string, number>, time: number} => {
+    const sessionStats = Object.values(sessions).flatMap(session => (session.customRoutes || []).map((rt) => [rt, session.startTime] as const))
         .filter(([customRoute]) => customRoute.key === routeKey)
-        .map(([customRoute, time]) => [allowPartials ? splitRouteCount(customRoute) : ({[PARTIAL_MAX]: routeCount(customRoute, allowPartials)}), time])
+        .map(([customRoute, time]) => [allowPartials ? splitRouteCount(customRoute) : ({[PARTIAL_MAX]: routeCount(customRoute, allowPartials)}), time] as const)
         .reduce((acc, [count, time]) => ({count: sumByKey(acc.count, count), times: [...acc.times, time]}), {
-            count: {},
-            times: []
+            count: {} as Record<string, number>,
+            times: [] as number[]
         });
 
     return {
         ...route,
         count: sessionStats.count,
-        time: Math.max(sessionStats.times)
+        time: Math.max(...sessionStats.times)
     }
 }
 

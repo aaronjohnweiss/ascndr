@@ -1,8 +1,10 @@
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
 import {GymPicker} from "../components/GymPicker";
 import React from "react";
+import {Field} from "../components/EntityModal";
+import {Gym} from "../types/Gym";
 
-export const gymFields = [
+export const gymFields: Field<Gym>[] = [
     {
         title: 'Gym Name',
         placeholder: 'Name..',
@@ -20,15 +22,18 @@ export const gymFields = [
         return {
             title: `Wall height (${printType(style)})` ,
             placeholder: 'Height..',
-            name: `${style}_HEIGHT`,
+            name: `${style}_HEIGHT` as keyof Gym,
             options: {
-                type: 'number'
+                type: 'number' as const
             }
         }
     })
 ]
 
-export const migrateGymFields = ({gyms}) => [
+interface MigrateGym {
+    gymId: string
+}
+export const migrateGymFields = ({gyms}): Field<MigrateGym>[] => [
     {
         title: 'Gym',
         name: 'gymId',

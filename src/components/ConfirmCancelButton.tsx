@@ -1,52 +1,54 @@
-import React, {Component, Fragment} from 'react'
+import React, {Fragment} from 'react'
 import {Button, Modal} from 'react-bootstrap';
+import {useModalState} from "../helpers/useModalState";
 
-export default class ConfirmCancelButton extends Component {
-    state = {
-        showModal: false
-    }
+interface ButtonProps {
+    modalTitle: string
+    modalBody?: JSX.Element | string
+    handleConfirm: () => void
+    buttonText: string
+    buttonProps: object
+    buttonBlock?: boolean
+}
+const ConfirmCancelButton = ({ handleConfirm, modalTitle, modalBody, buttonText, buttonProps, buttonBlock }: ButtonProps) => {
+    const [showModal, openModal, closeModal] = useModalState(false)
 
-    showModal= () => {
-        this.setState({ showModal: true })
-    }
-
-    hideModal = () => {
-        this.setState({ showModal: false })
-    }
-
-    render() {
-        const { handleConfirm, modalTitle, modalBody, buttonText, buttonProps, buttonBlock } = this.props
-        const { showModal } = this.state
-
-        const ShowModalButton = () => (
-            <Button variant='danger' {...buttonProps} onClick={this.showModal}>
+    const ShowModalButton = () => (
+        <Button variant='danger' {...buttonProps} onClick={openModal}>
             {buttonText}
         </Button>
-        )
+    )
 
-        const WrappedButton = () => buttonBlock ? (
-            <div className={buttonBlock ? "d-grid d-block" : ""}>
-                <ShowModalButton />
-            </div>
-        ) : (
+    const WrappedButton = () => buttonBlock ? (
+        <div className={buttonBlock ? "d-grid d-block" : ""}>
             <ShowModalButton />
-        )
+        </div>
+    ) : (
+        <ShowModalButton />
+    )
 
-        return (
-            <Fragment>
-                <WrappedButton />
-                <ConfirmCancelModal showModal={showModal}
-                                    hideModal={this.hideModal}
-                                    modalTitle={modalTitle}
-                                    modalBody={modalBody}
-                                    handleConfirm={handleConfirm}
-                />
-            </Fragment>
-        )
-    }
+    return (
+        <Fragment>
+            <WrappedButton />
+            <ConfirmCancelModal showModal={showModal}
+                                hideModal={closeModal}
+                                modalTitle={modalTitle}
+                                modalBody={modalBody}
+                                handleConfirm={handleConfirm}
+            />
+        </Fragment>
+    )
 }
+export default ConfirmCancelButton
 
-export const ConfirmCancelModal = ({showModal, hideModal, modalTitle, modalBody, handleConfirm}) => (
+interface ModalProps {
+    showModal: boolean,
+    hideModal: () => void
+    modalTitle: string
+    modalBody?: JSX.Element | string
+    handleConfirm: () => void
+}
+export const ConfirmCancelModal = ({showModal, hideModal, modalTitle, modalBody, handleConfirm}: ModalProps) => (
     <Modal show={showModal} onHide={hideModal}>
         <Modal.Header closeButton>
             <Modal.Title>

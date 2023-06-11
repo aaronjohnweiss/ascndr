@@ -2,16 +2,9 @@ import React, {useState} from 'react'
 import {Button, Form, Modal} from 'react-bootstrap'
 import {getUserName} from "../helpers/filterUtils";
 import {MultiSelect} from "../containers/StatFilters";
-import {CalendarMode} from "../types/User";
+import {ActivityCalendarPreferences, CalendarMode, defaultActivityCalendarPreferences, User} from "../types/User";
 
-export const getPreferences = user => ({...defaultPreferences, ...(user && user.preferences && user.preferences.activityCalendar || {})})
-
-const defaultPreferences = {
-    mode: CalendarMode.USER_ONLY,
-    includeWorkouts: true,
-    splitWorkouts: true,
-    friends: [],
-}
+export const getPreferences = (user: User): ActivityCalendarPreferences => ({...defaultActivityCalendarPreferences(), ...(user && user.preferences && user.preferences.activityCalendar || {})})
 
 export const ActivityCalendarSettingsModal = ({user, friends, show, handleClose, handleSubmit}) => {
 

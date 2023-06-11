@@ -1,7 +1,12 @@
 import React, {useState} from 'react'
 import {Button, ListGroup} from 'react-bootstrap'
 
-const TruncatedList = ({ children = [], pageSize, initialSize = pageSize }) => {
+interface Props {
+    children: JSX.Element[]
+    pageSize: number
+    initialSize?: number
+}
+const TruncatedList = ({ children = [], pageSize, initialSize = pageSize }: Props) => {
     const [numItems, setNumItems] = useState(initialSize || children.length);
 
     const onShowMore = () => {

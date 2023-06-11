@@ -3,20 +3,16 @@ import ReactDOM from 'react-dom'
 import 'bootstrap/dist/css/bootstrap.css'
 import App from './App'
 import {Provider} from 'react-redux'
-import {applyMiddleware, createStore} from 'redux'
 import firebase from 'firebase/app'
 import {ReactReduxFirebaseProvider} from 'react-redux-firebase'
-import rootReducer from './redux/reducer'
-import thunkMiddleware from 'redux-thunk'
 import 'firebase/database'
 import * as serviceWorker from './serviceWorker'
+import {store} from "./redux";
 
 
 const rrfConfig = {
     userProfile: 'users'
 }
-
-const store = createStore(rootReducer, undefined, applyMiddleware(thunkMiddleware))
 
 const rrfProps = {
     firebase,

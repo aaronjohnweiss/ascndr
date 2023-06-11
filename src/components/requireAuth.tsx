@@ -1,36 +1,18 @@
-import React, {Component} from "react";
-import {connect} from "react-redux";
-import PropTypes from "prop-types";
+import React, {FC} from "react";
+import {RouteComponentProps, useHistory} from "react-router";
+import {useAppSelector} from "../redux";
 
-export default function(ComposedComponent) {
-    class Authentication extends Component {
-        static contextTypes = {
-            router: PropTypes.object
-        };
+export default function(ComposedComponent: FC<RouteComponentProps<any>>) {
 
-        componentWillMount() {
-            if (this.props.authenticated === null) {
-                this.context.router.history.push("/login");
-            }
+    const Authentication = (props: any) => {
+        const auth = useAppSelector(state => state.auth)
+        const history = useHistory()
+
+        if (auth === null || auth === false) {
+            history.push("/login");
         }
-
-        componentWillUpdate(nextProps) {
-            if (!nextProps.authenticated) {
-                this.context.router.history.push("/login");
-            }
-        }
-
-        render() {
-            if (this.props.authenticated) {
-                return <ComposedComponent {...this.props} />;
-            }
-            return null;
-        }
+        return <ComposedComponent {...props} />;
     }
 
-    function mapStateToProps(state) {
-        return { authenticated: state.auth };
-    }
-
-    return connect(mapStateToProps)(Authentication);
+    return Authentication
 }

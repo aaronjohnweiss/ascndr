@@ -1,4 +1,6 @@
-export const durationString = (durationMillis, includeMinutes = true) => {
+import {Session} from "../types/Session";
+
+export const durationString = (durationMillis: number, includeMinutes = true) => {
     const hours = Math.floor(durationMillis / 3600000);
     const hoursString = hours + ' hour' + (hours === 1 ?  '' : 's');
 
@@ -11,4 +13,4 @@ export const durationString = (durationMillis, includeMinutes = true) => {
     }
 };
 
-export const sessionDuration = (session) => durationString(session.endTime - session.startTime);
+export const sessionDuration = (session: Session) => session.endTime === undefined ? '(ongoing)' : durationString(session.endTime - session.startTime);

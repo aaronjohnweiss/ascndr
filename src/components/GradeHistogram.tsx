@@ -6,23 +6,35 @@ import {Button, Col, Container, Row} from 'react-bootstrap';
 import {RangeSlider} from 'reactrangeslider';
 import {partialRouteCount, routeCount} from './StatsIndex';
 import {getUserName} from "../helpers/filterUtils";
+import {Data} from "../types/Firebase";
+import {Route} from "../types/Route";
+import {Session} from "../types/Session";
+import {Grade, RouteStyle} from "../types/Grade";
+import {User} from "../types/User";
 
-const addCount = (arr, key, count, partialCount, allowSuffixes) => {
+interface CountForGrade<T> {
+    key: T,
+    count: number,
+    partialCount: number
+}
+
+const addCount = <T, >(arr: CountForGrade<T>[], key: T, count: number, partialCount: number | false, allowSuffixes: boolean) => {
     const entry = arr.find(val => gradeEquals(val.key, key, allowSuffixes));
     if (entry) {
         entry.count += count;
-        entry.partialCount += partialCount;
+        entry.partialCount += partialCount || 0;
     } else {
-        arr.push({key, count, partialCount});
+        arr.push({key, count, partialCount: partialCount || 0});
     }
 };
 
 const ANIMATION_INTERVAL = 1000;
 const MAX_ANIMATION_DURATION = 10000;
 
-function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixes, allowPartials) {
+type BarDatum = {x: string, y: number}
+function getGraphData(users: User[], allowedSessions: Session[], routes: Data<Route>, allowedTypes: RouteStyle[], allowSuffixes: boolean, allowPartials: boolean) {
     // Maintain list of all grades for the x axis labels
-    const allGrades = [];
+    const allGrades: Grade[] = [];
     let maxValue = 0;
 
     // Aggregate session data for each user
@@ -52,7 +64,7 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
             }
 
             return acc;
-        }, []);
+        }, [] as CountForGrade<Grade>[]);
 
         // Add to list of all grades
         countByGrade.forEach(({key, count, partialCount}) => {
@@ -71,9 +83,9 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
 
     const graphData = data.map(({name, countByGrade}) => {
 
-        const fullCompletions = [];
-        const partialCompletions = [];
-        const totalCompletions = {};
+        const fullCompletions: BarDatum[] = [];
+        const partialCompletions: BarDatum[] = [];
+        const totalCompletions: Record<string, number> = {};
 
         sortedGrades.forEach(grade => {
             const entry = countByGrade.find(val => gradeEquals(val.key, grade, allowSuffixes));
@@ -91,7 +103,25 @@ function getGraphData(users, allowedSessions, routes, allowedTypes, allowSuffixe
     return {categories, graphData, maxValue};
 }
 
-const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, allowPartials, canAnimate = true}) => {
+export interface GradeChartProps {
+    users: Data<User>
+    routes: Data<Route>
+    sessions: Data<Session>
+    allowSuffixes: boolean
+    allowedTypes: RouteStyle[]
+    allowPartials: boolean
+    canAnimate?: boolean
+}
+
+const GradeHistogram = ({
+                            users,
+                            routes,
+                            sessions,
+                            allowSuffixes,
+                            allowedTypes,
+                            allowPartials,
+                            canAnimate = true
+                        }: GradeChartProps) => {
     // Get session dates for animating
     const validUids = Object.keys(users);
     const sessionDates = Object.values(sessions).filter(session => validUids.includes(session.uid)).map(session => session.startTime).sort();
@@ -101,7 +131,7 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, a
     const [isAnimating, setIsAnimating] = useState(false);
     // Track date range
     const [minDateValue, setMinDateValue] = useState(0);
-    const [maxDateValue, setMaxDateValue] = useState(undefined);
+    const [maxDateValue, setMaxDateValue] = useState<number | undefined>(undefined);
 
     const minDate = firstDate.clone().add(minDateValue, 'months').startOf('month');
     const maxDate = maxDateValue === undefined ? undefined : firstDate.clone().add(maxDateValue, 'months').endOf('month');
@@ -158,30 +188,32 @@ const GradeHistogram = ({users, routes, sessions, allowSuffixes, allowedTypes, a
             <Row>
                 <Col xs={12}>
                     <ReactiveBarGraph data={graphData} categories={allCategories} maxDomain={{y: maxValue}}
-                                      animate={{duration: ANIMATION_INTERVAL / 4, onLoad: {duration: 0}}} showLegend={validUids.length > 1} isStacked={allowPartials}/>
+                                      animate={{duration: ANIMATION_INTERVAL / 4, onLoad: {duration: 0}}}
+                                      showLegend={validUids.length > 1} isStacked={allowPartials}/>
                 </Col>
             </Row>
             {canAnimate &&
-            <>
-                <Row>
-                    <Col xs={12}>
-                        <p style={{textAlign: 'center'}}>{minDate.format('MMMM YYYY')} to {(maxDate || lastDate).format('MMMM YYYY')}</p>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col xs={12}>
-                        <RangeSlider value={{start: minDateValue, end: maxDateValue}} min={0} max={numMonths} step={1} onChange={onRangeSliderChange} />
-                    </Col>
-                </Row>
-                <Row>
-                    <Col sm={{span: 6, offset: 3}} className="d-grid d-block">
-                        {isAnimating ?
-                            <Button onClick={() => setMaxDateValue(undefined)}>Stop</Button> :
-                            <Button onClick={() => startAnimation()}>Play</Button>
-                        }
-                    </Col>
-                </Row>
-            </>
+                <>
+                    <Row>
+                        <Col xs={12}>
+                            <p style={{textAlign: 'center'}}>{minDate.format('MMMM YYYY')} to {(maxDate || lastDate).format('MMMM YYYY')}</p>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col xs={12}>
+                            <RangeSlider value={{start: minDateValue, end: maxDateValue}} min={0} max={numMonths}
+                                         step={1} onChange={onRangeSliderChange}/>
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col sm={{span: 6, offset: 3}} className="d-grid d-block">
+                            {isAnimating ?
+                                <Button onClick={() => setMaxDateValue(undefined)}>Stop</Button> :
+                                <Button onClick={() => startAnimation()}>Play</Button>
+                            }
+                        </Col>
+                    </Row>
+                </>
             }
         </Container>
     );

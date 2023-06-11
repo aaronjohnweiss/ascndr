@@ -1,6 +1,7 @@
 import {sum} from './mathUtils';
 import {PARTIAL_MAX} from '../components/GradeModal';
 import {distinct} from "./filterUtils";
+import {PartialCount} from "../types/Session";
 
 export const TOP_ROPE = 'TOP_ROPE';
 export const BOULDER = 'BOULDER';
@@ -39,7 +40,7 @@ export const prettyPrint = (grade, useModifier = true, usePercentage = false) =>
 
 export const printModifier = (modifier) => modifier ? modifier : 'Even';
 
-export const countPartials = (partials = {}) => Object.values(partials).reduce(sum, 0);
+export const countPartials = (partials: PartialCount = {}): number => Object.values(partials).reduce(sum, 0);
 
 export const printType = (type) => {
     switch (type) {

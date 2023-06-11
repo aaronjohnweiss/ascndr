@@ -1,20 +1,20 @@
 import React, {useState} from 'react'
-import {useSelector} from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {getWorkoutsForUser} from '../helpers/filterUtils';
 import Workout from "../components/Workout";
 import {validateWorkoutFields, workoutFields} from "../templates/workoutFields";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
+import {getUser} from "../redux/selectors";
 
 const WorkoutIndex = () => {
     useFirebaseConnect([
         'workouts'
     ])
 
-    const { uid } = useSelector((state: AppState) => state.auth)
-    const workouts = useSelector((state: AppState) => state.firebase.ordered.workouts)
+    const { uid } = getUser()
+    const workouts = useAppSelector(state => state.firebase.ordered.workouts)
 
     const firebase = useFirebase()
 
@@ -28,7 +28,7 @@ const WorkoutIndex = () => {
         closeModal()
     }
 
-    if (!isLoaded(workouts)) return 'Loading'
+    if (!isLoaded(workouts)) return <>Loading</>
 
     const workoutsForUser = getWorkoutsForUser(workouts, uid)
     workoutsForUser.sort((a, b) => b.value.startTime - a.value.startTime)

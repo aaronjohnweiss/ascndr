@@ -1,13 +1,14 @@
 import React from 'react'
 import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
-import {useSelector} from 'react-redux'
 import {Route, Switch, useLocation} from 'react-router-dom'
 import {toObj} from '../helpers/objectConverters';
 import {ALL_STYLES} from '../helpers/gradeUtils';
 import {findFriends} from "../helpers/filterUtils";
-import RoutesIndex from "../components/RoutesIndex";
+import RoutesIndex, {RoutesFilterProps} from "../components/RoutesIndex";
 import RouteFilters from "./RouteFilters";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index"
+import {getUser} from "../redux/selectors";
+import {isStyle, RouteStyle} from "../types/Grade";
 
 const defaultSort = {
     key: 'created',
@@ -32,15 +33,15 @@ const StatsContainer = () => {
         'users'
     ])
 
-    const { uid } = useSelector((state: AppState) => state.auth)
-    const routes = useSelector((state: AppState) => state.firebase.data.routes)
-    const sessions = useSelector((state: AppState) => state.firebase.ordered.sessions)
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
+    const { uid } = getUser()
+    const routes = useAppSelector(state => state.firebase.data.routes)
+    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
+    const users = useAppSelector(state => state.firebase.ordered.users)
 
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
-    if (!isLoaded(routes, sessions, users)) return 'Loading';
+    if (!isLoaded(routes, sessions, users)) return <>Loading</>;
 
     let allowedSessions = sessions;
     if (query.has('gyms')) {
@@ -51,23 +52,24 @@ const StatsContainer = () => {
 
     const selfOnly = getBooleanFromQuery(query, 'selfOnly', true);
 
-    let allowedUids = selfOnly ? [uid] : findFriends(users, uid)
+    const allowedUids = selfOnly ? [uid] : findFriends(users, uid)
 
     allowedSessions = allowedSessions.filter(session => allowedUids.includes(session.value.uid));
 
+    let allowedTypes: RouteStyle[]
+    if (query.has('allowedTypes')) {
+        allowedTypes = query.getAll('allowedTypes').filter(type => isStyle(type)) as RouteStyle[];
+    } else {
+        allowedTypes = [...ALL_STYLES];
+    }
 
-    const filterProps = {
+    const filterProps: RoutesFilterProps = {
         routes,
         sessions: toObj(allowedSessions),
         sortBy: parseSort(query),
+        allowedTypes,
+        allowPartials: getBooleanFromQuery(query, 'allowPartials', true)
     };
-    if (query.has('allowedTypes')) {
-        filterProps.allowedTypes = query.getAll('allowedTypes');
-    } else {
-        filterProps.allowedTypes = ALL_STYLES;
-
-    }
-    filterProps.allowPartials = getBooleanFromQuery(query, 'allowPartials', true);
 
     return (
         <Switch>

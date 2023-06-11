@@ -4,11 +4,12 @@ import getDay from 'date-fns/getDay';
 import getYear from 'date-fns/getYear';
 
 import {
+    CalendarLabels,
     createCalendarTheme,
     DEFAULT_LABELS,
     DEFAULT_WEEKDAY_LABELS,
-    generateEmptyData,
     getClassName,
+    getLatestDate,
     getMonthLabels,
     GradientForDay,
     groupByWeeks,
@@ -19,14 +20,29 @@ import {
 import styles from './styles.module.css';
 import tinycolor from 'tinycolor2';
 import WrappedLegend from "../WrappedLegend";
+import {LabeledData} from "../../helpers/activityCalendarEntries";
 
+interface Props {
+    blockMargin: number
+    blockRadius?: number
+    blockSize: number,
+    data: LabeledData[]
+    fontSize: number
+    hideColorLegend?: boolean
+    hideMonthLabels?: boolean
+    hideTotalCount?: boolean,
+    loading?: false,
+    labels?: CalendarLabels
+    style: object
+    showWeekdayLabels?: boolean
+    weekStart?: string
+}
 function ActivityCalendar({
                               blockMargin,
                               blockRadius,
                               blockSize,
                               children,
                               data,
-                              dateFormat,
                               fontSize,
                               hideColorLegend,
                               hideMonthLabels,
@@ -37,17 +53,15 @@ function ActivityCalendar({
                               showWeekdayLabels,
                               weekStart,
                               ...otherProps
-                          }) {
-    if (loading) data = generateEmptyData();
-
+                          }: React.PropsWithChildren<Props>) {
     if (data.length === 0) return null;
 
     const weeks = groupByWeeks(data, weekStart);
     const textHeight = hideMonthLabels ? 0 : fontSize + 2 * blockMargin;
     const {theme, level0} = createCalendarTheme(data.length);
     const labels = Object.assign({}, DEFAULT_LABELS, labelsProp);
-    const totalCount = data.flatMap(x => x).reduce((sum, day) => sum + day.count, 0);
-    const year = getYear(parseISO(data[0].date));
+    const totalCount = data.flatMap(x => x.data).reduce((sum, day) => sum + day.count, 0);
+    const year = getYear(parseISO(getLatestDate(data)));
 
     function getDimensions() {
         return {

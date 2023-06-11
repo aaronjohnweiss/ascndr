@@ -3,10 +3,10 @@ import moment from 'moment';
 import ActivityCalendar from "./activity-calendar/ActivityCalendar";
 
 export const ResponsiveActivityCalendar = ({minCutoffDate, getData, blockSize = 12, blockMargin = 4}) => {
-    const divRef = useRef();
+    const divRef = useRef<HTMLDivElement | null>(null);
     const [width, setWidth] = useState(0);
     useLayoutEffect(() => {
-        setWidth(divRef.current.clientWidth)
+        setWidth(divRef?.current?.clientWidth || 100)
     }, [divRef.current]);
 
     const numWeeks = Math.floor(width / (blockSize + blockMargin)) - 1;

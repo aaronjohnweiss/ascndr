@@ -10,23 +10,32 @@ import {
 } from '../helpers/gradeUtils'
 import {Button, Form, Modal} from 'react-bootstrap'
 import InputSlider from './InputSlider';
+import {DecoratedGrade, RouteModifier, RouteStyle} from "../types/Grade";
 
 export const PARTIAL_MAX = 100;
 
-const GradeModal = ({defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, title, allowPartial = true}) => {
+interface Props {
+    defaultStyle?: RouteStyle
+    handleClose: () => void
+    handleSubmit: (grade: DecoratedGrade) => void
+    show: boolean
+    title: string
+    allowPartial?: boolean
+}
+const GradeModal = ({defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, title, allowPartial = true}: Props) => {
 
     const [style, setStyle] = useState(defaultStyle);
 
     const [difficulty, setDifficulty] = useState(GRADE_RANGE[defaultStyle].min);
 
-    const [modifier, setModifier] = useState(null);
+    const [modifier, setModifier] = useState<RouteModifier>(null);
 
     const [percentage, setPercentage] = useState(PARTIAL_MAX);
 
     const submitDisabled = percentage <= 0;
 
     const submitGrade = () => {
-        const toSubmit = {style, difficulty};
+        const toSubmit: DecoratedGrade = {style, difficulty};
         if (percentage < PARTIAL_MAX) toSubmit.percentage = percentage;
         if (modifier) toSubmit.modifier = modifier;
         handleSubmit(toSubmit);
@@ -62,7 +71,7 @@ const GradeModal = ({defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, t
 
                     <Form.Label className='grade-modal-label'>Grade</Form.Label>
                     <InputSlider min={GRADE_RANGE[style].min} max={GRADE_RANGE[style].max} step={1} value={difficulty}
-                                 toString={difficulty => prettyPrint({style, difficulty, modifier})}
+                                 printValue={difficulty => prettyPrint({style, difficulty, modifier})}
                                  onChange={setDifficulty} minLabelWidth='4.5em'/>
 
                     <Form.Label className='grade-modal-label'>Modifier</Form.Label>
@@ -86,7 +95,7 @@ const GradeModal = ({defaultStyle = TOP_ROPE, handleClose, handleSubmit, show, t
                         <>
                             <Form.Label className='grade-modal-label'>Progress</Form.Label>
                             <InputSlider min={0} max={PARTIAL_MAX} step={PARTIAL_MAX/4} value={percentage} onChange={setPercentage}
-                                         toString={p => `${p}%`} minLabelWidth='4.5em' />
+                                         printValue={p => `${p}%`} minLabelWidth='4.5em' />
                         </>
                     )}
                 </Modal.Body>

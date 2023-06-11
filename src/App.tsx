@@ -10,7 +10,6 @@ import SessionPage from './containers/SessionPage'
 import SignIn from './components/SignIn'
 import requireAuth from './components/requireAuth'
 import {fetchUser, signOut} from './redux/actions'
-import {connect} from 'react-redux'
 import denyAuth from './components/denyAuth'
 import UserPage from './containers/UserPage'
 import StatsPage from './containers/StatsContainer'
@@ -19,22 +18,26 @@ import Sidebar from "./containers/Sidebar";
 import WorkoutIndex from "./containers/WorkoutIndex";
 import UserCheck from "./containers/UserCheck";
 import RoutesContainer from "./containers/RoutesContainer";
+import {useAppSelector} from "./redux/index";
+import {useAppDispatch} from "./redux";
 
-const App = (props) => {
+const App = () => {
+    const authenticated = useAppSelector(state => state.auth)
+    const dispatch = useAppDispatch()
     const [showSidebar, setShowSidebar] = useState(false)
     const closeSidebar = () => setShowSidebar(false)
     const openSidebar = () => setShowSidebar(true)
 
     useEffect(() => {
-        props.fetchUser()
+        fetchUser(dispatch)
     }, [])
 
     let authState
 
-    if (props.authenticated) {
+    if (authenticated) {
         authState = <>
             <li className="nav-item">
-                <Link className="nav-link" to='/' onClick={props.signOut}>Sign Out</Link>
+                <Link className="nav-link" to='/' onClick={signOut}>Sign Out</Link>
             </li>
             <UserCheck/>
         </>
@@ -81,8 +84,4 @@ const App = (props) => {
     )
 }
 
-function mapStateToProps(state) {
-    return {authenticated: state.auth}
-}
-
-export default connect(mapStateToProps, {fetchUser, signOut})(App)
+export default App

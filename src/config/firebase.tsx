@@ -1,5 +1,7 @@
 import * as firebase from "firebase";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import {FirebaseConfig} from "../config/keys";
 
 firebase.initializeApp(FirebaseConfig);

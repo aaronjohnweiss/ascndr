@@ -3,6 +3,8 @@ import GradeModal from '../components/GradeModal'
 import {Button, Form} from 'react-bootstrap'
 import {prettyPrint} from '../helpers/gradeUtils'
 import {dateString} from "../helpers/dateUtils";
+import {Field} from "../components/EntityModal";
+import {Route, RouteVideo} from "../types/Route";
 
 const SetRouteGrade = ({ value, onChange }) => {
     const [show, setShow] = useState(false)
@@ -30,7 +32,7 @@ export const DatePicker = ({value, onChange}) => (<Form.Control
     value={value ? dateString(value) : ''}
     type='date'/>)
 
-export const routeCreateFields = [
+export const routeCreateFields: Field<Route>[] = [
     {
         title: 'Route Name',
         placeholder: 'Name..',
@@ -72,7 +74,7 @@ export const routeCreateFields = [
     }
 ]
 
-export const routeUpdateFields = [...routeCreateFields,
+export const routeUpdateFields: Field<Route>[] = [...routeCreateFields,
     {
         title: 'Retired',
         name: 'isRetired',
@@ -82,7 +84,7 @@ export const routeUpdateFields = [...routeCreateFields,
     }
 ]
 
-export const routeVideoFields = [
+export const routeVideoFields: Field<RouteVideo>[] = [
     {
         title: 'URL',
         name: 'url',

@@ -1,16 +1,17 @@
 import React, {Fragment} from 'react'
-import {useSelector} from 'react-redux'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import {gymFields} from '../templates/gymFields'
-import Gym from '../components/Gym'
+import GymCard from '../components/GymCard'
 import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {getGymsForUser, getLatestSession, getSessionsForGym, getSessionsForUser} from '../helpers/filterUtils';
 import {useModalState} from "../helpers/useModalState";
-import {AppState} from "../redux/reducer";
+import {useAppSelector} from "../redux/index";
+import {getUser} from "../redux/selectors";
+import {Gym} from "../types/Gym";
 
 const getLatestTimeForGym = (gym, sessions) => {
-    const latest = getLatestSession(getSessionsForGym(sessions, gym));
+    const latest = getLatestSession(getSessionsForGym(sessions, gym.key));
     return latest ? latest.value.startTime : 0;
 }
 
@@ -21,22 +22,22 @@ export const GymIndex = () => {
         'sessions'
     ])
 
-    const users = useSelector((state: AppState) => state.firebase.ordered.users)
-    const gyms = useSelector((state: AppState) => state.firebase.ordered.gyms)
-    const sessions = useSelector((state: AppState) => state.firebase.ordered.sessions)
-    const { uid } = useSelector((state: AppState) => state.auth)
+    const users = useAppSelector(state => state.firebase.ordered.users)
+    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
+    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
+    const { uid } = getUser()
 
     const firebase = useFirebase()
 
     const [showGymModal, openGymModal, hideGymModal] = useModalState()
 
-    const handleNewGym = (gym) => {
+    const handleNewGym = (gym: Partial<Gym>) => {
         firebase.push('gyms', {...gym, owner: uid})
 
         hideGymModal()
     }
 
-    if (!isLoaded(gyms, users)) return 'Loading'
+    if (!isLoaded(gyms, users)) return <>Loading</>
 
     const gymsForUser = getGymsForUser(gyms, users, uid)
     const sessionsForUser = getSessionsForUser(sessions, uid);
@@ -45,8 +46,8 @@ export const GymIndex = () => {
 
     return (
         <Fragment>
-            {gymsForUser.map((gym) => <Gym gym={gym} key={gym.key}
-                                           sessions={getSessionsForGym(sessionsForUser, gym)}/>)}
+            {gymsForUser.map((gym) => <GymCard gym={gym} key={gym.key}
+                                               sessions={getSessionsForGym(sessionsForUser, gym.key)}/>)}
             <br/>
             <div className="d-grid d-block mb-4">
                 <Button variant='primary' onClick={openGymModal}>
@@ -60,15 +61,6 @@ export const GymIndex = () => {
         </Fragment>
     )
 
-}
-
-const mapStateToProps = state => {
-    return {
-        users: state.firebase.ordered.users,
-        gyms: state.firebase.ordered.gyms,
-        sessions: state.firebase.ordered.sessions,
-        auth: state.auth
-    }
 }
 
 export default GymIndex

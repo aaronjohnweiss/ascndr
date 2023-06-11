@@ -20,9 +20,26 @@ export interface UserPreferences {
 }
 
 export interface User {
-    name: string
+    name?: string
     friends: string[]
     hiatuses: Hiatus[]
     preferences: UserPreferences
     uid: string
 }
+
+export const defaultUser = (uid: string): User => ({
+    name: uid,
+    friends: [],
+    hiatuses: [],
+    preferences: {
+        activityCalendar: defaultActivityCalendarPreferences()
+    },
+    uid
+})
+
+export const defaultActivityCalendarPreferences = (): ActivityCalendarPreferences => ({
+    mode: CalendarMode.USER_ONLY,
+    includeWorkouts: true,
+    splitWorkouts: true,
+    friends: [],
+})
