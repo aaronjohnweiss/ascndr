@@ -54,8 +54,6 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: Ro
         return 0
     })
 
-    console.log(stats)
-
     const cards = stats.map(([key,route], idx) => <Card key={idx}>
         <Card.Img variant='top' src={(route.picture && route.picture !== FAILED_IMAGE && route.picture !== PENDING_IMAGE) ? route.picture : '/ElCap-512.png'} onClick={() => history.push(`/routes/${key}`)} />
         <Card.Body>
