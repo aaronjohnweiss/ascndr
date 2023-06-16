@@ -48,7 +48,7 @@ export const PartialRoutesAccordion = ({
                                             {printPercentage(percentage)} ({count})
                                         </Col>
                                         <Col xs={6}>
-                                            {quickEditButtons({
+                                            {quickEditButtons(count, {
                                                 key: {
                                                     ...grade,
                                                     percentage
@@ -73,7 +73,7 @@ export const PartialRoutesAccordion = ({
                                                     {printPercentage(percentage)} ({count})
                                                 </Col>
                                                 <Col xs={6}>
-                                                    {quickEditButtons({
+                                                    {quickEditButtons(count, {
                                                         key: {
                                                             key: route.key,
                                                             percentage

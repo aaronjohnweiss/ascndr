@@ -8,8 +8,7 @@ import {distinct, findUser, findUserKey, getFriendsForUser, getUserName} from '.
 import ConfirmCancelButton from "../components/ConfirmCancelButton";
 import {useModalState} from "../helpers/useModalState";
 import {ActivityCalendarSettingsModal} from "../components/ActivityCalendarSettingsModal";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 const UserPage = () => {
     useFirebaseConnect([
@@ -17,7 +16,7 @@ const UserPage = () => {
     ])
 
     const { uid } = getUser()
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()
 

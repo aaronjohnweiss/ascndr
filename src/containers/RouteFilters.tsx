@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {useFirebaseConnect} from 'react-redux-firebase';
+import React, {useEffect, useState} from 'react';
+import {isLoaded, useFirebaseConnect} from 'react-redux-firebase';
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
@@ -7,8 +7,7 @@ import {getGymsForUser} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
 import {parseSort} from "./RoutesContainer";
 import {MultiSelect} from "./StatFilters";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 
 const defaultIfEmpty = (a1, a2) => {
@@ -23,13 +22,13 @@ const RouteFilters = () => {
     ])
 
     const { uid } = getUser()
-    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const gyms = firebaseState.gyms.getOrdered()
+    const users = firebaseState.users.getOrdered()
 
     const query = new URLSearchParams(useLocation().search);
 
-    const visibleGyms = getGymsForUser(gyms, users, uid);
-    const [gymIds, setGymIds] = useState(defaultIfEmpty(query.getAll('gyms'), visibleGyms.map(gym => gym.key)));
+
+    const [gymIds, setGymIds] = useState<string[]>(defaultIfEmpty(query.getAll('gyms'), []));
 
 
     const [selfOnly, setSelfOnly] = useState(getBooleanFromQuery(query, 'selfOnly'));
@@ -37,9 +36,21 @@ const RouteFilters = () => {
 
     const [allowedTypes, setAllowedTypes] = useState(defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES));
 
+    useEffect(() => {
+        if (isLoaded(gyms) && isLoaded(users) && gymIds.length === 0) {
+            setGymIds(getGymsForUser(gyms, users, uid).map(gym => gym.key))
+        }
+    }, [gyms])
+
     const sortBy = parseSort(query)[0];
     const [sortDesc, setSortDesc] = useState(sortBy.desc)
     const [sortKey, setSortKey] = useState(sortBy.key)
+
+    if (!isLoaded(gyms) || !isLoaded(users)) {
+        return <>Loading</>
+    }
+
+    const visibleGyms = gyms && getGymsForUser(gyms, users, uid);
 
     const returnUrl = '/routeGallery';
 

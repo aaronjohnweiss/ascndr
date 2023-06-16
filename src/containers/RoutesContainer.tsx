@@ -6,8 +6,7 @@ import {ALL_STYLES} from '../helpers/gradeUtils';
 import {findFriends} from "../helpers/filterUtils";
 import RoutesIndex, {RoutesFilterProps} from "../components/RoutesIndex";
 import RouteFilters from "./RouteFilters";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
 
 const defaultSort = {
@@ -34,14 +33,14 @@ const StatsContainer = () => {
     ])
 
     const { uid } = getUser()
-    const routes = useAppSelector(state => state.firebase.data.routes)
-    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const routes = firebaseState.routes.getData()
+    const sessions = firebaseState.sessions.getOrdered()
+    const users = firebaseState.users.getOrdered()
 
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
-    if (!isLoaded(routes, sessions, users)) return <>Loading</>;
+    if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users)) return <>Loading</>;
 
     let allowedSessions = sessions;
     if (query.has('gyms')) {

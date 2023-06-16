@@ -5,8 +5,7 @@ import SessionCard from '../components/SessionCard';
 import moment from 'moment';
 import ResponsiveActivityCalendar from '../components/ResponsiveActivityCalendar';
 import {getCalendarData} from "../helpers/activityCalendarEntries";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 const UserHome = () => {
     useFirebaseConnect([
@@ -18,13 +17,13 @@ const UserHome = () => {
     ])
 
     const {uid} = getUser()
-    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
-    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
-    const users = useAppSelector(state => state.firebase.ordered.users)
-    const routes = useAppSelector(state => state.firebase.data.routes)
-    const workouts = useAppSelector(state => state.firebase.ordered.workouts)
+    const gyms = firebaseState.gyms.getOrdered()
+    const sessions = firebaseState.sessions.getOrdered()
+    const users = firebaseState.users.getOrdered()
+    const routes = firebaseState.routes.getData()
+    const workouts = firebaseState.workouts.getOrdered()
 
-    if (!isLoaded(gyms, sessions, routes, users, workouts)) return <>Loading</>
+    if (!isLoaded(gyms) || !isLoaded(sessions) || !isLoaded(routes) || !isLoaded(users) || !isLoaded(workouts)) return <>Loading</>
 
     const sessionsForUser = getSessionsForUser(sessions, uid);
 

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import GymIndex from './containers/GymIndex'
-import {BrowserRouter as Router, Link, Route} from 'react-router-dom'
+import {BrowserRouter as Router, Link, Route, Switch} from 'react-router-dom'
 import GymPage from './containers/GymPage'
 import Home from './containers/Home'
 import {Button, Container} from 'react-bootstrap'
@@ -8,9 +8,7 @@ import './styles/styles.css'
 import RoutePage from './containers/RoutePage'
 import SessionPage from './containers/SessionPage'
 import SignIn from './components/SignIn'
-import requireAuth from './components/requireAuth'
 import {fetchUser, signOut} from './redux/actions'
-import denyAuth from './components/denyAuth'
 import UserPage from './containers/UserPage'
 import StatsPage from './containers/StatsContainer'
 import {FaBars} from "react-icons/fa";
@@ -67,16 +65,24 @@ const App = () => {
                 <Sidebar show={showSidebar} onHide={closeSidebar}/>
                 <Container>
                     <div className="px-2">
-                        <Route exact path='/' component={Home}/>
-                        <Route exact path='/user' component={requireAuth(UserPage)}/>
-                        <Route exact path='/gyms' component={requireAuth(GymIndex)}/>
-                        <Route exact path='/gyms/:id' component={requireAuth(GymPage)}/>
-                        <Route exact path='/routes/:id' component={requireAuth(RoutePage)}/>
-                        <Route exact path='/sessions/:id' component={requireAuth(SessionPage)}/>
-                        <Route path='/stats' component={requireAuth(StatsPage)}/>
-                        <Route path='/routeGallery' component={requireAuth(RoutesContainer)} />
-                        <Route exact path='/workouts' component={requireAuth(WorkoutIndex)}/>
-                        <Route exact path='/login' component={denyAuth(SignIn)}/>
+                        {authenticated && <>
+                            <Route exact path='/' component={Home}/>
+                            <Route exact path='/user' component={UserPage}/>
+                            <Route exact path='/gyms' component={GymIndex}/>
+                            <Route exact path='/gyms/:id' component={GymPage}/>
+                            <Route exact path='/routes/:id' component={RoutePage}/>
+                            <Route exact path='/sessions/:id' component={SessionPage}/>
+                            <Route path='/stats' component={StatsPage}/>
+                            <Route path='/routeGallery' component={RoutesContainer}/>
+                            <Route exact path='/workouts' component={WorkoutIndex}/>
+                            <Route exact path='/login' component={SignIn}/>
+                        </> || <>
+                            <Switch>
+                                <Route exact path='/login' component={SignIn}/>
+                                <Route component={Home} />
+                            </Switch>
+                        </>
+                        }
                     </div>
                 </Container>
             </div>

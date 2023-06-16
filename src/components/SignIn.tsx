@@ -1,10 +1,19 @@
 import React, {Fragment} from 'react';
-import {connect} from 'react-redux';
 import {signIn} from '../redux/actions';
 import {FaGoogle} from 'react-icons/fa'
 import {Button} from 'react-bootstrap';
+import {useHistory} from "react-router";
+import {useAppSelector} from "../redux";
 
-const SignIn = ({signIn}) => {
+const SignIn = () => {
+    const history = useHistory()
+    const auth = useAppSelector(state => state.auth)
+
+    if (auth) {
+
+        history.push('/')
+    }
+
     return (
         <Fragment>
             <h2>Sign in</h2>
@@ -18,8 +27,4 @@ const SignIn = ({signIn}) => {
     );
 };
 
-function mapStateToProps({ auth }) {
-    return { auth };
-}
-
-export default connect(mapStateToProps, { signIn })(SignIn);
+export default SignIn

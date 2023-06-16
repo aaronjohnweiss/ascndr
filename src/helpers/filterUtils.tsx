@@ -1,21 +1,21 @@
 import {isEmpty} from 'react-redux-firebase';
 import {Gym} from "../types/Gym";
-import {defaultUser, User} from "../types/User";
+import {missingUser, User} from "../types/User";
 import {OrderedList, Persisted} from "../types/Firebase";
 import {Route} from "../types/Route";
 import {Session} from "../types/Session";
 import {Workout} from "../types/Workout";
 
-export const filterList = <T, >(arr: OrderedList<T>, field: keyof T, value: any): OrderedList<T> => isEmpty(arr) ? [] : arr.filter(item => {
-    let fieldArray: any[];
-    const value = item.value[field];
-    if (!Array.isArray(value)) {
-        fieldArray = [value];
+export const filterList = <T,U >(arr: OrderedList<T>, field: keyof T, value: U): OrderedList<T> => isEmpty(arr) ? [] : arr.filter(item => {
+    let fieldArray: unknown[];
+    const itemValue = item.value[field];
+    if (!Array.isArray(itemValue)) {
+        fieldArray = [itemValue];
     } else {
-        fieldArray = value
+        fieldArray = itemValue
     }
 
-    let valueArray: any[];
+    let valueArray: unknown[];
     if (!Array.isArray(value)) {
         valueArray = [value];
     } else {
@@ -26,7 +26,7 @@ export const filterList = <T, >(arr: OrderedList<T>, field: keyof T, value: any)
 
 export const findEntry = <T,>(array: OrderedList<T>, key: string): Persisted<T> | undefined => array.find(item => item.key === key);
 export const userExists = (users: OrderedList<User>, uid: string): boolean => users.some(user => user.value.uid === uid)
-export const findUser = (users: OrderedList<User>, uid: string, fallback: User = defaultUser(uid)) => {
+export const findUser = (users: OrderedList<User>, uid: string, fallback: User = missingUser(uid)) => {
     const user = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid);
     return user ? user.value : fallback;
 }

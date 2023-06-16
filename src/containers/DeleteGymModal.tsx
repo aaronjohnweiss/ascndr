@@ -6,8 +6,7 @@ import {useModalState} from "../helpers/useModalState";
 import {isLoaded, useFirebase, useFirebaseConnect} from "react-redux-firebase";
 import {getEditGymsForUser, getRoutesForGym, getSessionsForGym} from "../helpers/filterUtils";
 import {Form} from "react-bootstrap";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 
 export const DeleteGymModal = ({gymId, history}) => {
@@ -19,10 +18,10 @@ export const DeleteGymModal = ({gymId, history}) => {
     ])
 
     const { uid } = getUser()
-    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
-    const routes = useAppSelector(state => state.firebase.ordered.routes)
-    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const gyms = firebaseState.gyms.getOrdered()
+    const routes = firebaseState.routes.getOrdered()
+    const sessions = firebaseState.sessions.getOrdered()
+    const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()
 
@@ -30,7 +29,7 @@ export const DeleteGymModal = ({gymId, history}) => {
     const [showMigrateModal, openMigrateModal, closeMigrateModal] = useModalState(false)
     const [shouldMigrate, setShouldMigrate] = useState(true)
 
-    if (!isLoaded(gyms, sessions, routes, users)) return null;
+    if (!isLoaded(gyms) || !isLoaded(sessions) || !isLoaded(routes) || !isLoaded(users)) return null;
 
     const editableGyms = getEditGymsForUser(gyms, users, uid);
     const routesForGym = getRoutesForGym(routes, gymId);

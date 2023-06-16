@@ -3,8 +3,7 @@ import EntityModal from '../components/EntityModal'
 import {userNameField, userNameValidation} from '../templates/userFields'
 import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {findUser, findUserKey, userExists} from '../helpers/filterUtils';
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 const UserCheck = () => {
     useFirebaseConnect([
@@ -12,7 +11,7 @@ const UserCheck = () => {
     ])
 
     const { uid } = getUser()
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()
 

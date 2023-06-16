@@ -11,8 +11,7 @@ import {distinct, findUser, getEditorsForGym, getSessionsForRoute, getUserName} 
 import RouteHistory from '../components/RouteHistory';
 import {dateString} from "../helpers/dateUtils";
 import {useModalState} from "../helpers/useModalState";
-import {useAppSelector} from "../redux/index";
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 export const PENDING_IMAGE = 'PENDING';
 export const FAILED_IMAGE = 'FAILED';
@@ -47,16 +46,18 @@ const RoutePage = ({match: {params: {id}}}) => {
     ])
 
     const { uid } = getUser()
-    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
-    const route = useAppSelector(({firebase: {data}}) => data.routes && data.routes[id])
-    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const gyms = firebaseState.gyms.getOrdered()
+    const route = firebaseState.routes.getOne(id)
+    const sessions = firebaseState.sessions.getOrdered()
+    const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()
 
     const [rotation, setRotation] = useState(0)
     const [showEditModal, openEditModal, closeEditModal] = useModalState()
     const [showVideoModal, openVideoModal, closeVideoModal] = useModalState()
+
+    if (!isLoaded(route) || !isLoaded(gyms) || !isLoaded(sessions) || !isLoaded(users)) return <>Loading</>
 
     const updateRoute = (route) => {
         firebase.update(`routes/${id}`, route)
@@ -103,7 +104,6 @@ const RoutePage = ({match: {params: {id}}}) => {
         })
     }
 
-    if (!isLoaded(route, gyms, sessions, users)) return <>Loading</>
     if (!route) return <>Uh oh</>
 
     const gym = gyms.find(gym => gym.key === route.gymId)

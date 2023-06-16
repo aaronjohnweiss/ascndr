@@ -14,8 +14,7 @@ import {PartialRoutesAccordion} from '../components/PartialRoutesAccordion';
 import EntityModal from "../components/EntityModal";
 import {sessionFields} from "../templates/sessionFields";
 import {useModalState} from "../helpers/useModalState";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 import {DecoratedCustomGrade, DecoratedGrade, Grade} from "../types/Grade";
 import {RouteCount} from "../types/Session";
 import {entries} from "../helpers/recordUtils";
@@ -23,7 +22,7 @@ import {entries} from "../helpers/recordUtils";
 const hasPartialCompletions = ({partials = {}}) => entries(partials).some(([key, val]) => key > 0 && val > 0)
 const hasFullCompletions = ({count = 0}) => count > 0;
 
-export type QuickEditButtons = ({key, isCustom}: ({
+export type QuickEditButtons = (count: number, {key, isCustom}: ({
     key: { percentage?: number, key: string },
     isCustom: true
 } | { key: { percentage?: number } & Grade, isCustom?: false })) => JSX.Element
@@ -36,16 +35,18 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
     ])
 
     const {uid} = getUser()
-    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
-    const routes = useAppSelector(state => state.firebase.ordered.routes)
-    const session = useAppSelector(({firebase: {data}}) => data.sessions && data.sessions[id])
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const gyms = firebaseState.gyms.getOrdered()
+    const routes = firebaseState.routes.getOrdered()
+    const session = firebaseState.sessions.getOne(id)
+    const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()
 
     const [showCustomRoutes, openCustomRoutes, closeCustomRoutes] = useModalState()
     const [showStandardRoutes, openStandardRoutes, closeStandardRoutes] = useModalState()
     const [showEditSession, openEditSession, closeEditSession] = useModalState()
+
+    if (!isLoaded(session) || !isLoaded(routes) || !isLoaded(gyms) || !isLoaded(users)) return <>Loading</>
 
     const updateSession = (session) => {
         firebase.update(`sessions/${id}`, session)
@@ -101,7 +102,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
         closeStandardRoutes()
     }
 
-    const removeRoute = <T,>({routes, key, percentage, keyEquals = (a, b) => a === b, updateRoutes}: {
+    const removeRoute = <T, >({routes, key, percentage, keyEquals = (a, b) => a === b, updateRoutes}: {
         routes: RouteCount<T>[],
         key: T,
         percentage?: number,
@@ -183,7 +184,6 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
         updateSession(sessionCopy)
     }
 
-    if (!isLoaded(session, routes, gyms, users)) return <>Loading</>
     if (!session || !gyms) return <>Uh oh</>
 
     if (!session.customRoutes) session.customRoutes = []
@@ -225,17 +225,19 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
                                       title='Add generic route'
     />
 
-    const quickEditButtons: QuickEditButtons = ({key, isCustom}): JSX.Element => {
+    const quickEditButtons: QuickEditButtons = (count: number, {key, isCustom}): JSX.Element => {
         return (
             <>
                 <Button variant='outline-secondary' className='plus-minus-button'
                         onClick={() => isCustom ? addCustomRoute(key) : addStandardRoute(key)}>
                     +
                 </Button>
-                <Button variant='outline-secondary' className='plus-minus-button'
-                        onClick={() => isCustom ? removeCustomRoute(key) : removeStandardRoute(key)}>
-                    -
-                </Button>
+                {count > 0 &&
+                    <Button variant='outline-secondary' className='plus-minus-button'
+                            onClick={() => isCustom ? removeCustomRoute(key) : removeStandardRoute(key)}>
+                        -
+                    </Button>
+                }
             </>
         )
     }
@@ -283,7 +285,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
                                     </Col>
                                     {canEdit &&
                                         <Col xs={6}>
-                                            {quickEditButtons({key: grade})}
+                                            {quickEditButtons(standardCountForGrade, {key: grade})}
                                         </Col>
                                     }
                                 </Row>
@@ -294,7 +296,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
                                         </Col>
                                         {canEdit &&
                                             <Col xs={6}>
-                                                {quickEditButtons({
+                                                {quickEditButtons(customRoutesMap[route.key].count, {
                                                     key: {key: route.key},
                                                     isCustom: true
                                                 })}

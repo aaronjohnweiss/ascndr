@@ -6,8 +6,7 @@ import GymCard from '../components/GymCard'
 import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {getGymsForUser, getLatestSession, getSessionsForGym, getSessionsForUser} from '../helpers/filterUtils';
 import {useModalState} from "../helpers/useModalState";
-import {useAppSelector} from "../redux/index";
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 import {Gym} from "../types/Gym";
 
 const getLatestTimeForGym = (gym, sessions) => {
@@ -22,9 +21,9 @@ export const GymIndex = () => {
         'sessions'
     ])
 
-    const users = useAppSelector(state => state.firebase.ordered.users)
-    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
-    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
+    const users = firebaseState.users.getOrdered()
+    const gyms = firebaseState.gyms.getOrdered()
+    const sessions = firebaseState.sessions.getOrdered()
     const { uid } = getUser()
 
     const firebase = useFirebase()
@@ -37,7 +36,7 @@ export const GymIndex = () => {
         hideGymModal()
     }
 
-    if (!isLoaded(gyms, users)) return <>Loading</>
+    if (!isLoaded(gyms) || !isLoaded(users) || !isLoaded(sessions)) return <>Loading</>
 
     const gymsForUser = getGymsForUser(gyms, users, uid)
     const sessionsForUser = getSessionsForUser(sessions, uid);

@@ -1,4 +1,4 @@
-import {defaultUser, User} from "../types/User";
+import {missingUser, User} from "../types/User";
 import {Data} from "../types/Firebase";
 
 const resolveUsers = (users: Data<User>, uids: string[]) => {
@@ -9,7 +9,7 @@ const resolveUsers = (users: Data<User>, uids: string[]) => {
         if (user) {
             foundUsers = foundUsers.concat(user)
         } else {
-            foundUsers = foundUsers.concat(defaultUser(uid));
+            foundUsers = foundUsers.concat(missingUser(uid));
         }
     }
 

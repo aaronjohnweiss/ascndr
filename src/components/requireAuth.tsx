@@ -10,6 +10,7 @@ export default function(ComposedComponent: FC<RouteComponentProps<any>>) {
 
         if (auth === null || auth === false) {
             history.push("/login");
+            return <></>
         }
         return <ComposedComponent {...props} />;
     }

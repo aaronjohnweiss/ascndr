@@ -1,12 +1,11 @@
-import React, {useState} from 'react';
-import {useFirebaseConnect} from 'react-redux-firebase';
+import React, {useEffect, useState} from 'react';
+import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
 import {findUser, getFriendsForUser, getGymsForUser, getUserName} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
 
@@ -40,21 +39,39 @@ const StatFilters = () => {
     ])
 
     const { uid } = getUser()
-    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const gyms = firebaseState.gyms.getOrdered()
+    const users = firebaseState.users.getOrdered()
 
     const query = new URLSearchParams(useLocation().search);
 
-    const user = findUser(users, uid);
-    const visibleUsers = [user, ...getFriendsForUser(user, users)];
-    const visibleGyms = getGymsForUser(gyms, users, uid);
-    const [gymIds, setGymIds] = useState(defaultIfEmpty(query.getAll('gyms'), visibleGyms.map(gym => gym.key)));
-    const [uids, setUids] = useState(defaultIfEmpty(query.getAll('uids'), visibleUsers.map(u => u.uid)));
+
+    const [gymIds, setGymIds] = useState<string[]>(defaultIfEmpty(query.getAll('gyms'), []));
+    const [uids, setUids] = useState<string[]>(defaultIfEmpty(query.getAll('uids'), []));
 
     const [allowSuffixes, setAllowSuffixes] = useState(getBooleanFromQuery(query, 'allowSuffixes'));
     const [allowPartials, setAllowPartials] = useState(getBooleanFromQuery(query, 'allowPartials', true));
 
     const [allowedTypes, setAllowedTypes] = useState(defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES));
+
+    useEffect(() => {
+        if (isLoaded(gyms) && isLoaded(users) && gymIds.length === 0) {
+            setGymIds(getGymsForUser(gyms, users, uid).map(gym => gym.key))
+        }
+    }, [gyms])
+
+    useEffect(() => {
+        if (isLoaded(users) && uids.length === 0) {
+            setUids(getFriendsForUser(findUser(users, uid), users).map(user => user.uid))
+        }
+    })
+
+    if (!isLoaded(gyms) || !isLoaded(users)) {
+        return <>Loading</>
+    }
+
+    const user = findUser(users, uid);
+    const visibleUsers = [user, ...getFriendsForUser(user, users)];
+    const visibleGyms = getGymsForUser(gyms, users, uid);
 
     const returnUrl = query.get('ref') || '/stats';
 

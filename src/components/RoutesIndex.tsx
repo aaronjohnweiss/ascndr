@@ -37,7 +37,9 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: Ro
                     compareResult = k1.localeCompare(k2)
                     break
                 case 'time':
-                    compareResult = r1.time - r2.time
+                    if (!r1.time) compareResult = -1
+                    else if (!r2.time) compareResult = 1
+                    else compareResult = r1.time - r2.time
                     break
                 case 'count':
                     compareResult = compareSplitCounts(r1.count, r2.count)
@@ -51,6 +53,8 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: Ro
         }
         return 0
     })
+
+    console.log(stats)
 
     const cards = stats.map(([key,route], idx) => <Card key={idx}>
         <Card.Img variant='top' src={(route.picture && route.picture !== FAILED_IMAGE && route.picture !== PENDING_IMAGE) ? route.picture : '/ElCap-512.png'} onClick={() => history.push(`/routes/${key}`)} />
@@ -76,7 +80,7 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: Ro
     )
 };
 
-const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, allowPartials: boolean): Route & {count: Record<string, number>, time: number} => {
+const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, allowPartials: boolean): Route & {count: Record<string, number>, time: number | null} => {
     const sessionStats = Object.values(sessions).flatMap(session => (session.customRoutes || []).map((rt) => [rt, session.startTime] as const))
         .filter(([customRoute]) => customRoute.key === routeKey)
         .map(([customRoute, time]) => [allowPartials ? splitRouteCount(customRoute) : ({[PARTIAL_MAX]: routeCount(customRoute, allowPartials)}), time] as const)
@@ -88,7 +92,7 @@ const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, 
     return {
         ...route,
         count: sessionStats.count,
-        time: Math.max(...sessionStats.times)
+        time: sessionStats.times.length ? Math.max(...sessionStats.times) : null
     }
 }
 

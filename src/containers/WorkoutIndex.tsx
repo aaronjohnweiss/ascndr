@@ -5,8 +5,7 @@ import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {getWorkoutsForUser} from '../helpers/filterUtils';
 import Workout from "../components/Workout";
 import {validateWorkoutFields, workoutFields} from "../templates/workoutFields";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 const WorkoutIndex = () => {
     useFirebaseConnect([
@@ -14,7 +13,7 @@ const WorkoutIndex = () => {
     ])
 
     const { uid } = getUser()
-    const workouts = useAppSelector(state => state.firebase.ordered.workouts)
+    const workouts = firebaseState.workouts.getOrdered()
 
     const firebase = useFirebase()
 

@@ -27,15 +27,18 @@ export interface User {
     uid: string
 }
 
-export const defaultUser = (uid: string): User => ({
-    name: uid,
+export type FirebaseUser = Pick<User, 'uid'> & Partial<User>
+
+export const defaultUser = (part: FirebaseUser): User => ({
     friends: [],
     hiatuses: [],
     preferences: {
         activityCalendar: defaultActivityCalendarPreferences()
     },
-    uid
+    name: part.uid,
+    ...part
 })
+export const missingUser = (uid: string): User => defaultUser({uid})
 
 export const defaultActivityCalendarPreferences = (): ActivityCalendarPreferences => ({
     mode: CalendarMode.USER_ONLY,

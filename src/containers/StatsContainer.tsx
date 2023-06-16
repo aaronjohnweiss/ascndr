@@ -10,8 +10,7 @@ import GradeHistory from '../components/GradeHistory';
 import StatFilters, {filtersLink} from './StatFilters';
 import {Button} from 'react-bootstrap';
 import {filterList, findFriends, getGymsForUser} from "../helpers/filterUtils";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
 
 const filterByKeys = (data, keys) => {
@@ -38,15 +37,15 @@ const StatsContainer = () => {
     ])
 
     const { uid } = getUser()
-    const gyms = useAppSelector(state => state.firebase.ordered.gyms)
-    const routes = useAppSelector(state => state.firebase.data.routes)
-    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const gyms = firebaseState.gyms.getOrdered()
+    const routes = firebaseState.routes.getData()
+    const sessions = firebaseState.sessions.getOrdered()
+    const users = firebaseState.users.getOrdered()
 
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
-    if (!isLoaded(routes, sessions, users, gyms)) return <>Loading</>;
+    if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(gyms)) return <>Loading</>;
 
     let allowedSessions = sessions;
     let allowedGyms = getGymsForUser(gyms, users, uid);

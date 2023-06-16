@@ -11,8 +11,7 @@ import {getEditorsForGym, getRoutesForGym, getSessionsForUserAndGym} from '../he
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
 import DeleteGymModal from "./DeleteGymModal";
-import {useAppSelector} from "../redux/index"
-import {getUser} from "../redux/selectors";
+import {firebaseState, getUser} from "../redux/selectors";
 
 const GymPage = ({match: {params: {id}}, history}) => {
     useFirebaseConnect([
@@ -23,17 +22,17 @@ const GymPage = ({match: {params: {id}}, history}) => {
     ])
 
     const { uid } = getUser()
-    const gym = useAppSelector(({ firebase: {data}}) => data.gyms && data.gyms[id])
-    const routes = useAppSelector(state => state.firebase.ordered.routes)
-    const sessions = useAppSelector(state => state.firebase.ordered.sessions)
-    const users = useAppSelector(state => state.firebase.ordered.users)
+    const gym = firebaseState.gyms.getOne(id)
+    const routes = firebaseState.routes.getOrdered()
+    const sessions = firebaseState.sessions.getOrdered()
+    const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()
 
     const [showRouteModal, openRouteModal, closeRouteModal] = useModalState(false)
     const [showEditModal, openEditModal, closeEditModal] = useModalState(false)
 
-    if (!isLoaded(gym, sessions, routes, users)) return <>Loading</>
+    if (!isLoaded(gym) || !isLoaded(sessions) || !isLoaded(routes) || !isLoaded(users)) return <>Loading</>
     if (!gym) return <>Uh oh</>
 
     const handleNewRoute = (route) => {

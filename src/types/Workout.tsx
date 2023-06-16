@@ -8,3 +8,12 @@ export interface Workout {
     startTime: number
     uid: string
 }
+
+export type FirebaseWorkout = Pick<Workout, 'uid'> & Partial<Workout>
+
+export const defaultWorkout = (part: FirebaseWorkout): Workout => ({
+    categories: [],
+    intensity: 0,
+    startTime: new Date().getTime(),
+    ...part
+})

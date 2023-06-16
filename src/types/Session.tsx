@@ -17,3 +17,10 @@ export interface Session {
     standardRoutes: RouteCount<Grade>[]
 }
 
+export type FirebaseSession = Pick<Session, 'uid' | 'gymId' | 'startTime'> & Partial<Session>
+
+export const defaultSession = (part: FirebaseSession): Session => ({
+    customRoutes: [],
+    standardRoutes: [],
+    ...part
+})

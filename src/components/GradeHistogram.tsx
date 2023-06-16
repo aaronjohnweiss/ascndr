@@ -3,7 +3,6 @@ import {compareGrades, gradeEquals, prettyPrint} from '../helpers/gradeUtils'
 import ReactiveBarGraph from './ReactiveBarGraph';
 import moment from 'moment';
 import {Button, Col, Container, Row} from 'react-bootstrap';
-import {RangeSlider} from 'reactrangeslider';
 import {partialRouteCount, routeCount} from './StatsIndex';
 import {getUserName} from "../helpers/filterUtils";
 import {Data} from "../types/Firebase";
@@ -11,6 +10,7 @@ import {Route} from "../types/Route";
 import {Session} from "../types/Session";
 import {Grade, RouteStyle} from "../types/Grade";
 import {User} from "../types/User";
+import MultiRangeSlider, {ChangeResult} from 'multi-range-slider-react'
 
 interface CountForGrade<T> {
     key: T,
@@ -31,7 +31,8 @@ const addCount = <T, >(arr: CountForGrade<T>[], key: T, count: number, partialCo
 const ANIMATION_INTERVAL = 1000;
 const MAX_ANIMATION_DURATION = 10000;
 
-type BarDatum = {x: string, y: number}
+type BarDatum = { x: string, y: number }
+
 function getGraphData(users: User[], allowedSessions: Session[], routes: Data<Route>, allowedTypes: RouteStyle[], allowSuffixes: boolean, allowPartials: boolean) {
     // Maintain list of all grades for the x axis labels
     const allGrades: Grade[] = [];
@@ -136,9 +137,9 @@ const GradeHistogram = ({
     const minDate = firstDate.clone().add(minDateValue, 'months').startOf('month');
     const maxDate = maxDateValue === undefined ? undefined : firstDate.clone().add(maxDateValue, 'months').endOf('month');
 
-    const onRangeSliderChange = ({start, end}) => {
-        setMinDateValue(start);
-        setMaxDateValue(end);
+    const onRangeSliderChange = ({minValue, maxValue}: ChangeResult) => {
+        setMinDateValue(minValue);
+        setMaxDateValue(maxValue);
     }
 
     const startAnimation = () => {
@@ -201,8 +202,11 @@ const GradeHistogram = ({
                     </Row>
                     <Row>
                         <Col xs={12}>
-                            <RangeSlider value={{start: minDateValue, end: maxDateValue}} min={0} max={numMonths}
-                                         step={1} onChange={onRangeSliderChange}/>
+                            <MultiRangeSlider min={0} max={numMonths} minValue={minDateValue} maxValue={maxDateValue}
+                                              step={1} ruler={false} label={false} onChange={onRangeSliderChange}
+                                              onInput={onRangeSliderChange} style={{border: 'none', boxShadow: 'none'}}
+                                              barInnerColor={'blue'}
+                            />
                         </Col>
                     </Row>
                     <Row>
