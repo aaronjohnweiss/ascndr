@@ -1,6 +1,6 @@
 .jumbotron {
     color: white;
-    background: url('/ElCap-512.png') center;
+    background: url('./ElCap-512.png') center;
     text-shadow: 2px 2px 4px #000000;
     padding-bottom: 3px;
 }
