@@ -11,7 +11,7 @@ export const ALL_STYLES = [TOP_ROPE, BOULDER, LEAD] as const;
 export const ALL_MODIFIERS = ['-', null, '+'] as const
 export const GRADE_RANGE = {
     [TOP_ROPE]: {min: 6, max: 14},
-    [BOULDER]: {min: 0, max: 8},
+    [BOULDER]: {min: 0, max: 10},
     [LEAD]: {min: 6, max: 14}
 }
 
