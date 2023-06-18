@@ -8,6 +8,8 @@ import {getBooleanFromQuery} from './StatsContainer';
 import {parseSort} from "./RoutesContainer";
 import {MultiSelect} from "./StatFilters";
 import {firebaseState, getUser} from "../redux/selectors";
+import {entries} from "../helpers/recordUtils";
+import {sortOptions} from "../components/RoutesIndex";
 
 
 const defaultIfEmpty = (a1, a2) => {
@@ -99,12 +101,7 @@ const RouteFilters = () => {
 
             <h3>Sort by:</h3>
             {
-                [
-                    {field: 'created', label: 'Created date'},
-                    {field: 'time', label: 'Last climbed date'},
-                    {field: 'count', label: 'Times climbed'},
-                    {field: 'grade', label: 'Grade'},
-                ].map(({field, label}, idx) =>
+                entries(sortOptions).map(([field, {label}], idx) =>
                     <Form.Check type='radio' key={idx} label={label}
                                 checked={sortKey === field}
                                 onChange={() => setSortKey(field)}/>

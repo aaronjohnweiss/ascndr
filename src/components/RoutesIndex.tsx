@@ -3,25 +3,95 @@ import {compareGrades, compareSplitCounts, prettyPrint} from '../helpers/gradeUt
 import {Button, Card, Col, Row} from 'react-bootstrap';
 import {useHistory, useLocation} from 'react-router-dom';
 import {printSplitRouteCount, routeCount, splitRouteCount} from "./StatsIndex";
-import {sumByKey} from "../helpers/mathUtils";
+import {pluralize, sumByKey} from "../helpers/mathUtils";
 import {PARTIAL_MAX} from "./GradeModal";
 import {FAILED_IMAGE, PENDING_IMAGE} from "../containers/RoutePage";
-import {Data} from "../types/Firebase";
+import {Data, OrderedList, Persisted} from "../types/Firebase";
 import {Route} from "../types/Route";
 import {Session} from "../types/Session";
 import {RouteStyle} from "../types/Grade";
+import {entries} from "../helpers/recordUtils";
+import {findUser, getUserName} from "../helpers/filterUtils";
+import {User} from "../types/User";
+
+
+export const SORT_FIELDS = [
+    'count',
+    'time',
+    'project',
+    'grade',
+    'created'
+] as const
+
+export type SortField = typeof SORT_FIELDS[number]
+
+interface SortOption {
+    label: string
+    comparator: (r1: Persisted<RouteWithStats>, r2: Persisted<RouteWithStats>, desc: boolean) => number
+    display: (r: RouteWithStats, props: RoutesFilterProps, isFirst: boolean) => string | null
+}
+
+export const sortOptions: Record<SortField, SortOption> = {
+    'count': {
+        label: 'Times climbed',
+        comparator: (r1, r2, desc) => (desc ? -1 : 1) * compareSplitCounts(r1.value.count, r2.value.count),
+        display: (r, {allowPartials}, isFirst) => `${isFirst ? 'Climbed' : 'climbed'} ${printSplitRouteCount(r.count, allowPartials)}`
+    },
+    'time': {
+        label: 'Last climbed date',
+        comparator: (r1, r2, desc) => {
+            // Nulls last
+            if (!r2.value.time) return -1
+            if (!r1.value.time) return 1
+            // Order by session time
+            return (desc ? -1 : 1) * (r1.value.time - r2.value.time)
+        },
+        display: (r, _, isFirst) => r.time ? `${isFirst ? 'Climbed most' : 'most'} recently on ${new Date(r.time).toDateString()}` : null
+    },
+    'project': {
+        label: 'Longest project',
+        comparator: (r1, r2, desc) => {
+            // Nulls last
+            if (!r2.value.project) return -1
+            if (!r1.value.project) return 1
+            // Order by project session count
+            return (desc ? -1 : 1) * (r1.value.project.sessionCount - r2.value.project.sessionCount)
+        },
+        display: (r, {users}, isFirst) => {
+            if (!r.project) return null
+            const name = getUserName(findUser(users, r.project.uid))
+            const count = r.project.sessionCount
+            return `${isFirst ? 'Projected' : 'projected'} by ${name} for ${count} ${pluralize('session', count)}`
+        }
+    },
+    'grade': {
+        label: 'Grade',
+        comparator: (r1, r2, desc) => (desc ? -1 : 1) * compareGrades(r1.value.grade, r2.value.grade),
+        display: () => null
+    },
+    'created': {
+        label: 'Created date',
+        comparator: (r1, r2, desc) => (desc ? -1 : 1) * r1.key.localeCompare(r2.key),
+        display: () => null
+    }
+}
+
+export interface SortEntry {
+    key: SortField,
+    desc: boolean,
+}
 
 export interface RoutesFilterProps {
     routes: Data<Route>
     sessions: Data<Session>
+    users: OrderedList<User>
     allowedTypes: RouteStyle[]
     allowPartials: boolean
-    sortBy: {
-        key: string,
-        desc: boolean
-    }[]
+    sortBy: SortEntry[]
 }
-const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: RoutesFilterProps) => {
+
+const RoutesIndex = (props: RoutesFilterProps) => {
+    const {routes, sessions, allowedTypes, allowPartials, sortBy} = props
     const location = useLocation();
     const history = useHistory();
     const filterParams = location.search;
@@ -30,36 +100,24 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: Ro
         .filter(([, route]) => route.grade && allowedTypes.includes(route.grade.style))
         .map(([key, route]) => [key, statsForRoute(key, route, sessions, allowPartials)] as const)
         .sort(([k1, r1], [k2, r2]) => {
-        for (const {key, desc} of sortBy) {
-            let compareResult = 0
-            switch(key) {
-                case 'created':
-                    compareResult = k1.localeCompare(k2)
-                    break
-                case 'time':
-                    if (!r1.time) compareResult = -1
-                    else if (!r2.time) compareResult = 1
-                    else compareResult = r1.time - r2.time
-                    break
-                case 'count':
-                    compareResult = compareSplitCounts(r1.count, r2.count)
-                    break
-                case 'grade':
-                    compareResult = compareGrades(r1.grade, r2.grade)
-                    break
+            for (const {key, desc} of sortBy) {
+                const compareResult = sortOptions[key].comparator({
+                    key: k1,
+                    value: r1
+                }, {key: k2, value: r2}, desc) || 0
+                if (compareResult !== 0) return compareResult
             }
-            compareResult *= desc ? -1 : 1
-            if (compareResult !== 0) return compareResult
-        }
-        return 0
-    })
+            return 0
+        })
 
-    const cards = stats.map(([key,route], idx) => <Card key={idx}>
-        <Card.Img variant='top' src={(route.picture && route.picture !== FAILED_IMAGE && route.picture !== PENDING_IMAGE) ? route.picture : '/ElCap-512.png'} onClick={() => history.push(`/routes/${key}`)} />
+    const cards = stats.map(([key, route], idx) => <Card key={idx}>
+        <Card.Img variant='top'
+                  src={(route.picture && route.picture !== FAILED_IMAGE && route.picture !== PENDING_IMAGE) ? route.picture : '/ElCap-512.png'}
+                  onClick={() => history.push(`/routes/${key}`)}/>
         <Card.Body>
             <Card.Title>{route.name || 'Unnamed'} {prettyPrint(route.grade)}</Card.Title>
             <Card.Text>
-                Climbed {printSplitRouteCount(route.count, allowPartials)}{route.time && `, most recently on ${new Date(route.time).toDateString()}` || ''}
+                {buildCardDescription(route, props)}
             </Card.Text>
         </Card.Body>
     </Card>)
@@ -68,7 +126,8 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: Ro
         <>
             <Row>
                 <Col xs={6}><h2>Routes</h2></Col>
-                <Col><Button href={`/routeGallery/filters${filterParams}`} style={{float: 'right'}}>Filters</Button></Col>
+                <Col><Button href={`/routeGallery/filters${filterParams}`}
+                             style={{float: 'right'}}>Filters</Button></Col>
             </Row>
             <Row>
                 {cards.map((card, idx) => <Col key={idx} xs={6} sm={4} md={3} lg={2}>{card}</Col>)}
@@ -78,8 +137,11 @@ const RoutesIndex = ({routes, sessions, allowedTypes, allowPartials, sortBy}: Ro
     )
 };
 
-const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, allowPartials: boolean): Route & {count: Record<string, number>, time: number | null} => {
-    const sessionStats = Object.values(sessions).flatMap(session => (session.customRoutes || []).map((rt) => [rt, session.startTime] as const))
+type RouteWithStats = Route & { count: Record<string, number>, time: number | null, project: Project | null }
+const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, allowPartials: boolean): RouteWithStats => {
+    const sessionsForRoute = Object.values(sessions).filter(s => s.customRoutes.some(r => r.key === routeKey))
+
+    const sessionStats = sessionsForRoute.flatMap(session => (session.customRoutes).map((rt) => [rt, session.startTime] as const))
         .filter(([customRoute]) => customRoute.key === routeKey)
         .map(([customRoute, time]) => [allowPartials ? splitRouteCount(customRoute) : ({[PARTIAL_MAX]: routeCount(customRoute, allowPartials)}), time] as const)
         .reduce((acc, [count, time]) => ({count: sumByKey(acc.count, count), times: [...acc.times, time]}), {
@@ -90,9 +152,56 @@ const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, 
     return {
         ...route,
         count: sessionStats.count,
-        time: sessionStats.times.length ? Math.max(...sessionStats.times) : null
+        time: sessionStats.times.length ? Math.max(...sessionStats.times) : null,
+        project: calculateLongestProject(routeKey, sessionsForRoute)
     }
 }
 
+interface Project {
+    uid: string,
+    sessionCount: number
+}
+
+const calculateLongestProject = (routeKey: string, sessionsForRoute: Session[]): Project | null => {
+    const sessionsByUser = sessionsForRoute.reduce((map, s) => {
+        (map[s.uid] = map[s.uid] || []).push(s);
+        return map
+    }, {} as Record<string, Session[]>)
+
+    return calculateProjectTimes(routeKey, sessionsByUser)
+        .reduce((longest: Project | null, x) => longest && longest.sessionCount < x.sessionCount ? longest : x, null)
+}
+const calculateProjectTimes = (routeKey: string, sessionsByUser: Record<string, Session[]>): Project[] => {
+    return entries(sessionsByUser)
+        // Exclude users that have not sent this route
+        .filter(([, sessions]) => sessions.some(s => s.customRoutes.some(r => r.key === routeKey && r.count >= 1)))
+        .map(([uid, sessions]) => {
+            // Order sessions by oldest first
+            sessions.sort((s1, s2) => s1.startTime - s2.startTime)
+            // Find the leftmost (earliest) session where the route was sent
+            const firstSend = sessions.findIndex(s => s.customRoutes.some(r => r.key === routeKey && r.count >= 1))
+            // + 1 to convert out of 0-indexing
+            return { uid, sessionCount: firstSend + 1}
+        })
+}
+
+const MAX_BLURBS = 2
+const buildCardDescription = (route: RouteWithStats, props: RoutesFilterProps): string => {
+    // Prefer displaying the description related to a sort key first, then by the rest of the sort options in order (as defined by SORT_FIELDS)
+    const preferredOptions = [...new Set([...props.sortBy.map(s => s.key), ...SORT_FIELDS])].map(key => sortOptions[key])
+    const blurbs: string[] = []
+    for (const opt of preferredOptions) {
+        // Contribute description from this sort option if it is non-null
+        const blurb = opt.display(route, props, blurbs.length === 0)
+        if (blurb != null) {
+            blurbs.push(blurb)
+        }
+        // Limit description length
+        if (blurbs.length >= MAX_BLURBS) {
+            break
+        }
+    }
+    return blurbs.join(', ')
+}
 
 export default RoutesIndex;
