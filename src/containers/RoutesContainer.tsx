@@ -4,21 +4,21 @@ import {Route, Switch, useLocation} from 'react-router-dom'
 import {toObj} from '../helpers/objectConverters';
 import {ALL_STYLES} from '../helpers/gradeUtils';
 import {findFriends} from "../helpers/filterUtils";
-import RoutesIndex, {RoutesFilterProps} from "../components/RoutesIndex";
+import RoutesIndex, {RoutesFilterProps, SORT_FIELDS, SortEntry} from "../components/RoutesIndex";
 import RouteFilters from "./RouteFilters";
 import {firebaseState, getUser} from "../redux/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
 
 const defaultSort = {
-    key: 'created',
+    key: 'created' as const,
     desc: true,
 }
 
-export const parseSort = query => {
-    const sort = query.has('sortBy') ? query.get('sortBy').split(',').map(field => ({
+export const parseSort = (query: URLSearchParams): SortEntry[] => {
+    const sort = query.get('sortBy')?.split(',').map(field => ({
         key: field.substring(1),
         desc: field.charAt(0) === '-'
-    })) : []
+    })).filter((sortEntry): sortEntry is SortEntry => SORT_FIELDS.findIndex(s => s === sortEntry.key) >= 0) || []
 
     return [...sort, defaultSort]
 }
@@ -32,7 +32,7 @@ const StatsContainer = () => {
         'users'
     ])
 
-    const { uid } = getUser()
+    const {uid} = getUser()
     const routes = firebaseState.routes.getData()
     const sessions = firebaseState.sessions.getOrdered()
     const users = firebaseState.users.getOrdered()
@@ -65,6 +65,7 @@ const StatsContainer = () => {
     const filterProps: RoutesFilterProps = {
         routes,
         sessions: toObj(allowedSessions),
+        users: users.filter(u => allowedUids.includes(u.value.uid)),
         sortBy: parseSort(query),
         allowedTypes,
         allowPartials: getBooleanFromQuery(query, 'allowPartials', true)
@@ -73,7 +74,7 @@ const StatsContainer = () => {
     return (
         <Switch>
             <Route exact path={'/routeGallery'}><RoutesIndex {...filterProps} /></Route>
-            <Route exact path={'/routeGallery/filters'}><RouteFilters /></Route>
+            <Route exact path={'/routeGallery/filters'}><RouteFilters/></Route>
         </Switch>
     );
 };
