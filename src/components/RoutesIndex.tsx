@@ -153,35 +153,45 @@ const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, 
         ...route,
         count: sessionStats.count,
         time: sessionStats.times.length ? Math.max(...sessionStats.times) : null,
-        project: calculateLongestProject(routeKey, sessionsForRoute)
+        project: calculateLongestProject(routeKey, sessionsForRoute, allowPartials)
     }
 }
 
 interface Project {
     uid: string,
-    sessionCount: number
+    sessionCount: number,
+    isSent: boolean,
 }
 
-const calculateLongestProject = (routeKey: string, sessionsForRoute: Session[]): Project | null => {
+const calculateLongestProject = (routeKey: string, sessionsForRoute: Session[], allowPartials: boolean): Project | null => {
     const sessionsByUser = sessionsForRoute.reduce((map, s) => {
         (map[s.uid] = map[s.uid] || []).push(s);
         return map
     }, {} as Record<string, Session[]>)
 
     return calculateProjectTimes(routeKey, sessionsByUser)
-        .reduce((longest: Project | null, x) => longest && longest.sessionCount < x.sessionCount ? longest : x, null)
+        .filter(proj => allowPartials || proj.isSent)
+        .reduce((longest: Project | null, x) => longest != null && longest.sessionCount > x.sessionCount ? longest : x, null)
 }
 const calculateProjectTimes = (routeKey: string, sessionsByUser: Record<string, Session[]>): Project[] => {
     return entries(sessionsByUser)
-        // Exclude users that have not sent this route
-        .filter(([, sessions]) => sessions.some(s => s.customRoutes.some(r => r.key === routeKey && r.count >= 1)))
         .map(([uid, sessions]) => {
             // Order sessions by oldest first
             sessions.sort((s1, s2) => s1.startTime - s2.startTime)
             // Find the leftmost (earliest) session where the route was sent
             const firstSend = sessions.findIndex(s => s.customRoutes.some(r => r.key === routeKey && r.count >= 1))
-            // + 1 to convert out of 0-indexing
-            return { uid, sessionCount: firstSend + 1}
+
+            let sessionCount, isSent
+            if (firstSend === -1) {
+                sessionCount = sessions.length
+                isSent = false
+            } else {
+                // + 1 to convert out of 0-indexing
+                sessionCount = firstSend + 1
+                isSent = true
+            }
+
+            return { uid, sessionCount, isSent }
         })
 }
 
