@@ -26,4 +26,4 @@ yarn-debug.log*
 yarn-error.log*
 
 # secrets
-/src/config/dev.js
+/src/config/dev.tsx
