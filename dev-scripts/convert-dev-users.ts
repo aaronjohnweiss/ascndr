@@ -7,6 +7,7 @@ const prodToDevIds: Record<string, string> = {
     'GDYFUaFdq8OLmnzSLmZumVwMcKs2': 'VsI36W1w0LSfVRZaYtwqXTubSqC3', // Ed
     'xbGSEC0ykSdSoKL37kIDpNL3yPu1': 'qKwO0o3sWQffJ7B0i9HDe1pt4cu2', // Jenna
     'MoyRA4UqIxanlL3dwT1y8cWaEkC3': 'eFvXbMugvvYnw3uSt9LWGPOANe83', // Nick
+    '05SdQfOUnDWJdeCJggljggTzVTn1': 'UuUY4kS7nxQy5MseDB71KmsZTMu1', // Joe
 };
 
 const convertMembers = (data: any, idMap: Record<string, string>) => {
