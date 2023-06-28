@@ -7,6 +7,7 @@ import {gymFields} from '../templates/gymFields'
 import {Link} from 'react-router-dom'
 import {sessionDuration} from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
+import GradeColorIcon from '../components/GradeColorIcon'
 import {getEditorsForGym, getRoutesForGym, getSessionsForUserAndGym} from '../helpers/filterUtils';
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
@@ -74,6 +75,7 @@ const GymPage = ({match: {params: {id}}, history}) => {
     // Filter to only routes for this gym
     const routesForGym = getRoutesForGym(routes, id);
     const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
+    console.log(currentRoutes)
     const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
     const sessionsForUser = getSessionsForUserAndGym(sessions, id, uid).sort((a, b) => b.value.startTime - a.value.startTime)
 
@@ -85,6 +87,7 @@ const GymPage = ({match: {params: {id}}, history}) => {
         <Link to={`/routes/${key}`} style={{textDecoration: 'none'}} key={key}>
             <ListGroup.Item action>
                 {value.name}
+                <GradeColorIcon grade={value.grade} color={value.color} />
             </ListGroup.Item>
         </Link>
     )
