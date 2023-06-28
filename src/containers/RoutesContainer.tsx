@@ -3,7 +3,7 @@ import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
 import {Route, Switch, useLocation} from 'react-router-dom'
 import {toObj} from '../helpers/objectConverters';
 import {ALL_STYLES} from '../helpers/gradeUtils';
-import {findFriends} from "../helpers/filterUtils";
+import {findFriends, getGymsForUser} from "../helpers/filterUtils";
 import RoutesIndex, {RoutesFilterProps, SORT_FIELDS, SortEntry} from "../components/RoutesIndex";
 import RouteFilters from "./RouteFilters";
 import {firebaseState, getUser} from "../redux/selectors";
@@ -29,25 +29,34 @@ const StatsContainer = () => {
     useFirebaseConnect([
         'routes',
         'sessions',
-        'users'
+        'users',
+        'gyms',
     ])
 
     const {uid} = getUser()
-    const routes = firebaseState.routes.getData()
+    const routes = firebaseState.routes.getOrdered()
     const sessions = firebaseState.sessions.getOrdered()
     const users = firebaseState.users.getOrdered()
+    const gyms = firebaseState.gyms.getOrdered()
 
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
-    if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users)) return <>Loading</>;
+    if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(gyms)) return <>Loading</>;
 
     let allowedSessions = sessions;
+    let allowedRoutes = routes;
+
+    let allowedGymIds = getGymsForUser(gyms, users, uid).map(gym => gym.key);
+
     if (query.has('gyms')) {
         const gymsFromQuery = query.getAll('gyms');
-        // Filter sessions based on gym ids
-        allowedSessions = allowedSessions.filter(session => gymsFromQuery.includes(session.value.gymId));
+        allowedGymIds = allowedGymIds.filter(gymId => gymsFromQuery.includes(gymId))
     }
+
+    // Filter sessions and routes based on gym ids
+    allowedSessions = allowedSessions.filter(session => allowedGymIds.includes(session.value.gymId));
+    allowedRoutes = allowedRoutes.filter(route => allowedGymIds.includes(route.value.gymId));
 
     const selfOnly = getBooleanFromQuery(query, 'selfOnly', true);
 
@@ -63,7 +72,7 @@ const StatsContainer = () => {
     }
 
     const filterProps: RoutesFilterProps = {
-        routes,
+        routes: toObj(allowedRoutes),
         sessions: toObj(allowedSessions),
         users: users.filter(u => allowedUids.includes(u.value.uid)),
         sortBy: parseSort(query),
