@@ -10,6 +10,7 @@ import {MultiSelect} from "./StatFilters";
 import {firebaseState, getUser} from "../redux/selectors";
 import {entries} from "../helpers/recordUtils";
 import {sortOptions} from "../components/RoutesIndex";
+import {LinkContainer} from 'react-router-bootstrap'
 
 
 const defaultIfEmpty = (a1, a2) => {
@@ -114,7 +115,7 @@ const RouteFilters = () => {
             <Form.Check type='radio' label='Descending' checked={sortDesc}
                         onChange={() => setSortDesc(true)}/>
 
-            <Button href={`${returnUrl}?${generateQueryParams()}`}>Confirm</Button>
+            <LinkContainer to={`${returnUrl}?${generateQueryParams()}`}><Button>Confirm</Button></LinkContainer>
         </>
     );
 };

@@ -12,12 +12,15 @@ import {RouteCount, Session} from "../types/Session";
 import {Data} from "../types/Firebase";
 import {Grade, RouteStyle} from "../types/Grade";
 import {Gym} from "../types/Gym";
+import {LinkContainer} from 'react-router-bootstrap'
 
 export const StatItem = ({label, value, link}: { label: string, value?: string | number, link?: string }) => {
-    const itemProps = link ? {action: true, href: link} : {};
-
-    return (
-        <ListGroupItem {...itemProps} style={{paddingTop: '8px', paddingBottom: '8px'}}>
+    const paddingStyle = {paddingTop: '8px', paddingBottom: '8px'}
+    // Some stat items are links - those will get the `action` prop
+    // The outermost element should have the padding style applied - for links, that will be the LinkContainer, but for non-links, that will be the ListGroupItem
+    const listItemProps = link ? {action: true} : {style: paddingStyle}
+    const listItem = (
+        <ListGroupItem {...listItemProps}>
             <Row style={{marginBottom: '0'}}>
                 <Col xs={6}>
                     {label}
@@ -29,6 +32,13 @@ export const StatItem = ({label, value, link}: { label: string, value?: string |
             </Row>
         </ListGroupItem>
     )
+
+    if (link) {
+        return <LinkContainer to={link} style={paddingStyle}>
+            {listItem}
+        </LinkContainer>
+    }
+    return listItem
 };
 
 export const partialRouteCount = <T, >(route: RouteCount<T>): number => route.partials && Object.entries(route.partials).map(([key, val]) => Number(key) * val / PARTIAL_MAX).reduce(sum, 0) || 0;
@@ -116,7 +126,7 @@ const StatsIndex = ({gyms, routes, sessions, allowSuffixes, allowedTypes, allowP
         <>
             <Row>
                 <Col xs={6}><h2>Stats</h2></Col>
-                <Col><Button href={filtersLink(location)} style={{float: 'right'}}>Filters</Button></Col>
+                <Col><LinkContainer to={filtersLink(location)} style={{float: 'right'}}><Button>Filters</Button></LinkContainer></Col>
             </Row>
             <Row>
                 <Col><h4>Totals</h4></Col>
