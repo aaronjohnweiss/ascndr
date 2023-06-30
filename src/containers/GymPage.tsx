@@ -7,11 +7,11 @@ import {gymFields} from '../templates/gymFields'
 import {Link} from 'react-router-dom'
 import {sessionDuration} from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
-import {getEditorsForGym, getRoutesForGym, getSessionsForUserAndGym} from '../helpers/filterUtils';
+import {getRoutesForGym} from '../helpers/filterUtils';
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
 import DeleteGymModal from "./DeleteGymModal";
-import {firebaseState, getUser} from "../redux/selectors";
+import {canEditGym, firebaseState, getUser} from "../redux/selectors";
 
 const GymPage = ({match: {params: {id}}, history}) => {
     useFirebaseConnect([
@@ -22,17 +22,22 @@ const GymPage = ({match: {params: {id}}, history}) => {
     ])
 
     const { uid } = getUser()
+    console.log('selecting gym')
     const gym = firebaseState.gyms.getOne(id)
-    const routes = firebaseState.routes.getOrdered()
-    const sessions = firebaseState.sessions.getOrdered()
-    const users = firebaseState.users.getOrdered()
+    console.log('selecting routes')
+    const routes = firebaseState.routes.getOrdered(['gym', id])
+    console.log('selecting sessions')
+    const sessions = firebaseState.sessions.getOrdered(['gym', id], ['owner', uid])?.sort((a, b) => b.value.startTime - a.value.startTime)
+    console.log('selecting canEdit')
+    const canEdit = canEditGym(gym)?.(uid)
+    console.log('we selected')
 
     const firebase = useFirebase()
 
     const [showRouteModal, openRouteModal, closeRouteModal] = useModalState(false)
     const [showEditModal, openEditModal, closeEditModal] = useModalState(false)
 
-    if (!isLoaded(gym) || !isLoaded(sessions) || !isLoaded(routes) || !isLoaded(users)) return <>Loading</>
+    if (!isLoaded(gym) || !isLoaded(sessions) || !isLoaded(routes) || !isLoaded(canEdit)) return <>Loading</>
     if (!gym) return <>Uh oh</>
 
     const handleNewRoute = (route) => {
@@ -75,9 +80,6 @@ const GymPage = ({match: {params: {id}}, history}) => {
     const routesForGym = getRoutesForGym(routes, id);
     const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
     const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
-    const sessionsForUser = getSessionsForUserAndGym(sessions, id, uid).sort((a, b) => b.value.startTime - a.value.startTime)
-
-    const canEdit = getEditorsForGym(gym, users).includes(uid)
 
     const canDelete = gym.owner === uid
 
@@ -151,7 +153,7 @@ const GymPage = ({match: {params: {id}}, history}) => {
             </Row>
 
             <TruncatedList pageSize={5}>
-                {sessionsForUser.map(session => (
+                {sessions.map(session => (
                     <Link to={`/sessions/${session.key}`} style={{textDecoration: 'none'}}
                           key={session.key}>
                         <ListGroup.Item action>

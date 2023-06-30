@@ -8,6 +8,7 @@ export interface RouteVideo {
 }
 
 export interface Route {
+    _type: 'route'
     color?: string
     description?: string
     grade: Grade
@@ -22,6 +23,7 @@ export interface Route {
 export type FirebaseRoute = Pick<Route, 'gymId'> & Partial<Route>
 
 export const defaultRoute = (part: FirebaseRoute): Route => ({
+    _type: 'route',
     grade: {
         difficulty: 0,
         style: TOP_ROPE

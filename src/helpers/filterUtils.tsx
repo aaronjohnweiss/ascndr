@@ -43,6 +43,19 @@ export const findFriends = (users: OrderedList<User>, uid: string, includeSelf =
     return includeSelf ? [uid, ...friends] : friends
 }
 
+// users depend on auth
+// gyms depend on users
+// routes depend on gyms
+// sessions depend on users and routes
+
+
+
+// gyms.getData({owner, editor, viewer})
+// routes.getData({gym})
+// sessions.getData({gym, owner, viewer, route})
+// users.getData({friendOf})
+// users.getOne({uid})
+// workoutes.getData({owner})
 export const getGymsForUser = (gyms: OrderedList<Gym>, users: OrderedList<User>, uid: string) => {
     const allowedUids = findFriends(users, uid);
 

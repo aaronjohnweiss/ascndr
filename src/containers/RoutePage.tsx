@@ -7,7 +7,7 @@ import EntityModal from '../components/EntityModal'
 import {routeUpdateFields, routeVideoFields} from '../templates/routeFields'
 import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
 import {prettyPrint} from '../helpers/gradeUtils'
-import {distinct, findUser, getEditorsForGym, getSessionsForRoute, getUserName} from '../helpers/filterUtils';
+import {distinct, findUser, getEditorsForGym, getUserName} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
 import {dateString} from "../helpers/dateUtils";
 import {useModalState} from "../helpers/useModalState";
@@ -46,10 +46,10 @@ const RoutePage = ({match: {params: {id}}}) => {
     ])
 
     const { uid } = getUser()
-    const gyms = firebaseState.gyms.getOrdered()
+    const gyms = firebaseState.gyms.getOrdered(['viewer', uid])
     const route = firebaseState.routes.getOne(id)
-    const sessions = firebaseState.sessions.getOrdered()
-    const users = firebaseState.users.getOrdered()
+    const sessions = firebaseState.sessions.getOrdered(['viewer', uid], ['route', id])
+    const users = firebaseState.users.getOrdered(['friendOf', uid])
 
     const firebase = useFirebase()
 
@@ -135,8 +135,7 @@ const RoutePage = ({match: {params: {id}}}) => {
                                    src={route.picture} onClick={handleRotate}/>;
     }
 
-    const sessionsForRoute = getSessionsForRoute(sessions, id);
-    const uidsForRoute = distinct(sessionsForRoute.map(session => session.value.uid));
+    const uidsForRoute = distinct(sessions.map(session => session.value.uid));
     const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
 
     const canEdit = getEditorsForGym(gym.value, users).includes(uid)
@@ -165,7 +164,7 @@ const RoutePage = ({match: {params: {id}}}) => {
                     {route.isRetired && <h4>Retired</h4>}
                     {RouteImageComponent}
                     <p>{route.description}</p>
-                    <RouteHistory routeKey={id} users={usersForRoute} sessions={sessionsForRoute}/>
+                    <RouteHistory routeKey={id} users={usersForRoute} sessions={sessions}/>
                     <br/>
                     <div className='d-flex align-items-center mb-1'><h3 className='me-auto'>Videos</h3> <Button onClick={openVideoModal}>Add video</Button></div>
                     <ListGroup>

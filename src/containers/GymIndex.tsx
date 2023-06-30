@@ -4,7 +4,7 @@ import EntityModal from '../components/EntityModal'
 import {gymFields} from '../templates/gymFields'
 import GymCard from '../components/GymCard'
 import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
-import {getGymsForUser, getLatestSession, getSessionsForGym, getSessionsForUser} from '../helpers/filterUtils';
+import {getLatestSession, getSessionsForGym} from '../helpers/filterUtils';
 import {useModalState} from "../helpers/useModalState";
 import {firebaseState, getUser} from "../redux/selectors";
 import {Gym} from "../types/Gym";
@@ -21,10 +21,9 @@ export const GymIndex = () => {
         'sessions'
     ])
 
-    const users = firebaseState.users.getOrdered()
-    const gyms = firebaseState.gyms.getOrdered()
-    const sessions = firebaseState.sessions.getOrdered()
     const { uid } = getUser()
+    const gyms = firebaseState.gyms.getOrdered(['viewer', uid])
+    const sessions = firebaseState.sessions.getOrdered(['owner', uid])
 
     const firebase = useFirebase()
 
@@ -36,17 +35,15 @@ export const GymIndex = () => {
         hideGymModal()
     }
 
-    if (!isLoaded(gyms) || !isLoaded(users) || !isLoaded(sessions)) return <>Loading</>
+    if (!isLoaded(gyms) || !isLoaded(sessions)) return <>Loading</>
 
-    const gymsForUser = getGymsForUser(gyms, users, uid)
-    const sessionsForUser = getSessionsForUser(sessions, uid);
     // Sort gyms according to latest sessions
-    gymsForUser.sort((gymA, gymB) => getLatestTimeForGym(gymB, sessionsForUser) - getLatestTimeForGym(gymA, sessionsForUser))
+    gyms.sort((gymA, gymB) => getLatestTimeForGym(gymB, sessions) - getLatestTimeForGym(gymA, sessions))
 
     return (
         <Fragment>
-            {gymsForUser.map((gym) => <GymCard gym={gym} key={gym.key}
-                                               sessions={getSessionsForGym(sessionsForUser, gym.key)}/>)}
+            {gyms.map((gym) => <GymCard gym={gym} key={gym.key}
+                                               sessions={getSessionsForGym(sessions, gym.key)}/>)}
             <br/>
             <div className="d-grid d-block mb-4">
                 <Button variant='primary' onClick={openGymModal}>

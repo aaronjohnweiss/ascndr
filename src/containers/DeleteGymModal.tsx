@@ -4,7 +4,6 @@ import {migrateGymFields} from "../templates/gymFields";
 import React, {useState} from "react";
 import {useModalState} from "../helpers/useModalState";
 import {isLoaded, useFirebase, useFirebaseConnect} from "react-redux-firebase";
-import {getEditGymsForUser, getRoutesForGym, getSessionsForGym} from "../helpers/filterUtils";
 import {Form} from "react-bootstrap";
 import {firebaseState, getUser} from "../redux/selectors";
 
@@ -18,10 +17,9 @@ export const DeleteGymModal = ({gymId, history}) => {
     ])
 
     const { uid } = getUser()
-    const gyms = firebaseState.gyms.getOrdered()
-    const routes = firebaseState.routes.getOrdered()
-    const sessions = firebaseState.sessions.getOrdered()
-    const users = firebaseState.users.getOrdered()
+    const gyms = firebaseState.gyms.getOrdered(['editor', uid])
+    const routes = firebaseState.routes.getOrdered(['gym', gymId])
+    const sessions = firebaseState.sessions.getOrdered(['gym', gymId])
 
     const firebase = useFirebase()
 
@@ -29,19 +27,15 @@ export const DeleteGymModal = ({gymId, history}) => {
     const [showMigrateModal, openMigrateModal, closeMigrateModal] = useModalState(false)
     const [shouldMigrate, setShouldMigrate] = useState(true)
 
-    if (!isLoaded(gyms) || !isLoaded(sessions) || !isLoaded(routes) || !isLoaded(users)) return null;
-
-    const editableGyms = getEditGymsForUser(gyms, users, uid);
-    const routesForGym = getRoutesForGym(routes, gymId);
-    const sessionsForGym = getSessionsForGym(sessions, gymId);
+    if (!isLoaded(gyms) || !isLoaded(sessions) || !isLoaded(routes)) return null;
 
     const handleMigrateGym = ({gymId: migratedId}) => {
         const updates = {}
-        for (const route of routesForGym) {
+        for (const route of routes) {
             updates[`/routes/${route.key}`] = {...route.value, gymId: migratedId}
         }
 
-        for (const session of sessionsForGym) {
+        for (const session of sessions) {
             updates[`/sessions/${session.key}`] = {...session.value, gymId: migratedId}
         }
 
@@ -53,11 +47,11 @@ export const DeleteGymModal = ({gymId, history}) => {
 
     const handleDeletedGym = () => {
         const updates = {}
-        for (const route of routesForGym) {
+        for (const route of routes) {
             updates[`/routes/${route.key}`] = null
         }
 
-        for (const session of sessionsForGym) {
+        for (const session of sessions) {
             updates[`/sessions/${session.key}`] = null
         }
 
@@ -103,7 +97,7 @@ export const DeleteGymModal = ({gymId, history}) => {
             <EntityModal show={showMigrateModal}
                          handleClose={closeMigrateModal}
                          handleSubmit={handleMigrateGym}
-                         fields={migrateGymFields({gyms: editableGyms.filter(gym => gym.key !== gymId)})}
+                         fields={migrateGymFields({gyms: gyms.filter(gym => gym.key !== gymId)})}
                          title='Migrate gym'/>
         </>
     )

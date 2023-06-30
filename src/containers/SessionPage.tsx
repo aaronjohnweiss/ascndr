@@ -5,7 +5,6 @@ import GradeModal, {PARTIAL_MAX} from '../components/GradeModal'
 import {Link} from 'react-router-dom'
 import {sessionDuration} from '../helpers/durationUtils'
 import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
-import {getGymsForUser} from '../helpers/filterUtils';
 import {sum} from '../helpers/mathUtils';
 import CustomRouteModal from '../components/CustomRouteModal';
 import ConfirmCancelButton from '../components/ConfirmCancelButton';
@@ -14,7 +13,7 @@ import {PartialRoutesAccordion} from '../components/PartialRoutesAccordion';
 import EntityModal from "../components/EntityModal";
 import {sessionFields} from "../templates/sessionFields";
 import {useModalState} from "../helpers/useModalState";
-import {firebaseState, getUser} from "../redux/selectors";
+import {expectOne, firebaseState, getUser} from "../redux/selectors";
 import {DecoratedCustomGrade, DecoratedGrade, Grade} from "../types/Grade";
 import {RouteCount} from "../types/Session";
 import {entries} from "../helpers/recordUtils";
@@ -35,9 +34,11 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
     ])
 
     const {uid} = getUser()
-    const gyms = firebaseState.gyms.getOrdered()
-    const routes = firebaseState.routes.getOrdered()
     const session = firebaseState.sessions.getOne(id)
+    const gym = expectOne(firebaseState.gyms.getOrdered(['gymKey', session?.gymId]))
+    const gymsForUser = firebaseState.gyms.getOrdered(['viewer', uid])
+    const routesForGym = firebaseState.routes.getOrdered(['gym', gym?.key])?.filter(route => !route.value.isRetired)
+    const routesForSession = firebaseState.routes.getOrdered(['gym', gym?.key], ['session', id])
     const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()
@@ -46,7 +47,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
     const [showStandardRoutes, openStandardRoutes, closeStandardRoutes] = useModalState()
     const [showEditSession, openEditSession, closeEditSession] = useModalState()
 
-    if (!isLoaded(session) || !isLoaded(routes) || !isLoaded(gyms) || !isLoaded(users)) return <>Loading</>
+    if (!isLoaded(session) || !isLoaded(routesForGym) || !isLoaded(routesForSession) || !isLoaded(gym) || !isLoaded(users)) return <>Loading</>
 
     const updateSession = (session) => {
         firebase.update(`sessions/${id}`, session)
@@ -184,10 +185,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
         updateSession(sessionCopy)
     }
 
-    if (!session || !gyms) return <>Uh oh</>
-
-    if (!session.customRoutes) session.customRoutes = []
-    if (!session.standardRoutes) session.standardRoutes = []
+    if (!session || !gym) return <>Uh oh</>
 
     // Convert to maps for easier consumption
     const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({...acc, [entry.key]: entry}), {})
@@ -195,12 +193,6 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
         ...acc,
         [prettyPrint(entry.key)]: entry
     }), {})
-
-    // Filter to only routes for this session
-    const routesForSession = routes.filter(route => customRoutesMap[route.key])
-
-    const gym = gyms.find(gym => gym.key === session.gymId)
-    if (!gym) return <>Uh oh</>
 
     const allGrades = [...routesForSession.map(route => route.value.grade), ...session.standardRoutes.map(entry => entry.key)].filter((grade): grade is Grade => grade !== undefined)
     const grades = allGrades.filter((grade, idx) => allGrades.findIndex(val => gradeEquals(val, grade)) === idx).sort(compareGrades).reverse()
@@ -210,8 +202,6 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
     const isFinished = !!session.endTime;
 
     const canEdit = uid === session.uid;
-
-    const routesForGym = routes.filter(route => route.value.gymId === gym.key && !route.value.isRetired)
 
     const customModal = <CustomRouteModal show={showCustomRoutes}
                                           handleClose={closeCustomRoutes}
@@ -359,7 +349,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
                          handleClose={closeEditSession}
                          handleSubmit={updateSession}
                          handleDelete={deleteSession}
-                         fields={sessionFields({gyms: getGymsForUser(gyms, users, session.uid)})}
+                         fields={sessionFields({gyms: gymsForUser})}
                          title='Edit session'
                          initialValues={{...session}}
             />

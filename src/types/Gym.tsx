@@ -1,4 +1,5 @@
 export interface Gym {
+    _type: 'gym'
     name: string
     owner: string
     BOULDER_HEIGHT: string
@@ -10,6 +11,7 @@ export interface Gym {
 export type FirebaseGym = Partial<Gym>
 
 export const defaultGym = (part: FirebaseGym): Gym => ({
+    _type: 'gym',
     name: '',
     owner: '',
     BOULDER_HEIGHT: '',
