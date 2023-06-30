@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {isLoaded, useFirebaseConnect} from 'react-redux-firebase';
+import {isLoaded} from 'react-redux-firebase';
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
@@ -7,7 +7,7 @@ import {getGymsForUser} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
 import {parseSort} from "./RoutesContainer";
 import {MultiSelect} from "./StatFilters";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 import {entries} from "../helpers/recordUtils";
 import {sortOptions} from "../components/RoutesIndex";
 
@@ -18,12 +18,8 @@ const defaultIfEmpty = (a1, a2) => {
 };
 
 const RouteFilters = () => {
-    useFirebaseConnect([
-        'gyms',
-        'users'
-    ])
-
     const { uid } = getUser()
+    const firebaseState = useDatabase()
     const gyms = firebaseState.gyms.getOrdered()
     const users = firebaseState.users.getOrdered()
 

@@ -3,20 +3,14 @@ import EntityModal from "../components/EntityModal";
 import {migrateGymFields} from "../templates/gymFields";
 import React, {useState} from "react";
 import {useModalState} from "../helpers/useModalState";
-import {isLoaded, useFirebase, useFirebaseConnect} from "react-redux-firebase";
+import {isLoaded, useFirebase} from "react-redux-firebase";
 import {Form} from "react-bootstrap";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 
 
 export const DeleteGymModal = ({gymId, history}) => {
-    useFirebaseConnect([
-        'gyms',
-        'routes',
-        'sessions',
-        'users'
-    ])
-
     const { uid } = getUser()
+    const firebaseState = useDatabase()
     const gyms = firebaseState.gyms.getOrdered(['editor', uid])
     const routes = firebaseState.routes.getOrdered(['gym', gymId])
     const sessions = firebaseState.sessions.getOrdered(['gym', gymId])

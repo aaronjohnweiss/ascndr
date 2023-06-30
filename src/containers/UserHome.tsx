@@ -1,22 +1,15 @@
 import React from 'react'
-import {isLoaded, useFirebaseConnect} from 'react-redux-firebase';
+import {isLoaded} from 'react-redux-firebase';
 import {findEntry, findUser, getSessionsForUser} from '../helpers/filterUtils';
 import SessionCard from '../components/SessionCard';
 import moment from 'moment';
 import ResponsiveActivityCalendar from '../components/ResponsiveActivityCalendar';
 import {getCalendarData} from "../helpers/activityCalendarEntries";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 
 const UserHome = () => {
-    useFirebaseConnect([
-        'gyms',
-        'sessions',
-        'users',
-        'routes',
-        'workouts'
-    ])
-
     const {uid} = getUser()
+    const firebaseState = useDatabase()
     const gyms = firebaseState.gyms.getOrdered()
     const sessions = firebaseState.sessions.getOrdered()
     const users = firebaseState.users.getOrdered()

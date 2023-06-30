@@ -1,5 +1,5 @@
 import React from 'react'
-import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded} from 'react-redux-firebase'
 import GradeHistogram, {GradeChartProps} from '../components/GradeHistogram'
 import {Route, Switch, useLocation} from 'react-router-dom'
 import StatsIndex, {StatsFilterProps} from '../components/StatsIndex';
@@ -10,7 +10,7 @@ import GradeHistory from '../components/GradeHistory';
 import StatFilters, {filtersLink} from './StatFilters';
 import {Button} from 'react-bootstrap';
 import {filterList, findFriends, getGymsForUser} from "../helpers/filterUtils";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
 
 const filterByKeys = (data, keys) => {
@@ -29,14 +29,8 @@ const StatsHeader = ({location}) => (
 export const getBooleanFromQuery = (query, name, valueIfMissing = false) => query.has(name) ? query.get(name) === 'true' : valueIfMissing;
 
 const StatsContainer = () => {
-    useFirebaseConnect([
-        'gyms',
-        'routes',
-        'sessions',
-        'users'
-    ])
-
     const { uid } = getUser()
+    const firebaseState = useDatabase()
     const gyms = firebaseState.gyms.getOrdered()
     const routes = firebaseState.routes.getData()
     const sessions = firebaseState.sessions.getOrdered()

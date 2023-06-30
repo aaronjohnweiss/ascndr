@@ -3,10 +3,10 @@ import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import {gymFields} from '../templates/gymFields'
 import GymCard from '../components/GymCard'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {getLatestSession, getSessionsForGym} from '../helpers/filterUtils';
 import {useModalState} from "../helpers/useModalState";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 import {Gym} from "../types/Gym";
 
 const getLatestTimeForGym = (gym, sessions) => {
@@ -15,13 +15,8 @@ const getLatestTimeForGym = (gym, sessions) => {
 }
 
 export const GymIndex = () => {
-    useFirebaseConnect([
-        'gyms',
-        'users',
-        'sessions'
-    ])
-
     const { uid } = getUser()
+    const firebaseState = useDatabase()
     const gyms = firebaseState.gyms.getOrdered(['viewer', uid])
     const sessions = firebaseState.sessions.getOrdered(['owner', uid])
 

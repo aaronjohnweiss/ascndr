@@ -4,7 +4,7 @@ import {compareGrades, countPartials, gradeEquals, prettyPrint} from '../helpers
 import GradeModal, {PARTIAL_MAX} from '../components/GradeModal'
 import {Link} from 'react-router-dom'
 import {sessionDuration} from '../helpers/durationUtils'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {sum} from '../helpers/mathUtils';
 import CustomRouteModal from '../components/CustomRouteModal';
 import ConfirmCancelButton from '../components/ConfirmCancelButton';
@@ -13,7 +13,7 @@ import {PartialRoutesAccordion} from '../components/PartialRoutesAccordion';
 import EntityModal from "../components/EntityModal";
 import {sessionFields} from "../templates/sessionFields";
 import {useModalState} from "../helpers/useModalState";
-import {expectOne, firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 import {DecoratedCustomGrade, DecoratedGrade, Grade} from "../types/Grade";
 import {RouteCount} from "../types/Session";
 import {entries} from "../helpers/recordUtils";
@@ -26,19 +26,13 @@ export type QuickEditButtons = (count: number, {key, isCustom}: ({
     isCustom: true
 } | { key: { percentage?: number } & Grade, isCustom?: false })) => JSX.Element
 export const SessionPage = ({match: {params: {id}}, history}) => {
-    useFirebaseConnect([
-        'gyms',
-        'routes',
-        'sessions',
-        'users'
-    ])
-
     const {uid} = getUser()
+    const firebaseState = useDatabase()
     const session = firebaseState.sessions.getOne(id)
-    const gym = expectOne(firebaseState.gyms.getOrdered(['gymKey', session?.gymId]))
+    const gym = session && firebaseState.gyms.getOne(session.gymId)
     const gymsForUser = firebaseState.gyms.getOrdered(['viewer', uid])
-    const routesForGym = firebaseState.routes.getOrdered(['gym', gym?.key])?.filter(route => !route.value.isRetired)
-    const routesForSession = firebaseState.routes.getOrdered(['gym', gym?.key], ['session', id])
+    const routesForGym = firebaseState.routes.getOrdered(['gym', session?.gymId])?.filter(route => !route.value.isRetired)
+    const routesForSession = firebaseState.routes.getOrdered(['gym', session?.gymId], ['session', id])
     const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()
@@ -189,6 +183,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
 
     // Convert to maps for easier consumption
     const customRoutesMap = session.customRoutes.reduce((acc, entry) => ({...acc, [entry.key]: entry}), {})
+    // console.log(session, customRoutesMap, routesForSession)
     const standardRoutesMap = session.standardRoutes.reduce((acc, entry) => ({
         ...acc,
         [prettyPrint(entry.key)]: entry
@@ -242,7 +237,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
                     <Row>
                         <Col>
                             <h2>
-                                Session at <Link to={`/gyms/${gym.key}`}>{gym.value.name}</Link>
+                                Session at <Link to={`/gyms/${session.gymId}`}>{gym.name}</Link>
                             </h2>
                         </Col>
                         {isFinished && canEdit &&
@@ -253,7 +248,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
                         }
                     </Row>
                     <h5 className="fw-normal mb-3">
-                        {date} in {gym.value.location} {isFinished && ` for ${sessionDuration(session)}`}
+                        {date} in {gym.location} {isFinished && ` for ${sessionDuration(session)}`}
                     </h5>
                     <h3>Routes</h3>
                     {grades && grades.length ? grades.map(grade => {

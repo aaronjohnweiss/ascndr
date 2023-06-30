@@ -1,10 +1,10 @@
 import React from 'react'
-import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded} from 'react-redux-firebase'
 import {Route, Switch, useLocation} from 'react-router-dom'
 import {ALL_STYLES} from '../helpers/gradeUtils';
 import RoutesIndex, {RoutesFilterProps, SORT_FIELDS, SortEntry} from "../components/RoutesIndex";
 import RouteFilters from "./RouteFilters";
-import {FilterParam, firebaseState, getUser} from "../redux/selectors";
+import {FilterParam, getUser, useDatabase} from "../redux/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
 import {Gym} from "../types/Gym";
 import {Session} from "../types/Session";
@@ -27,17 +27,12 @@ export const parseSort = (query: URLSearchParams): SortEntry[] => {
 export const getBooleanFromQuery = (query, name, valueIfMissing = false) => query.has(name) ? query.get(name) === 'true' : valueIfMissing;
 
 const StatsContainer = () => {
-    useFirebaseConnect([
-        'routes',
-        'sessions',
-        'users',
-        'gyms',
-    ])
-
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
     const {uid} = getUser()
+
+    const firebaseState = useDatabase()
 
     // Get all viewable gyms
     const gymParams: FilterParam<Gym>[] = [['viewer', uid]];

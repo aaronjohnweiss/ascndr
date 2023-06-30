@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {Button, Col, ListGroup, Row} from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
 import {routeCreateFields} from '../templates/routeFields'
@@ -11,26 +11,15 @@ import {getRoutesForGym} from '../helpers/filterUtils';
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
 import DeleteGymModal from "./DeleteGymModal";
-import {canEditGym, firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 
 const GymPage = ({match: {params: {id}}, history}) => {
-    useFirebaseConnect([
-        'gyms',
-        'routes',
-        'sessions',
-        'users'
-    ])
-
     const { uid } = getUser()
-    console.log('selecting gym')
+    const firebaseState = useDatabase()
     const gym = firebaseState.gyms.getOne(id)
-    console.log('selecting routes')
     const routes = firebaseState.routes.getOrdered(['gym', id])
-    console.log('selecting sessions')
     const sessions = firebaseState.sessions.getOrdered(['gym', id], ['owner', uid])?.sort((a, b) => b.value.startTime - a.value.startTime)
-    console.log('selecting canEdit')
-    const canEdit = canEditGym(gym)?.(uid)
-    console.log('we selected')
+    const canEdit = firebaseState.gyms.canEdit(gym)?.(uid)
 
     const firebase = useFirebase()
 

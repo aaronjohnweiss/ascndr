@@ -1,18 +1,15 @@
 import React, {useState} from 'react'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {getWorkoutsForUser} from '../helpers/filterUtils';
 import Workout from "../components/Workout";
 import {validateWorkoutFields, workoutFields} from "../templates/workoutFields";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 
 const WorkoutIndex = () => {
-    useFirebaseConnect([
-        'workouts'
-    ])
-
     const { uid } = getUser()
+    const firebaseState = useDatabase()
     const workouts = firebaseState.workouts.getOrdered()
 
     const firebase = useFirebase()

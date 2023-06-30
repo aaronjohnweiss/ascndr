@@ -3,19 +3,16 @@ import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import {Col, ListGroup, Row} from 'react-bootstrap'
 import {addFriendFields, userFields, userIdValidation, userNameValidation} from '../templates/userFields'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {distinct, findUser, findUserKey, getFriendsForUser, getUserName} from '../helpers/filterUtils';
 import ConfirmCancelButton from "../components/ConfirmCancelButton";
 import {useModalState} from "../helpers/useModalState";
 import {ActivityCalendarSettingsModal} from "../components/ActivityCalendarSettingsModal";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 
 const UserPage = () => {
-    useFirebaseConnect([
-        'users'
-    ])
-
     const { uid } = getUser()
+    const firebaseState = useDatabase()
     const users = firebaseState.users.getOrdered()
 
     const firebase = useFirebase()

@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded} from 'react-redux-firebase'
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
 import {findUser, getFriendsForUser, getGymsForUser, getUserName} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors";
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
 
@@ -33,12 +33,8 @@ const defaultIfEmpty = (a1, a2) => {
 };
 
 const StatFilters = () => {
-    useFirebaseConnect([
-        'gyms',
-        'users'
-    ])
-
     const { uid } = getUser()
+    const firebaseState = useDatabase()
     const gyms = firebaseState.gyms.getOrdered()
     const users = firebaseState.users.getOrdered()
 

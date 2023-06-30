@@ -5,13 +5,13 @@ import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import axios from 'axios'
 import EntityModal from '../components/EntityModal'
 import {routeUpdateFields, routeVideoFields} from '../templates/routeFields'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {prettyPrint} from '../helpers/gradeUtils'
 import {distinct, findUser, getEditorsForGym, getUserName} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
 import {dateString} from "../helpers/dateUtils";
 import {useModalState} from "../helpers/useModalState";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getFirst, getUser, useDatabase} from "../redux/selectors";
 
 export const PENDING_IMAGE = 'PENDING';
 export const FAILED_IMAGE = 'FAILED';
@@ -38,16 +38,10 @@ export const uploadImage = (routeRef, picture) => {
 }
 
 const RoutePage = ({match: {params: {id}}}) => {
-    useFirebaseConnect([
-        'gyms',
-        'routes',
-        'sessions',
-        'users'
-    ])
-
     const { uid } = getUser()
-    const gyms = firebaseState.gyms.getOrdered(['viewer', uid])
+    const firebaseState = useDatabase()
     const route = firebaseState.routes.getOne(id)
+    const gym = getFirst(firebaseState.gyms.getOrdered(['viewer', uid], ['gymKey', route?.gymId]))
     const sessions = firebaseState.sessions.getOrdered(['viewer', uid], ['route', id])
     const users = firebaseState.users.getOrdered(['friendOf', uid])
 
@@ -57,7 +51,7 @@ const RoutePage = ({match: {params: {id}}}) => {
     const [showEditModal, openEditModal, closeEditModal] = useModalState()
     const [showVideoModal, openVideoModal, closeVideoModal] = useModalState()
 
-    if (!isLoaded(route) || !isLoaded(gyms) || !isLoaded(sessions) || !isLoaded(users)) return <>Loading</>
+    if (!isLoaded(route) || !isLoaded(gym) || !isLoaded(sessions) || !isLoaded(users)) return <>Loading</>
 
     const updateRoute = (route) => {
         firebase.update(`routes/${id}`, route)
@@ -105,8 +99,6 @@ const RoutePage = ({match: {params: {id}}}) => {
     }
 
     if (!route) return <>Uh oh</>
-
-    const gym = gyms.find(gym => gym.key === route.gymId)
     if (!gym) return <>Uh oh</>
 
     const renderEditModal = () =>
