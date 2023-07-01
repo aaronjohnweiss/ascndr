@@ -13,7 +13,7 @@ import {PartialRoutesAccordion} from '../components/PartialRoutesAccordion';
 import EntityModal from "../components/EntityModal";
 import {sessionFields} from "../templates/sessionFields";
 import {useModalState} from "../helpers/useModalState";
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {DecoratedCustomGrade, DecoratedGrade, Grade} from "../types/Grade";
 import {RouteCount} from "../types/Session";
 import {entries} from "../helpers/recordUtils";

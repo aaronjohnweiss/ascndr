@@ -4,11 +4,12 @@ import {Route, Switch, useLocation} from 'react-router-dom'
 import {ALL_STYLES} from '../helpers/gradeUtils';
 import RoutesIndex, {RoutesFilterProps, SORT_FIELDS, SortEntry} from "../components/RoutesIndex";
 import RouteFilters from "./RouteFilters";
-import {FilterParam, getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
 import {Gym} from "../types/Gym";
 import {Session} from "../types/Session";
 import {User} from "../types/User";
+import {FilterParam} from "../redux/selectors/types";
 
 const defaultSort = {
     key: 'created' as const,

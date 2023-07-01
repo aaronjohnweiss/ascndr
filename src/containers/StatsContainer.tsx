@@ -8,10 +8,11 @@ import {ALL_STYLES} from '../helpers/gradeUtils';
 import GradeHistory from '../components/GradeHistory';
 import StatFilters, {filtersLink} from './StatFilters';
 import {Button} from 'react-bootstrap';
-import {FilterParam, getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
 import {Gym} from "../types/Gym";
 import {User} from "../types/User";
+import {FilterParam} from "../redux/selectors/types";
 
 const StatsHeader = ({location}) => (
     <>

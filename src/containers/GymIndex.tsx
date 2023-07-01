@@ -6,7 +6,7 @@ import GymCard from '../components/GymCard'
 import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {getLatestSession, groupBy} from '../helpers/filterUtils';
 import {useModalState} from "../helpers/useModalState";
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {Gym} from "../types/Gym";
 
 export const GymIndex = () => {

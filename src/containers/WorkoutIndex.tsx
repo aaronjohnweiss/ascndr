@@ -4,7 +4,7 @@ import EntityModal from '../components/EntityModal'
 import {isLoaded, useFirebase} from 'react-redux-firebase'
 import Workout from "../components/Workout";
 import {validateWorkoutFields, workoutFields} from "../templates/workoutFields";
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 const WorkoutIndex = () => {
     const { uid } = getUser()

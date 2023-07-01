@@ -3,7 +3,8 @@ import EntityModal from '../components/EntityModal'
 import {userNameField, userNameValidation} from '../templates/userFields'
 import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {findUser, findUserKey} from '../helpers/filterUtils';
-import {getFirst, getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
+import {getFirst} from "../redux/selectors/utils";
 
 const UserCheck = () => {
     const { uid } = getUser()

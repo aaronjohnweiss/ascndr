@@ -11,7 +11,8 @@ import {distinct, findUser, getUserName} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
 import {dateString} from "../helpers/dateUtils";
 import {useModalState} from "../helpers/useModalState";
-import {getFirst, getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
+import {getFirst} from "../redux/selectors/utils";
 
 export const PENDING_IMAGE = 'PENDING';
 export const FAILED_IMAGE = 'FAILED';

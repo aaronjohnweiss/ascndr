@@ -10,7 +10,7 @@ import TruncatedList from '../components/TruncatedList'
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
 import DeleteGymModal from "./DeleteGymModal";
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 const GymPage = ({match: {params: {id}}, history}) => {
     const { uid } = getUser()

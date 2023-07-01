@@ -5,7 +5,7 @@ import React, {useState} from "react";
 import {useModalState} from "../helpers/useModalState";
 import {isLoaded, useFirebase} from "react-redux-firebase";
 import {Form} from "react-bootstrap";
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 
 export const DeleteGymModal = ({gymId, history}) => {

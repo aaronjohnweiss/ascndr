@@ -8,7 +8,7 @@ import {distinct, findUserKey, getUserName} from '../helpers/filterUtils';
 import ConfirmCancelButton from "../components/ConfirmCancelButton";
 import {useModalState} from "../helpers/useModalState";
 import {ActivityCalendarSettingsModal} from "../components/ActivityCalendarSettingsModal";
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 const UserPage = () => {
     const { uid } = getUser()

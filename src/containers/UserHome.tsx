@@ -5,7 +5,7 @@ import SessionCard from '../components/SessionCard';
 import moment from 'moment';
 import ResponsiveActivityCalendar from '../components/ResponsiveActivityCalendar';
 import {getCalendarData} from "../helpers/activityCalendarEntries";
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 const UserHome = () => {
     const {uid} = getUser()

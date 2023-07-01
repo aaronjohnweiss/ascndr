@@ -5,7 +5,7 @@ import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
 import {getUserName} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
 

@@ -6,7 +6,7 @@ import {ALL_STYLES, printType} from '../helpers/gradeUtils';
 import {getBooleanFromQuery} from './StatsContainer';
 import {parseSort} from "./RoutesContainer";
 import {MultiSelect} from "./StatFilters";
-import {getUser, useDatabase} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {entries} from "../helpers/recordUtils";
 import {sortOptions} from "../components/RoutesIndex";
 
