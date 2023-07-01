@@ -13,7 +13,7 @@ import {Data, OrderedList, Persisted} from "../../types/Firebase";
 import {DatabaseState} from "./selectors";
 
 /**
- * Given an ordered list of data, apply the filters. Returns undefined if any predicate returns undefined, or the filtered list otherwise.
+ * Given an ordered list of data and an array of predicates, filter the data. Returns undefined if any predicate returns undefined; returns the filtered list otherwise.
  */
 const filterOrdered = <T, >(ordered: Optional<OrderedList<T>>, predicates: FilterPredicate<Persisted<T>>[]): Optional<OrderedList<T>> => {
     if (!ordered) return undefined
@@ -51,7 +51,6 @@ const evaluatePredicates = <T, >(obj: Persisted<T>, predicates: FilterPredicate<
 }
 /**
  * Convert a function that returns an OrderedList to one that returns Data
- * @param orderedSelector
  */
 const toData = <Whole extends Filterable>(orderedSelector: ParameterizedSelector<Whole, OrderedList<Whole>>): ParameterizedSelector<Whole, Data<Whole>> => (...params) => {
     const ordered = orderedSelector(...params)
@@ -62,7 +61,7 @@ const toData = <Whole extends Filterable>(orderedSelector: ParameterizedSelector
  */
 export const getFirst = <T, >(arr: Optional<T[]>): Optional<T> => arr?.length ? arr[0] : undefined
 /**
- * Build a function that can filter on the provided data
+ * Given data and a set of filters, build a function that can filter on the data based on user parameters
  */
 const getFilterable = <T extends Filterable>(selector: Optional<OrderedList<T>>, filters: Filter<T>): ParameterizedSelector<T, OrderedList<T>> => (...params) => {
     const predicates = getPredicates(params, filters)
@@ -102,6 +101,9 @@ const getPredicates = <T extends Filterable>(params: FilterParam<T>[], filters: 
     }
     return predicates
 }
+/**
+ * Build selectors (getOrdered, getData, getOne) for a given Filterable type
+ */
 export const buildSelectors = <T extends Filterable>(state: DatabaseState, model: Optional<OrderedList<T>>, filters: StateFilter<T>): Selectors<T> => {
     const getOrdered = getFilterable(model, filters(state))
     const getData = toData(getOrdered)

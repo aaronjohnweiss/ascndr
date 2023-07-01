@@ -8,7 +8,7 @@ import {DatabaseState} from "./selectors";
 
 export type Optional<T> = T | undefined
 /**
- * Predicate that can also return undefined, to indicate that data is still loading
+ * Predicate that can evaluate to true or false, but also return undefined to indicate that data is still loading
  */
 export type FilterPredicate<T> = (t: T) => Optional<boolean>
 /**
@@ -36,18 +36,19 @@ const FilterableFields: Record<FilterableType, readonly string[]> = {
 type FilterName<T extends Filterable> = typeof FilterableFields[T['_type']][number]
 /**
  * A Filter defines FilterFunctions for every FilterName for a given Filterable type
+ * (essentially, an implementation of all possible filters on a given type)
  */
 export type Filter<T extends Filterable> = Record<FilterName<T>, FilterFunction<Persisted<T>>>
 /**
- * A StateFilter wraps a filter in a closure that has stateful information
+ * A StateFilter wraps a filter in a closure that has access to the database state
  */
 export type StateFilter<T extends Filterable> = (databaseState: DatabaseState) => Filter<T>
 /**
- * Callers can supply a string, string[], or undefined for a filter.
+ * Caller-supplied filter value
  */
 export type FilterValue = Optional<string | string[]>
 /**
- * User-supplied filter parameter. In the case of multiple values provided to FilterValue, they will be OR'ed
+ * Caller-supplied filter parameter (filter name and value)
  */
 export type FilterParam<T extends Filterable> = [FilterName<T>, FilterValue]
 /**
