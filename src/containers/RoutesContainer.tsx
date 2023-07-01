@@ -26,7 +26,7 @@ export const parseSort = (query: URLSearchParams): SortEntry[] => {
 
 export const getBooleanFromQuery = (query, name, valueIfMissing = false) => query.has(name) ? query.get(name) === 'true' : valueIfMissing;
 
-const StatsContainer = () => {
+const RoutesContainer = () => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
@@ -78,4 +78,4 @@ const StatsContainer = () => {
     );
 };
 
-export default StatsContainer
+export default RoutesContainer

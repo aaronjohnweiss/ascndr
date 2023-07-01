@@ -3,21 +3,15 @@ import {isLoaded} from 'react-redux-firebase'
 import GradeHistogram, {GradeChartProps} from '../components/GradeHistogram'
 import {Route, Switch, useLocation} from 'react-router-dom'
 import StatsIndex, {StatsFilterProps} from '../components/StatsIndex';
-import {toObj} from '../helpers/objectConverters';
 import {FaChevronLeft} from 'react-icons/fa';
 import {ALL_STYLES} from '../helpers/gradeUtils';
 import GradeHistory from '../components/GradeHistory';
 import StatFilters, {filtersLink} from './StatFilters';
 import {Button} from 'react-bootstrap';
-import {filterList, findFriends, getGymsForUser} from "../helpers/filterUtils";
-import {getUser, useDatabase} from "../redux/selectors";
+import {FilterParam, getUser, useDatabase} from "../redux/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
-
-const filterByKeys = (data, keys) => {
-    if (!data) return [];
-    if (!keys || !keys.length) return data;
-    return data.filter(({key}) => keys.includes(key));
-};
+import {Gym} from "../types/Gym";
+import {User} from "../types/User";
 
 const StatsHeader = ({location}) => (
     <>
@@ -30,34 +24,30 @@ export const getBooleanFromQuery = (query, name, valueIfMissing = false) => quer
 
 const StatsContainer = () => {
     const { uid } = getUser()
-    const firebaseState = useDatabase()
-    const gyms = firebaseState.gyms.getOrdered()
-    const routes = firebaseState.routes.getData()
-    const sessions = firebaseState.sessions.getOrdered()
-    const users = firebaseState.users.getOrdered()
-
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
-    if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(gyms)) return <>Loading</>;
-
-    let allowedSessions = sessions;
-    let allowedGyms = getGymsForUser(gyms, users, uid);
+    const firebaseState = useDatabase()
+    // Get all viewable gyms
+    const gymParams: FilterParam<Gym>[] = [['viewer', uid]];
+    // Filter by gym keys from query params if provided
     if (query.has('gyms')) {
-        const gymsFromQuery = query.getAll('gyms');
-        // Filter sessions and gyms based on gym ids
-        allowedSessions = allowedSessions.filter(session => gymsFromQuery.includes(session.value.gymId));
-
-        allowedGyms = filterByKeys(gyms, gymsFromQuery);
+        gymParams.push(['gymKey', query.getAll('gyms')])
     }
-
-    let allowedUids = findFriends(users, uid)
+    const gyms = firebaseState.gyms.getData(...gymParams)
+    const gymKeys = isLoaded(gyms) ? Object.keys(gyms) : undefined
+    // Get all routes for the given gyms
+    const routes = firebaseState.routes.getData(['gym', gymKeys])
+    // Get all friends, filtered to the uids from query params if provided
+    const userParams: FilterParam<User>[] = [['friendOf', uid]];
     if (query.has('uids')) {
-        const uidsFromQuery = query.getAll('uids');
-        allowedUids = allowedUids.filter(uid => uidsFromQuery.includes(uid));
+        userParams.push(['uid', query.getAll('uids')]);
     }
+    const users = firebaseState.users.getOrdered(...userParams)
+    const sessions = firebaseState.sessions.getData(['gym', gymKeys], ['owner', users?.map(u => u.value.uid)])
 
-    allowedSessions = allowedSessions.filter(session => allowedUids.includes(session.value.uid));
+
+    if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(gyms)) return <>Loading</>;
 
     let allowedTypes: RouteStyle[]
     if (query.has('allowedTypes')) {
@@ -66,13 +56,11 @@ const StatsContainer = () => {
         allowedTypes = [...ALL_STYLES];
     }
 
-    const allowedUsers = filterList(users, 'uid', allowedUids);
-
     const filterProps: StatsFilterProps & GradeChartProps = {
-        gyms: toObj(allowedGyms),
-        users: allowedUsers.reduce((obj, user) => ({...obj, [user.value.uid]: user.value}), {}),
+        gyms,
+        users: users.reduce((obj, user) => ({...obj, [user.value.uid]: user.value}), {}),
         routes,
-        sessions: toObj(allowedSessions),
+        sessions,
         allowSuffixes: getBooleanFromQuery(query, 'allowSuffixes'),
         allowPartials: getBooleanFromQuery(query, 'allowPartials', true),
         allowedTypes

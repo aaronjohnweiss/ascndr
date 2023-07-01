@@ -7,7 +7,6 @@ import {gymFields} from '../templates/gymFields'
 import {Link} from 'react-router-dom'
 import {sessionDuration} from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
-import {getRoutesForGym} from '../helpers/filterUtils';
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
 import DeleteGymModal from "./DeleteGymModal";
@@ -65,10 +64,8 @@ const GymPage = ({match: {params: {id}}, history}) => {
         closeEditModal()
     }
 
-    // Filter to only routes for this gym
-    const routesForGym = getRoutesForGym(routes, id);
-    const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
-    const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
+    const currentRoutes = routes.filter(route => !route.value.isRetired).reverse()
+    const retiredRoutes = routes.filter(route => route.value.isRetired).reverse()
 
     const canDelete = gym.owner === uid
 

@@ -2,13 +2,13 @@ import React, {useEffect, useState} from 'react'
 import EntityModal from '../components/EntityModal'
 import {userNameField, userNameValidation} from '../templates/userFields'
 import {isLoaded, useFirebase} from 'react-redux-firebase'
-import {findUser, findUserKey, userExists} from '../helpers/filterUtils';
-import {getUser, useDatabase} from "../redux/selectors";
+import {findUser, findUserKey} from '../helpers/filterUtils';
+import {getFirst, getUser, useDatabase} from "../redux/selectors";
 
 const UserCheck = () => {
     const { uid } = getUser()
     const firebaseState = useDatabase()
-    const users = firebaseState.users.getOrdered()
+    const users = firebaseState.users.getOrdered(['uid', uid])
 
     const firebase = useFirebase()
 
@@ -17,11 +17,11 @@ const UserCheck = () => {
     useEffect(() => {
         if (!isLoaded(users)) return;
 
-        if (!userExists(users, uid)) {
+        if (!users.length) {
             firebase.push('users', {uid, friends: []});
         }
 
-        const userInfo = findUser(users, uid);
+        const userInfo = getFirst(users)?.value;
 
         const userName = userInfo && userInfo.name;
 

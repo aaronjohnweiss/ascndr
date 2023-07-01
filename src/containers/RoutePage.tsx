@@ -7,7 +7,7 @@ import EntityModal from '../components/EntityModal'
 import {routeUpdateFields, routeVideoFields} from '../templates/routeFields'
 import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {prettyPrint} from '../helpers/gradeUtils'
-import {distinct, findUser, getEditorsForGym, getUserName} from '../helpers/filterUtils';
+import {distinct, findUser, getUserName} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
 import {dateString} from "../helpers/dateUtils";
 import {useModalState} from "../helpers/useModalState";
@@ -44,6 +44,7 @@ const RoutePage = ({match: {params: {id}}}) => {
     const gym = getFirst(firebaseState.gyms.getOrdered(['viewer', uid], ['gymKey', route?.gymId]))
     const sessions = firebaseState.sessions.getOrdered(['viewer', uid], ['route', id])
     const users = firebaseState.users.getOrdered(['friendOf', uid])
+    const canEdit = firebaseState.gyms.canEdit(gym?.value)(uid)
 
     const firebase = useFirebase()
 
@@ -51,7 +52,7 @@ const RoutePage = ({match: {params: {id}}}) => {
     const [showEditModal, openEditModal, closeEditModal] = useModalState()
     const [showVideoModal, openVideoModal, closeVideoModal] = useModalState()
 
-    if (!isLoaded(route) || !isLoaded(gym) || !isLoaded(sessions) || !isLoaded(users)) return <>Loading</>
+    if (!isLoaded(route) || !isLoaded(gym) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(canEdit)) return <>Loading</>
 
     const updateRoute = (route) => {
         firebase.update(`routes/${id}`, route)
@@ -129,8 +130,6 @@ const RoutePage = ({match: {params: {id}}}) => {
 
     const uidsForRoute = distinct(sessions.map(session => session.value.uid));
     const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
-
-    const canEdit = getEditorsForGym(gym.value, users).includes(uid)
 
     return (
         <Container>

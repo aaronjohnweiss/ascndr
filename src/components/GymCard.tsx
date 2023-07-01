@@ -3,8 +3,11 @@ import {Card} from 'react-bootstrap'
 import {Link} from 'react-router-dom'
 import {timeFromNow} from '../helpers/dateUtils';
 import {getLatestSession} from '../helpers/filterUtils';
+import {OrderedList, Persisted} from "../types/Firebase";
+import {Gym} from "../types/Gym";
+import {Session} from "../types/Session";
 
-const GymCard = ({gym, sessions}) => {
+const GymCard = ({gym, sessions = []}: {gym: Persisted<Gym>, sessions?: OrderedList<Session>}) => {
     const latestSession = getLatestSession(sessions);
     return (
         <Card>
