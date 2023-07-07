@@ -1,5 +1,5 @@
 import React, {Fragment} from 'react'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {Button, Col, ListGroup, Row} from 'react-bootstrap'
 import EntityModal from '../components/EntityModal'
 import {routeCreateFields} from '../templates/routeFields'
@@ -7,32 +7,25 @@ import {gymFields} from '../templates/gymFields'
 import {Link} from 'react-router-dom'
 import {sessionDuration} from '../helpers/durationUtils'
 import TruncatedList from '../components/TruncatedList'
-import {getEditorsForGym, getRoutesForGym, getSessionsForUserAndGym} from '../helpers/filterUtils';
 import {PENDING_IMAGE, uploadImage} from './RoutePage';
 import {useModalState} from "../helpers/useModalState";
 import DeleteGymModal from "./DeleteGymModal";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 const GymPage = ({match: {params: {id}}, history}) => {
-    useFirebaseConnect([
-        'gyms',
-        'routes',
-        'sessions',
-        'users'
-    ])
-
     const { uid } = getUser()
+    const firebaseState = useDatabase()
     const gym = firebaseState.gyms.getOne(id)
-    const routes = firebaseState.routes.getOrdered()
-    const sessions = firebaseState.sessions.getOrdered()
-    const users = firebaseState.users.getOrdered()
+    const routes = firebaseState.routes.getOrdered(['gym', id])
+    const sessions = firebaseState.sessions.getOrdered(['gym', id], ['owner', uid])?.sort((a, b) => b.value.startTime - a.value.startTime)
+    const canEdit = firebaseState.gyms.canEdit(gym)?.(uid)
 
     const firebase = useFirebase()
 
     const [showRouteModal, openRouteModal, closeRouteModal] = useModalState(false)
     const [showEditModal, openEditModal, closeEditModal] = useModalState(false)
 
-    if (!isLoaded(gym) || !isLoaded(sessions) || !isLoaded(routes) || !isLoaded(users)) return <>Loading</>
+    if (!isLoaded(gym) || !isLoaded(sessions) || !isLoaded(routes) || !isLoaded(canEdit)) return <>Loading</>
     if (!gym) return <>Uh oh</>
 
     const handleNewRoute = (route) => {
@@ -71,13 +64,8 @@ const GymPage = ({match: {params: {id}}, history}) => {
         closeEditModal()
     }
 
-    // Filter to only routes for this gym
-    const routesForGym = getRoutesForGym(routes, id);
-    const currentRoutes = routesForGym.filter(route => !route.value.isRetired).reverse()
-    const retiredRoutes = routesForGym.filter(route => route.value.isRetired).reverse()
-    const sessionsForUser = getSessionsForUserAndGym(sessions, id, uid).sort((a, b) => b.value.startTime - a.value.startTime)
-
-    const canEdit = getEditorsForGym(gym, users).includes(uid)
+    const currentRoutes = routes.filter(route => !route.value.isRetired).reverse()
+    const retiredRoutes = routes.filter(route => route.value.isRetired).reverse()
 
     const canDelete = gym.owner === uid
 
@@ -151,7 +139,7 @@ const GymPage = ({match: {params: {id}}, history}) => {
             </Row>
 
             <TruncatedList pageSize={5}>
-                {sessionsForUser.map(session => (
+                {sessions.map(session => (
                     <Link to={`/sessions/${session.key}`} style={{textDecoration: 'none'}}
                           key={session.key}>
                         <ListGroup.Item action>

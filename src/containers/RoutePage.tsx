@@ -5,13 +5,14 @@ import ConfirmCancelButton from '../components/ConfirmCancelButton'
 import axios from 'axios'
 import EntityModal from '../components/EntityModal'
 import {routeUpdateFields, routeVideoFields} from '../templates/routeFields'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import {prettyPrint} from '../helpers/gradeUtils'
-import {distinct, findUser, getEditorsForGym, getSessionsForRoute, getUserName} from '../helpers/filterUtils';
+import {distinct, findUser, getUserName} from '../helpers/filterUtils';
 import RouteHistory from '../components/RouteHistory';
 import {dateString} from "../helpers/dateUtils";
 import {useModalState} from "../helpers/useModalState";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
+import {getFirst} from "../redux/selectors/utils";
 
 export const PENDING_IMAGE = 'PENDING';
 export const FAILED_IMAGE = 'FAILED';
@@ -38,18 +39,13 @@ export const uploadImage = (routeRef, picture) => {
 }
 
 const RoutePage = ({match: {params: {id}}}) => {
-    useFirebaseConnect([
-        'gyms',
-        'routes',
-        'sessions',
-        'users'
-    ])
-
     const { uid } = getUser()
-    const gyms = firebaseState.gyms.getOrdered()
+    const firebaseState = useDatabase()
     const route = firebaseState.routes.getOne(id)
-    const sessions = firebaseState.sessions.getOrdered()
-    const users = firebaseState.users.getOrdered()
+    const gym = getFirst(firebaseState.gyms.getOrdered(['viewer', uid], ['gymKey', route?.gymId]))
+    const sessions = firebaseState.sessions.getOrdered(['viewer', uid], ['route', id])
+    const users = firebaseState.users.getOrdered(['friendOf', uid])
+    const canEdit = firebaseState.gyms.canEdit(gym?.value)(uid)
 
     const firebase = useFirebase()
 
@@ -57,7 +53,7 @@ const RoutePage = ({match: {params: {id}}}) => {
     const [showEditModal, openEditModal, closeEditModal] = useModalState()
     const [showVideoModal, openVideoModal, closeVideoModal] = useModalState()
 
-    if (!isLoaded(route) || !isLoaded(gyms) || !isLoaded(sessions) || !isLoaded(users)) return <>Loading</>
+    if (!isLoaded(route) || !isLoaded(gym) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(canEdit)) return <>Loading</>
 
     const updateRoute = (route) => {
         firebase.update(`routes/${id}`, route)
@@ -105,8 +101,6 @@ const RoutePage = ({match: {params: {id}}}) => {
     }
 
     if (!route) return <>Uh oh</>
-
-    const gym = gyms.find(gym => gym.key === route.gymId)
     if (!gym) return <>Uh oh</>
 
     const renderEditModal = () =>
@@ -135,11 +129,8 @@ const RoutePage = ({match: {params: {id}}}) => {
                                    src={route.picture} onClick={handleRotate}/>;
     }
 
-    const sessionsForRoute = getSessionsForRoute(sessions, id);
-    const uidsForRoute = distinct(sessionsForRoute.map(session => session.value.uid));
+    const uidsForRoute = distinct(sessions.map(session => session.value.uid));
     const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
-
-    const canEdit = getEditorsForGym(gym.value, users).includes(uid)
 
     return (
         <Container>
@@ -165,7 +156,7 @@ const RoutePage = ({match: {params: {id}}}) => {
                     {route.isRetired && <h4>Retired</h4>}
                     {RouteImageComponent}
                     <p>{route.description}</p>
-                    <RouteHistory routeKey={id} users={usersForRoute} sessions={sessionsForRoute}/>
+                    <RouteHistory routeKey={id} users={usersForRoute} sessions={sessions}/>
                     <br/>
                     <div className='d-flex align-items-center mb-1'><h3 className='me-auto'>Videos</h3> <Button onClick={openVideoModal}>Add video</Button></div>
                     <ListGroup>

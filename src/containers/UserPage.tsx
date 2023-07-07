@@ -3,20 +3,18 @@ import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
 import {Col, ListGroup, Row} from 'react-bootstrap'
 import {addFriendFields, userFields, userIdValidation, userNameValidation} from '../templates/userFields'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
-import {distinct, findUser, findUserKey, getFriendsForUser, getUserName} from '../helpers/filterUtils';
+import {isLoaded, useFirebase} from 'react-redux-firebase'
+import {distinct, findUserKey, getUserName} from '../helpers/filterUtils';
 import ConfirmCancelButton from "../components/ConfirmCancelButton";
 import {useModalState} from "../helpers/useModalState";
 import {ActivityCalendarSettingsModal} from "../components/ActivityCalendarSettingsModal";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 const UserPage = () => {
-    useFirebaseConnect([
-        'users'
-    ])
-
     const { uid } = getUser()
-    const users = firebaseState.users.getOrdered()
+    const firebaseState = useDatabase()
+    const friends = firebaseState.users.getOrdered(['friendOf', uid])
+    const userInfo = firebaseState.users.getOne(uid)
 
     const firebase = useFirebase()
 
@@ -26,16 +24,12 @@ const UserPage = () => {
 
     const [showCalendarModal, openCalendarModal, closeCalendarModal] = useModalState(false);
 
-    if (!isLoaded(users)) return <>Loading</>
+    if (!isLoaded(friends) || !isLoaded(userInfo)) return <>Loading</>
 
-    const userInfo = findUser(users, uid);
-
-    const userName = userInfo && userInfo.name;
-
-    const friends = getFriendsForUser(userInfo, users);
+    const userName = userInfo.name;
 
     const handleUserUpdate = user => {
-        const key = findUserKey(users, uid);
+        const key = findUserKey(friends, uid);
 
         const data = {...userInfo, ...user, uid};
         if (key) {
@@ -48,10 +42,10 @@ const UserPage = () => {
 
     const addFriend = ({userValue}) => {
         let uidToAdd
-        if (users.map(user => user.value.uid).includes(userValue)) {
+        if (friends.map(user => user.value.uid).includes(userValue)) {
             uidToAdd = userValue
         } else {
-            uidToAdd = (users.map(user => user.value).find(user => user.name === userValue) || {}).uid
+            uidToAdd = (friends.map(user => user.value).find(user => user.name === userValue) || {}).uid
         }
 
 
@@ -98,10 +92,10 @@ const UserPage = () => {
             <ListGroup>
                 {friends.map((friend, idx) => (
                     <ListGroup.Item key={idx} className='align-items-center'>
-                        <div className='align-middle float-start'>{getUserName(friend)}</div>
+                        <div className='align-middle float-start'>{getUserName(friend.value)}</div>
                         <ConfirmCancelButton buttonText='-' buttonProps={{size: 'sm', className: 'float-end'}}
-                                             handleConfirm={() => removeFriend(friend.uid)} modalTitle='Remove friend'
-                                             modalBody={`Remove ${getUserName(friend)} from your friends list?`}/>
+                                             handleConfirm={() => removeFriend(friend.value.uid)} modalTitle='Remove friend'
+                                             modalBody={`Remove ${getUserName(friend.value)} from your friends list?`}/>
                     </ListGroup.Item>
                 ))}
             </ListGroup>
@@ -117,7 +111,7 @@ const UserPage = () => {
                          handleClose={closeUserModal}
                          handleSubmit={handleUserUpdate}
                          fields={userFields}
-                         validateState={userNameValidation(users, userName)}
+                         validateState={userNameValidation(friends, userName)}
                          initialValues={{...userInfo}}/>
 
             <EntityModal show={showFriendModal}
@@ -125,7 +119,7 @@ const UserPage = () => {
                          handleClose={closeFriendModal}
                          handleSubmit={addFriend}
                          fields={addFriendFields}
-                         validateState={userIdValidation(users)}/>
+                         validateState={userIdValidation(friends)}/>
 
             <ActivityCalendarSettingsModal show={showCalendarModal} user={userInfo} friends={friends}
                                            handleSubmit={setPreferences('activityCalendar')} handleClose={closeCalendarModal}/>

@@ -1,11 +1,19 @@
 import {isEmpty} from 'react-redux-firebase';
-import {Gym} from "../types/Gym";
 import {missingUser, User} from "../types/User";
 import {OrderedList, Persisted} from "../types/Firebase";
-import {Route} from "../types/Route";
 import {Session} from "../types/Session";
 import {Workout} from "../types/Workout";
 
+export const groupBy = <T,>(arr: OrderedList<T>, field: keyof T): Record<string, OrderedList<T>> => arr.reduce(
+    (acc, x) => {
+        const key = `${x.value[field]}`
+        if (!acc[key]) {
+            acc[key] = []
+        }
+        acc[key].push(x)
+        return acc
+    }, {}
+)
 export const filterList = <T,U >(arr: OrderedList<T>, field: keyof T, value: U): OrderedList<T> => isEmpty(arr) ? [] : arr.filter(item => {
     let fieldArray: unknown[];
     const itemValue = item.value[field];
@@ -25,7 +33,6 @@ export const filterList = <T,U >(arr: OrderedList<T>, field: keyof T, value: U):
 });
 
 export const findEntry = <T,>(array: OrderedList<T>, key: string): Persisted<T> | undefined => array.find(item => item.key === key);
-export const userExists = (users: OrderedList<User>, uid: string): boolean => users.some(user => user.value.uid === uid)
 export const findUser = (users: OrderedList<User>, uid: string, fallback: User = missingUser(uid)) => {
     const user = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid);
     return user ? user.value : fallback;
@@ -37,39 +44,7 @@ export const findUserKey = (users: OrderedList<User>, uid: string): string | nul
 
 export const getUserName = (user: User): string => user.name || user.uid
 
-export const findFriends = (users: OrderedList<User>, uid: string, includeSelf = true): string[] => {
-    const friends = findUser(users, uid).friends || []
-
-    return includeSelf ? [uid, ...friends] : friends
-}
-
-export const getGymsForUser = (gyms: OrderedList<Gym>, users: OrderedList<User>, uid: string) => {
-    const allowedUids = findFriends(users, uid);
-
-    return filterList(gyms, 'owner', allowedUids);
-}
-
-export const getEditGymsForUser = (gyms: OrderedList<Gym>, users: OrderedList<User>, uid: string): OrderedList<Gym> => gyms.filter(gym => canEditGym(gym.value, users, uid))
-
-export const getEditorsForGym = (gym: Gym, users: OrderedList<User>) => {
-    return findFriends(users, gym.owner);
-}
-
-export const canEditGym = (gym: Gym, users: OrderedList<User>, uid: string): boolean => getEditorsForGym(gym, users).includes(uid)
-
-export const getFriendsForUser = (user: User, users: OrderedList<User>): User[] => findFriends(users, user.uid, false).map(uid => findUser(users, uid))
-
-export const getRoutesForGym = (routes: OrderedList<Route>, gymId: string): OrderedList<Route> => filterList(routes, 'gymId', gymId);
-export const getSessionsForGym = (sessions: OrderedList<Session>, gymId: string): OrderedList<Session> => filterList(sessions, 'gymId', gymId);
 export const getSessionsForUser = (sessions: OrderedList<Session>, uid: string): OrderedList<Session> => filterList(sessions, 'uid', uid);
-export const getSessionsForUserAndGym = (sessions: OrderedList<Session>, gymId: string, uid: string) => getSessionsForUser(getSessionsForGym(sessions, gymId), uid);
-export const getSessionsForRoute = (sessions: OrderedList<Session>, routeKey: string): OrderedList<Session> => isEmpty(sessions) ? [] : sessions.filter(session => {
-    const { customRoutes } = session.value;
-    if (!customRoutes || !customRoutes.length) {
-        return false;
-    }
-    return customRoutes.some(route => route.key === routeKey);
-});
 
 export const getWorkoutsForUser = (workouts: OrderedList<Workout>, uid: string): OrderedList<Workout> => filterList(workouts, 'uid', uid);
 

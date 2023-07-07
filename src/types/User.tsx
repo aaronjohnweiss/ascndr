@@ -20,6 +20,7 @@ export interface UserPreferences {
 }
 
 export interface User {
+    _type: 'user'
     name?: string
     friends: string[]
     hiatuses: Hiatus[]
@@ -30,6 +31,7 @@ export interface User {
 export type FirebaseUser = Pick<User, 'uid'> & Partial<User>
 
 export const defaultUser = (part: FirebaseUser): User => ({
+    _type: 'user',
     friends: [],
     hiatuses: [],
     preferences: {

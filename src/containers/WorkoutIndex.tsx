@@ -1,19 +1,15 @@
 import React, {useState} from 'react'
 import Button from 'react-bootstrap/Button'
 import EntityModal from '../components/EntityModal'
-import {isLoaded, useFirebase, useFirebaseConnect} from 'react-redux-firebase'
-import {getWorkoutsForUser} from '../helpers/filterUtils';
+import {isLoaded, useFirebase} from 'react-redux-firebase'
 import Workout from "../components/Workout";
 import {validateWorkoutFields, workoutFields} from "../templates/workoutFields";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 
 const WorkoutIndex = () => {
-    useFirebaseConnect([
-        'workouts'
-    ])
-
     const { uid } = getUser()
-    const workouts = firebaseState.workouts.getOrdered()
+    const firebaseState = useDatabase()
+    const workouts = firebaseState.workouts.getOrdered(['owner', uid])
 
     const firebase = useFirebase()
 
@@ -29,8 +25,7 @@ const WorkoutIndex = () => {
 
     if (!isLoaded(workouts)) return <>Loading</>
 
-    const workoutsForUser = getWorkoutsForUser(workouts, uid)
-    workoutsForUser.sort((a, b) => b.value.startTime - a.value.startTime)
+    workouts.sort((a, b) => b.value.startTime - a.value.startTime)
 
     return (
         <>
@@ -39,7 +34,7 @@ const WorkoutIndex = () => {
                     Add Workout
                 </Button>
             </div>
-            {workoutsForUser.map((workout) => <Workout workout={workout.value} key={workout.key} />)}
+            {workouts.map((workout) => <Workout workout={workout.value} key={workout.key} />)}
             <EntityModal show={showModal}
                          handleClose={closeModal}
                          handleSubmit={addWorkout}

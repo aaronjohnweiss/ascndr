@@ -9,6 +9,7 @@ export interface RouteCount<KeyType> {
 }
 
 export interface Session {
+    _type: 'session'
     uid: string
     gymId: string
     startTime: number
@@ -20,6 +21,7 @@ export interface Session {
 export type FirebaseSession = Pick<Session, 'uid' | 'gymId' | 'startTime'> & Partial<Session>
 
 export const defaultSession = (part: FirebaseSession): Session => ({
+    _type: 'session',
     customRoutes: [],
     standardRoutes: [],
     ...part

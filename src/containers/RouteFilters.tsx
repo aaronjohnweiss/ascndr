@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import {isLoaded, useFirebaseConnect} from 'react-redux-firebase';
+import {isLoaded} from 'react-redux-firebase';
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
-import {getGymsForUser} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
 import {parseSort} from "./RoutesContainer";
 import {MultiSelect} from "./StatFilters";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {entries} from "../helpers/recordUtils";
 import {sortOptions} from "../components/RoutesIndex";
 import {LinkContainer} from 'react-router-bootstrap'
@@ -19,14 +18,9 @@ const defaultIfEmpty = (a1, a2) => {
 };
 
 const RouteFilters = () => {
-    useFirebaseConnect([
-        'gyms',
-        'users'
-    ])
-
     const { uid } = getUser()
-    const gyms = firebaseState.gyms.getOrdered()
-    const users = firebaseState.users.getOrdered()
+    const firebaseState = useDatabase()
+    const gyms = firebaseState.gyms.getOrdered(['viewer', uid])
 
     const query = new URLSearchParams(useLocation().search);
 
@@ -40,8 +34,8 @@ const RouteFilters = () => {
     const [allowedTypes, setAllowedTypes] = useState(defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES));
 
     useEffect(() => {
-        if (isLoaded(gyms) && isLoaded(users) && gymIds.length === 0) {
-            setGymIds(getGymsForUser(gyms, users, uid).map(gym => gym.key))
+        if (isLoaded(gyms) && gymIds.length === 0) {
+            setGymIds(gyms.map(gym => gym.key))
         }
     }, [gyms])
 
@@ -49,15 +43,13 @@ const RouteFilters = () => {
     const [sortDesc, setSortDesc] = useState(sortBy.desc)
     const [sortKey, setSortKey] = useState(sortBy.key)
 
-    if (!isLoaded(gyms) || !isLoaded(users)) {
+    if (!isLoaded(gyms)) {
         return <>Loading</>
     }
 
-    const visibleGyms = gyms && getGymsForUser(gyms, users, uid);
-
     const returnUrl = '/routeGallery';
 
-    const gymOptions = visibleGyms.map(({key, value}) => ({
+    const gymOptions = gyms.map(({key, value}) => ({
         key,
         label: value.name,
         checked: gymIds.includes(key)

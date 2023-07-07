@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded} from 'react-redux-firebase'
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
-import {findUser, getFriendsForUser, getGymsForUser, getUserName} from '../helpers/filterUtils';
+import {getUserName} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {LinkContainer} from 'react-router-bootstrap'
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
@@ -34,14 +34,11 @@ const defaultIfEmpty = (a1, a2) => {
 };
 
 const StatFilters = () => {
-    useFirebaseConnect([
-        'gyms',
-        'users'
-    ])
-
     const { uid } = getUser()
-    const gyms = firebaseState.gyms.getOrdered()
-    const users = firebaseState.users.getOrdered()
+    const firebaseState = useDatabase()
+    const gyms = firebaseState.gyms.getOrdered(['viewer', uid])
+    const user = firebaseState.users.getOne(uid)
+    const friends = firebaseState.users.getOrdered(['friendOf', uid])
 
     const query = new URLSearchParams(useLocation().search);
 
@@ -55,34 +52,30 @@ const StatFilters = () => {
     const [allowedTypes, setAllowedTypes] = useState(defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES));
 
     useEffect(() => {
-        if (isLoaded(gyms) && isLoaded(users) && gymIds.length === 0) {
-            setGymIds(getGymsForUser(gyms, users, uid).map(gym => gym.key))
+        if (isLoaded(gyms) && gymIds.length === 0) {
+            setGymIds(gyms.map(gym => gym.key))
         }
     }, [gyms])
 
     useEffect(() => {
-        if (isLoaded(users) && uids.length === 0) {
-            setUids(getFriendsForUser(findUser(users, uid), users).map(user => user.uid))
+        if (isLoaded(user) && uids.length === 0) {
+            setUids(user.friends)
         }
-    })
+    }, [user])
 
-    if (!isLoaded(gyms) || !isLoaded(users)) {
+    if (!isLoaded(gyms) || !isLoaded(user) || !isLoaded(friends)) {
         return <>Loading</>
     }
 
-    const user = findUser(users, uid);
-    const visibleUsers = [user, ...getFriendsForUser(user, users)];
-    const visibleGyms = getGymsForUser(gyms, users, uid);
-
     const returnUrl = query.get('ref') || '/stats';
 
-    const userOptions = visibleUsers.map(u => ({
+    const userOptions = friends.map(u => u.value).map(u => ({
         key: u.uid,
         label: getUserName(u),
         checked: uids.includes(u.uid)
     }));
 
-    const gymOptions = visibleGyms.map(({key, value}) => ({
+    const gymOptions = gyms.map(({key, value}) => ({
         key,
         label: value.name,
         checked: gymIds.includes(key)

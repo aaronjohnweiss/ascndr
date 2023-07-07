@@ -1,13 +1,15 @@
 import React from 'react'
-import {isLoaded, useFirebaseConnect} from 'react-redux-firebase'
+import {isLoaded} from 'react-redux-firebase'
 import {Route, Switch, useLocation} from 'react-router-dom'
-import {toObj} from '../helpers/objectConverters';
 import {ALL_STYLES} from '../helpers/gradeUtils';
-import {findFriends, getGymsForUser} from "../helpers/filterUtils";
 import RoutesIndex, {RoutesFilterProps, SORT_FIELDS, SortEntry} from "../components/RoutesIndex";
 import RouteFilters from "./RouteFilters";
-import {firebaseState, getUser} from "../redux/selectors";
+import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
+import {Gym} from "../types/Gym";
+import {Session} from "../types/Session";
+import {User} from "../types/User";
+import {FilterParam} from "../redux/selectors/types";
 
 const defaultSort = {
     key: 'created' as const,
@@ -25,44 +27,33 @@ export const parseSort = (query: URLSearchParams): SortEntry[] => {
 
 export const getBooleanFromQuery = (query, name, valueIfMissing = false) => query.has(name) ? query.get(name) === 'true' : valueIfMissing;
 
-const StatsContainer = () => {
-    useFirebaseConnect([
-        'routes',
-        'sessions',
-        'users',
-        'gyms',
-    ])
-
-    const {uid} = getUser()
-    const routes = firebaseState.routes.getOrdered()
-    const sessions = firebaseState.sessions.getOrdered()
-    const users = firebaseState.users.getOrdered()
-    const gyms = firebaseState.gyms.getOrdered()
-
+const RoutesContainer = () => {
     const location = useLocation();
     const query = new URLSearchParams(location.search);
 
-    if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(gyms)) return <>Loading</>;
+    const {uid} = getUser()
 
-    let allowedSessions = sessions;
-    let allowedRoutes = routes;
+    const firebaseState = useDatabase()
 
-    let allowedGymIds = getGymsForUser(gyms, users, uid).map(gym => gym.key);
-
+    // Get all viewable gyms
+    const gymParams: FilterParam<Gym>[] = [['viewer', uid]];
+    // Filter by gym keys from query params if provided
     if (query.has('gyms')) {
-        const gymsFromQuery = query.getAll('gyms');
-        allowedGymIds = allowedGymIds.filter(gymId => gymsFromQuery.includes(gymId))
+        gymParams.push(['gymKey', query.getAll('gyms')])
     }
-
-    // Filter sessions and routes based on gym ids
-    allowedSessions = allowedSessions.filter(session => allowedGymIds.includes(session.value.gymId));
-    allowedRoutes = allowedRoutes.filter(route => allowedGymIds.includes(route.value.gymId));
-
+    const gyms = firebaseState.gyms.getOrdered(...gymParams)
+    const gymKeys = gyms?.map(gym => gym.key)
+    // Get all routes for the given gyms
+    const routes = firebaseState.routes.getData(['gym', gymKeys])
     const selfOnly = getBooleanFromQuery(query, 'selfOnly', true);
+    // Get all sessions for the given gyms. Filter to self only based on query param
+    const sessionParams: FilterParam<Session>[] = [['gym', gymKeys], selfOnly ? ['owner', uid] : ['viewer', uid] ]
+    const sessions = firebaseState.sessions.getData(...sessionParams)
+    // Grab self only, or self and friends, depending on query param
+    const userParams: FilterParam<User>[] = [selfOnly ? ['uid', uid] : ['friendOf', uid]]
+    const users = firebaseState.users.getOrdered(...userParams)
 
-    const allowedUids = selfOnly ? [uid] : findFriends(users, uid)
-
-    allowedSessions = allowedSessions.filter(session => allowedUids.includes(session.value.uid));
+    if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(gyms)) return <>Loading</>;
 
     let allowedTypes: RouteStyle[]
     if (query.has('allowedTypes')) {
@@ -72,9 +63,9 @@ const StatsContainer = () => {
     }
 
     const filterProps: RoutesFilterProps = {
-        routes: toObj(allowedRoutes),
-        sessions: toObj(allowedSessions),
-        users: users.filter(u => allowedUids.includes(u.value.uid)),
+        routes,
+        sessions,
+        users,
         sortBy: parseSort(query),
         allowedTypes,
         allowPartials: getBooleanFromQuery(query, 'allowPartials', true)
@@ -88,4 +79,4 @@ const StatsContainer = () => {
     );
 };
 
-export default StatsContainer
+export default RoutesContainer
