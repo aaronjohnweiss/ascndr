@@ -6,7 +6,7 @@ import {StatItem} from './StatsIndex';
 import {sortHiatuses} from './HiatusModal';
 import {dateString} from '../helpers/dateUtils';
 import {GradeChartProps} from "./GradeHistogram";
-import {Data, Persisted} from "../types/Firebase";
+import {Data, OrderedList, Persisted} from "../types/Firebase";
 import {Session} from "../types/Session";
 import {entries} from "../helpers/recordUtils";
 import {Route} from "../types/Route";
@@ -24,7 +24,7 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
             const rangeEndDate = (i === 0) ? null : sortedHiatuses[i - 1].startDate;
 
             const sessionsInRange = sessionsForUser.filter(session => (rangeStartDate === null || session.value.startTime >= rangeStartDate) && (rangeEndDate === null || session.value.startTime < rangeEndDate));
-            const progression = calculateProgression(sessionsInRange, routes, allowSuffixes, allowedTypes, allowPartials, 'h4');
+            const progression = displayProgression(sessionsInRange, routes, allowSuffixes, allowedTypes, allowPartials, 'h4');
             if (progression.filter(entry => entry != null).length !== 0) {
                 let headerString;
                 if (rangeStartDate != null && rangeEndDate != null) {
@@ -54,7 +54,7 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
     }
 
     // No hiatuses: just show all data together
-    return calculateProgression(sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials)
+    return displayProgression(sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials)
 }
 
 export const highestGradeForSession = (session: Session, routes: Data<Route>, type: RouteStyle): {maxFullGrade?: Grade, maxPartialGrade?: Grade} => {
@@ -97,9 +97,34 @@ export const highestGradeForSession = (session: Session, routes: Data<Route>, ty
     return {maxFullGrade, maxPartialGrade};
 }
 
-const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials, Header: keyof JSX.IntrinsicElements = 'h3') => {
+const displayProgression = (sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials, Header: keyof JSX.IntrinsicElements = 'h3') => {
+    // List the firsts, their corresponding dates, with links to the session. Already sorted by date/grade descending.
+    return calculateProgression(sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials).map(({type, firsts}, j) => (
+        <Fragment key={j}>
+            <Header>{printType(type)}</Header>
+            <ListGroup>
+                {firsts.map(({date, grade, key}, k) => (
+                    <StatItem key={k}
+                              label={`${prettyPrint(grade, allowSuffixes, allowPartials)}: ${new Date(date).toDateString()}`}
+                              link={`/sessions/${key}`}/>
+                ))}
+            </ListGroup>
+        </Fragment>
+    ));
+}
+
+export interface GradeMilestone  {
+    date: number,
+    grade: Grade,
+    key: string
+}
+export interface GradeProgression {
+    type: RouteStyle
+    firsts: GradeMilestone[]
+}
+export const calculateProgression = (sessionsForUser: OrderedList<Session>, routes: Data<Route>, allowSuffixes: boolean, allowedTypes: RouteStyle[], allowPartials: boolean): GradeProgression[] => {
     // For each style of climb...
-    return allowedTypes.map((type, j) => {
+    return allowedTypes.map((type) => {
         // Go through all sessions, oldest to newest
         const firsts = sessionsForUser.sort((a, b) => b.value.startTime - a.value.startTime)
             .reduce((arr, {key, value}: Persisted<Session>) => {
@@ -123,24 +148,11 @@ const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTyp
                 }
 
                 return arr;
-            }, []);
+            }, [] as GradeMilestone[]);
         // If there are no routes at all for this user/style return null to ignore it
         if (firsts.length === 0) return null;
-
-        // List the firsts, their corresponding dates, with links to the session. Already sorted by date/grade descending.
-        return (
-            <Fragment key={j}>
-                <Header>{printType(type)}</Header>
-                <ListGroup>
-                    {firsts.map(({date, grade, key}, k) => (
-                        <StatItem key={k}
-                                  label={`${prettyPrint(grade, allowSuffixes, allowPartials)}: ${new Date(date).toDateString()}`}
-                                  link={`/sessions/${key}`}/>
-                    ))}
-                </ListGroup>
-            </Fragment>
-        );
-    });
+        return {type, firsts};
+    }).filter((x): x is GradeProgression => x !== null);
 }
 
 const GradeHistory = ({users, routes, sessions, allowSuffixes, allowedTypes, allowPartials}: GradeChartProps) => {

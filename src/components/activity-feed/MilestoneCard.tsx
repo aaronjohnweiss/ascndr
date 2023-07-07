@@ -4,6 +4,8 @@ import {AggregateSessionMilestone, IconProps} from "../../containers/ActivityFee
 import {pluralize} from "../../helpers/mathUtils";
 import {FaAward} from "react-icons/fa";
 import {IconContext} from "react-icons";
+import assertNever from "assert-never/index";
+import {prettyPrint} from "../../helpers/gradeUtils";
 
 interface Props {
     milestone: AggregateSessionMilestone
@@ -23,6 +25,12 @@ export const MilestoneCard = ({milestone}: Props) => {
             break
         case 'duration':
             milestoneText = `${milestone.count} ${pluralize('hour', milestone.count)} climbed`
+            break
+        case 'grade':
+            milestoneText = `first ${prettyPrint(milestone.grade, true, true)}`
+            break
+        default:
+            assertNever(milestone)
     }
 
     return <Container>
@@ -32,4 +40,9 @@ export const MilestoneCard = ({milestone}: Props) => {
     </Container>
 }
 
+// FaHotjar (fire)
+// FaThinkPeaks (mountain)
+// FaMedal (medal)
+// FaRocket (rocket)
+// FaVolcano
 export const MilestoneIcon = ({baseStyle}: IconProps) => <IconContext.Provider value={{...baseStyle, color: 'goldenrod'}}><FaAward /></IconContext.Provider>

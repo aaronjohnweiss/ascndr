@@ -20,11 +20,17 @@ import {timeFromNow} from "../helpers/dateUtils";
 import assertNever from "assert-never/index";
 import {Optional} from "../redux/selectors/types";
 import {LinkContainer} from 'react-router-bootstrap'
+import {calculateProgression} from "../components/GradeHistory";
+import {ALL_STYLES} from "../helpers/gradeUtils";
+import {Grade} from "../types/Grade";
 
 
-export interface AggregateSessionMilestone {
+export type AggregateSessionMilestone = {
     count: number,
     unit: 'sessionCount' | 'duration'
+} | {
+    grade: Grade,
+    unit: 'grade'
 }
 
 type FeedItem = {
@@ -49,6 +55,7 @@ const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedLis
         ...getSessionFeedItems(sessions),
         ...getSessionCountFeedItems(sessions),
         ...getSessionDurationFeedItems(sessions),
+        ...getGradeMilestoneFeedItems(sessions, routes)
     ]
 
     return feedData.sort(sortBy<FeedItem>()('date').descending)
@@ -89,6 +96,25 @@ const getSessionDurationFeedItems = (sessions: OrderedList<Session>): FeedItem[]
             data: {
                 _type: 'milestone',
                 value: milestone
+            }
+        }))
+    })
+}
+
+const getGradeMilestoneFeedItems = (sessions: OrderedList<Session>, routes: OrderedList<Route>): FeedItem[] => {
+    const sessionsByUser = groupBy(sessions, 'uid')
+    return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
+        const milestones = calculateProgression(userSessions, toObj(routes), true, [...ALL_STYLES], false)
+        return milestones.flatMap(({firsts}) => firsts).map(milestone => ({
+            date: milestone.date,
+            uid,
+            link: `/sessions/${milestone.key}`,
+            data: {
+                _type: 'milestone',
+                value: {
+                    unit: 'grade',
+                    grade: milestone.grade
+                }
             }
         }))
     })
