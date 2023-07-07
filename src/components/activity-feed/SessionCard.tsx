@@ -1,50 +1,80 @@
 import React from 'react'
-import {Data, OrderedList, Persisted} from "../../types/Firebase";
-import {User} from "../../types/User";
+import {Data, Persisted} from "../../types/Firebase";
 import {Session} from "../../types/Session";
 import {Gym} from "../../types/Gym";
-import {findUser} from "../../helpers/filterUtils";
-import {Card} from 'react-bootstrap';
-import {timeFromNow} from "../../helpers/dateUtils";
+import {Card, Col, Container, Row} from 'react-bootstrap';
+import {Route} from "../../types/Route";
+import {FaPersonFalling} from 'react-icons/fa6'
+import {IconContext} from "react-icons";
+import {IconProps} from "../../containers/ActivityFeed";
+import {sessionDuration} from "../../helpers/durationUtils";
+import {highestGradeForSession} from "../GradeHistory";
+import {ALL_STYLES, prettyPrint} from "../../helpers/gradeUtils";
+import {heightForSession} from "../StatsIndex";
 
 interface Props {
-    uid: string
-    users: OrderedList<User>
     session: Persisted<Session>
     gyms: Data<Gym>
+    routes: Data<Route>
 }
 
-const SessionCard = ({uid, users, session, gyms}: Props) => {
-    const sessionUser = findUser(users, session.value.uid)
-    const gymName = gyms[session.value.gymId]?.name || 'Unknown gym'
+export const SessionCard = ({session, gyms, routes}: Props) => {
+    const gym = gyms[session.value.gymId];
+    const gymName = gym?.name || 'Unknown gym'
+    const gymLocation = gym && gym.location
 
-    const isOngoing = session.value.endTime === undefined
+    const maxGrades = ALL_STYLES.map(style => highestGradeForSession(session.value, routes, style))
+        .map(grade => grade.maxFullGrade)
+        .filter(grade => grade != null)
+        .map(grade => prettyPrint(grade))
+        .join(' / ')
 
-    let title;
-    if (uid === session.value.uid) {
-        if (isOngoing) {
-            title = `You are climbing at ${gymName}`
-        } else {
-            title = `You climbed at ${gymName}`
-        }
-    } else {
-        if (isOngoing) {
-            title = `${sessionUser.name} is climbing at ${gymName}`
-        } else {
-            title = `${sessionUser.name} climbed at ${gymName}`
-        }
-    }
-
+    const distanceClimbed = gym !== undefined ? heightForSession(session.value, routes, gym, [...ALL_STYLES], true) : 'Unknown'
 
     return (
-        <Card>
-            <Card.Body>
-                <Card.Title>{title}</Card.Title>
-                <Card.Subtitle>{timeFromNow(session.value.startTime)}</Card.Subtitle>
-                <Card.Link href={`/sessions/${session.key}`}>View Session</Card.Link>
-            </Card.Body>
-        </Card>
+        <div className='session-card'>
+            <Container>
+                <Row>
+                    <Col xs={12}>Climbing session at <b>{gymName}</b>{gymLocation && ` in ${gymLocation}`}</Col>
+                </Row>
+                <Row className='session-summary-row'>
+                    <Col xs={4}>
+                        <Card>
+                            <Card.Body>
+                                <Card.Title>{session.value.endTime ? sessionDuration(session.value) : 'Ongoing'}</Card.Title>
+                                {session.value.endTime && <Card.Subtitle>Duration</Card.Subtitle>}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col xs={4}>
+                        <Card>
+                            <Card.Body>
+                                {maxGrades ?
+                                    <>
+                                        <Card.Title>{maxGrades}</Card.Title>
+                                        <Card.Subtitle>Max Grade</Card.Subtitle>
+                                    </>
+                                    : <Card.Title>No routes</Card.Title>}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col xs={4}>
+                        <Card>
+                            <Card.Body>
+                                <Card.Title>{distanceClimbed}ft</Card.Title>
+                                <Card.Subtitle>Distance</Card.Subtitle>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+        </div>
     )
 }
 
-export default SessionCard
+
+export const SessionIcon = ({
+                                session,
+                                baseStyle
+                            }: Pick<Props, 'session'> & IconProps) => session.value.endTime === undefined ?
+    <IconContext.Provider value={{...baseStyle, color: 'forestgreen'}}><FaPersonFalling/></IconContext.Provider> : <></>

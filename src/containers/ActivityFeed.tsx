@@ -8,27 +8,41 @@ import {User} from "../types/User";
 import {Route} from "../types/Route";
 import {Workout} from "../types/Workout";
 import {sortBy} from "../helpers/sortUtils";
-import SessionCard from "../components/activity-feed/SessionCard";
+import {SessionCard, SessionIcon} from "../components/activity-feed/SessionCard";
 import {toObj} from "../helpers/objectConverters";
-import {groupBy} from "../helpers/filterUtils";
+import {findUser, groupBy} from "../helpers/filterUtils";
 import {entries} from "../helpers/recordUtils";
-import SessionCountCard from "../components/activity-feed/SessionCountCard";
-import SessionDurationCard from "../components/activity-feed/SessionDurationCard";
+import {MilestoneCard, MilestoneIcon} from "../components/activity-feed/MilestoneCard";
 import moment from "moment";
+import {IconContext} from "react-icons";
+import {Card, Col, Container, Row} from "react-bootstrap";
+import {timeFromNow} from "../helpers/dateUtils";
+import assertNever from "assert-never/index";
+import {Optional} from "../redux/selectors/types";
+import {LinkContainer} from 'react-router-bootstrap'
 
 
 export interface AggregateSessionMilestone {
-    uid: string,
     count: number,
-    date: number,
+    unit: 'sessionCount' | 'duration'
 }
 
 type FeedItem = {
     date: number,
+    uid: string,
+    link?: string,
     data: {
         _type: 'session',
         value: Persisted<Session>
-    } | { _type: 'sessionCount', value: AggregateSessionMilestone } | { _type: 'totalDuration', value: AggregateSessionMilestone }
+    } | { _type: 'milestone', value: AggregateSessionMilestone }
+}
+
+const defaultIconContext: IconContext = {
+    size: '30'
+}
+
+export interface IconProps {
+    baseStyle: IconContext
 }
 const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedList<Session>, users: OrderedList<User>, routes: OrderedList<Route>, workouts: OrderedList<Workout>): FeedItem[] => {
     const feedData = [
@@ -43,6 +57,8 @@ const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedLis
 const getSessionFeedItems = (sessions: OrderedList<Session>): FeedItem[] =>
     sessions.map(session => ({
         date: session.value.startTime,
+        uid: session.value.uid,
+        link: `/sessions/${session.key}`,
         data: {
             _type: 'session',
             value: session
@@ -52,11 +68,12 @@ const getSessionFeedItems = (sessions: OrderedList<Session>): FeedItem[] =>
 const getSessionCountFeedItems = (sessions: OrderedList<Session>): FeedItem[] => {
     const sessionsByUser = groupBy(sessions, 'uid')
     return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
-        const milestones = getSessionCountMilestones(userSessions, uid)
+        const milestones = getSessionCountMilestones(userSessions)
         return milestones.map((milestone) => ({
             date: milestone.date,
+            uid,
             data: {
-                _type: 'sessionCount',
+                _type: 'milestone',
                 value: milestone
             }
         }))
@@ -65,11 +82,12 @@ const getSessionCountFeedItems = (sessions: OrderedList<Session>): FeedItem[] =>
 const getSessionDurationFeedItems = (sessions: OrderedList<Session>): FeedItem[] => {
     const sessionsByUser = groupBy(sessions, 'uid')
     return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
-        const milestones = getSessionDurationMilestones(userSessions, uid)
+        const milestones = getSessionDurationMilestones(userSessions)
         return milestones.map((milestone) => ({
             date: milestone.date,
+            uid,
             data: {
-                _type: 'totalDuration',
+                _type: 'milestone',
                 value: milestone
             }
         }))
@@ -82,7 +100,7 @@ const lowMilestones = [1, 5, 10, 25, 50, 75]
 const isMilestoneCount = (n: number) => lowMilestones.some(milestone => n === milestone) || n % 100 === 0
 
 const getMilestoneDuration = (before: number, after: number): number | undefined => {
-    const lowMilestone = lowMilestones.find(milestone => before < milestone && milestone <= after);
+    const lowMilestone = lowMilestones.findLast(milestone => before < milestone && milestone <= after);
     if (lowMilestone !== undefined) return lowMilestone
 
     if (after < 100) return undefined
@@ -94,29 +112,29 @@ const getMilestoneDuration = (before: number, after: number): number | undefined
 
     return afterHundred * 100
 }
-const getSessionCountMilestones = (sessions: OrderedList<Session>, uid: string): AggregateSessionMilestone[] => {
+const getSessionCountMilestones = (sessions: OrderedList<Session>): (AggregateSessionMilestone & {date: number})[] => {
 
     const sortedSessions = sessions.map(session => session.value)
         .filter(session => session.endTime !== undefined)
         .sort(sortBy<Session>()('endTime').ascending)
 
-    const milestones: AggregateSessionMilestone[] = []
+    const milestones: (AggregateSessionMilestone & {date: number})[] = []
     for (let i = 0; i < sortedSessions.length; i++) {
         if (isMilestoneCount(i + 1)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            milestones.push({count: i + 1, date: sortedSessions[i].endTime!, uid})
+            milestones.push({count: i + 1, date: sortedSessions[i].endTime!, unit: 'sessionCount'})
         }
     }
     return milestones
 }
 
-const getSessionDurationMilestones = (sessions: OrderedList<Session>, uid: string): AggregateSessionMilestone[] => {
+const getSessionDurationMilestones = (sessions: OrderedList<Session>): (AggregateSessionMilestone & {date: number})[] => {
 
     const sortedSessions = sessions.map(session => session.value)
         .filter(session => session.endTime !== undefined)
         .sort(sortBy<Session>()('endTime').ascending)
 
-    const milestones: AggregateSessionMilestone[] = []
+    const milestones: (AggregateSessionMilestone & {date: number})[] = []
     let duration = 0
     for (const sortedSession of sortedSessions) {
         const sessionDuration = moment(sortedSession.endTime!).diff(moment(sortedSession.startTime), 'h', true)
@@ -126,7 +144,7 @@ const getSessionDurationMilestones = (sessions: OrderedList<Session>, uid: strin
                 count: milestoneDuration,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 date: sortedSession.endTime!,
-                uid
+                unit: 'duration'
             })
         }
         duration = duration + sessionDuration
@@ -149,27 +167,42 @@ const ActivityFeed = () => {
     const feedData = buildFeedData(uid, gyms, sessions, users, routes, workouts)
 
     return (
-        <>
+        <div className='activity-feed'>
             {feedData.map((feedItem, idx) => {
+                let cardContent: JSX.Element;
+                let cardIcon: Optional<JSX.Element>;
                 switch (feedItem.data._type) {
                     case "session":
-                        return <SessionCard key={idx} session={feedItem.data.value} gyms={toObj(gyms)} users={users} uid={uid}/>
-                    case "sessionCount":
-                        return <SessionCountCard key={idx} milestone={feedItem.data.value} users={users} />
-                    case 'totalDuration':
-                        return <SessionDurationCard users={users} milestone={feedItem.data.value} key={idx} />
+                        cardContent = <SessionCard session={feedItem.data.value} gyms={toObj(gyms)} routes={toObj(routes)}/>
+                        cardIcon = <SessionIcon session={feedItem.data.value} baseStyle={defaultIconContext} />
+                        break
+                    case "milestone":
+                        cardContent = <MilestoneCard milestone={feedItem.data.value} />
+                        cardIcon = <MilestoneIcon baseStyle={defaultIconContext}/>
+                        break
+                    default:
+                        assertNever(feedItem.data)
                 }
+                const card = <Card key={idx}>
+                    <Card.Body>
+                        <Container>
+                            <Row>
+                                <Col xs={10}>
+                                    <Card.Title className={'w-100'}>{uid === feedItem.uid ? 'You' : findUser(users, feedItem.uid).name}</Card.Title>
+                                    <Card.Subtitle>{timeFromNow(feedItem.date)}</Card.Subtitle>
+                                </Col>
+                                {cardIcon !== undefined && <Col xs={2} className={'d-flex flex-row justify-content-end'}>{cardIcon}</Col> }
+                            </Row>
+                        </Container>
+                        <Card.Text>{cardContent}</Card.Text>
+                    </Card.Body>
+                </Card>
+                return (feedItem.link !== undefined ? <LinkContainer key={idx} to={feedItem.link}>{card}</LinkContainer> : card)
+
             })}
-        </>
+        </div>
     )
 
 }
 
 export default ActivityFeed
-
-// Sessions
-// Time milestones
-// Session count milestones
-// Grade milestones
-// Projects
-// Videos

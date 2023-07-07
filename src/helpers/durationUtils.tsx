@@ -2,11 +2,11 @@ import {Session} from "../types/Session";
 
 export const durationString = (durationMillis: number, includeMinutes = true) => {
     const hours = Math.floor(durationMillis / 3600000);
-    const hoursString = hours + ' hour' + (hours === 1 ?  '' : 's');
+    const hoursString = `${hours}h`;
 
     if (includeMinutes) {
         const minutes = Math.floor((durationMillis % 3600000) / 60000);
-        const minutesString = minutes + ' minute' + (minutes === 1 ? '' : 's');
+        const minutesString = `${minutes}m`;
         return hoursString + ' ' + minutesString
     } else {
         return hoursString;
