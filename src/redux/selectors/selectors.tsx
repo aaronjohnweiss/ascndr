@@ -17,6 +17,7 @@ import {
     workoutFilters
 } from "./filters";
 import {buildSelectors, withDefault} from "./utils";
+import firebase from "firebase/app";
 
 export const getUser = (): firebase.User => {
     const auth = useAppSelector(state => state.auth)
