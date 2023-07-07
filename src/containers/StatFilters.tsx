@@ -6,6 +6,7 @@ import {ALL_STYLES, printType} from '../helpers/gradeUtils';
 import {getUserName} from '../helpers/filterUtils';
 import {getBooleanFromQuery} from './StatsContainer';
 import {getUser, useDatabase} from "../redux/selectors/selectors";
+import {LinkContainer} from 'react-router-bootstrap'
 
 export const filtersLink = (location) => `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`;
 
@@ -121,7 +122,7 @@ const StatFilters = () => {
             <Form.Check type='radio' id='pn' key='pn' label='Ignore Partials' checked={!allowPartials}
                         onChange={() => setAllowPartials(false)}/>
 
-            <Button href={`${returnUrl}?${generateQueryParams()}`}>Confirm</Button>
+            <LinkContainer to={`${returnUrl}?${generateQueryParams()}`}><Button>Confirm</Button></LinkContainer>
         </>
     );
 };

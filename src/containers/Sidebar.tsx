@@ -1,6 +1,7 @@
 import {ListGroup, Offcanvas} from "react-bootstrap";
 import React from "react";
 import {useAppSelector} from "../redux/index"
+import {LinkContainer} from 'react-router-bootstrap'
 
 export const Sidebar = ({show, onHide}) => {
     const auth = useAppSelector(state => state.auth)
@@ -13,7 +14,9 @@ export const Sidebar = ({show, onHide}) => {
                 <ListGroup variant="flush">
                     {
                         listItems.map(({href, text}, idx) => (
-                            <ListGroup.Item action href={href} key={idx}>{text}</ListGroup.Item>)
+                            <LinkContainer to={href} key={idx} isActive={() => false}>
+                                <ListGroup.Item action onClick={onHide}>{text}</ListGroup.Item>
+                            </LinkContainer>)
                         )
                     }
                 </ListGroup>

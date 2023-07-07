@@ -13,11 +13,12 @@ import {isStyle, RouteStyle} from "../types/Grade";
 import {Gym} from "../types/Gym";
 import {User} from "../types/User";
 import {FilterParam} from "../redux/selectors/types";
+import {LinkContainer} from 'react-router-bootstrap'
 
 const StatsHeader = ({location}) => (
     <>
-    <Button variant='link' href={`/stats${location.search}`}><FaChevronLeft />Stats</Button>
-    <Button href={filtersLink(location)} style={{float: 'right'}}>Filters</Button>
+        <LinkContainer to={`/stats${location.search}`}><Button variant='link'><FaChevronLeft />Stats</Button></LinkContainer>
+        <LinkContainer to={filtersLink(location)} style={{float: 'right'}}><Button>Filters</Button></LinkContainer>
     </>
 );
 

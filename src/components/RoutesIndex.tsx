@@ -13,6 +13,7 @@ import {RouteStyle} from "../types/Grade";
 import {entries} from "../helpers/recordUtils";
 import {findUser, getUserName} from "../helpers/filterUtils";
 import {User} from "../types/User";
+import {LinkContainer} from 'react-router-bootstrap'
 
 
 export const SORT_FIELDS = [
@@ -126,8 +127,11 @@ const RoutesIndex = (props: RoutesFilterProps) => {
         <>
             <Row>
                 <Col xs={6}><h2>Routes</h2></Col>
-                <Col><Button href={`/routeGallery/filters${filterParams}`}
-                             style={{float: 'right'}}>Filters</Button></Col>
+                <Col>
+                    <LinkContainer to={`/routeGallery/filters${filterParams}`} style={{float: 'right'}}>
+                        <Button>Filters</Button>
+                    </LinkContainer>
+                </Col>
             </Row>
             <Row>
                 {cards.map((card, idx) => <Col key={idx} xs={6} sm={4} md={3} lg={2}>{card}</Col>)}
@@ -191,7 +195,7 @@ const calculateProjectTimes = (routeKey: string, sessionsByUser: Record<string, 
                 isSent = true
             }
 
-            return { uid, sessionCount, isSent }
+            return {uid, sessionCount, isSent}
         })
 }
 
