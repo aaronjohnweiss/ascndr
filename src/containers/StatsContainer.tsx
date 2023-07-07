@@ -12,6 +12,7 @@ import {Button} from 'react-bootstrap';
 import {filterList, findFriends, getGymsForUser} from "../helpers/filterUtils";
 import {firebaseState, getUser} from "../redux/selectors";
 import {isStyle, RouteStyle} from "../types/Grade";
+import {LinkContainer} from 'react-router-bootstrap'
 
 const filterByKeys = (data, keys) => {
     if (!data) return [];
@@ -21,8 +22,8 @@ const filterByKeys = (data, keys) => {
 
 const StatsHeader = ({location}) => (
     <>
-    <Button variant='link' href={`/stats${location.search}`}><FaChevronLeft />Stats</Button>
-    <Button href={filtersLink(location)} style={{float: 'right'}}>Filters</Button>
+        <LinkContainer to={`/stats${location.search}`}><Button variant='link'><FaChevronLeft />Stats</Button></LinkContainer>
+        <LinkContainer to={filtersLink(location)} style={{float: 'right'}}><Button>Filters</Button></LinkContainer>
     </>
 );
 
