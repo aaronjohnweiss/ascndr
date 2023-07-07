@@ -6,9 +6,12 @@ import {StatItem} from './StatsIndex';
 import {sortHiatuses} from './HiatusModal';
 import {dateString} from '../helpers/dateUtils';
 import {GradeChartProps} from "./GradeHistogram";
-import {Persisted} from "../types/Firebase";
+import {Data, Persisted} from "../types/Firebase";
 import {Session} from "../types/Session";
 import {entries} from "../helpers/recordUtils";
+import {Route} from "../types/Route";
+import {Grade, RouteStyle} from "../types/Grade";
+import {Optional} from "../redux/selectors/types";
 
 const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffixes, allowedTypes, allowPartials) => {
     // Given hiatuses: Split up and section off data around the hiatuses
@@ -54,61 +57,69 @@ const calculateAllProgressions = (sessionsForUser, hiatuses, routes, allowSuffix
     return calculateProgression(sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials)
 }
 
+export const highestGradeForSession = (session: Session, routes: Data<Route>, type: RouteStyle): {maxFullGrade?: Grade, maxPartialGrade?: Grade} => {
+    // Get all grades climbed in that session
+    let maxFullGrade: Optional<Grade> = undefined;
+    let maxPartialGrade: Optional<Grade> = undefined;
+
+    // Get the max difficulty for this session
+    [...session.customRoutes.map(({key, count, partials}) => ({
+        grade: routes[key].grade,
+        count,
+        partials
+    })), ...session.standardRoutes.map(({key, count, partials}) => ({grade: key, count, partials}))]
+        // Filter down to the current type
+        .filter(route => type === route.grade.style)
+        .forEach(({grade, count, partials}) => {
+            if (count > 0) {
+                // Keep track of max grade for full completions
+                if (compareGrades(grade, maxFullGrade) > 0) {
+                    maxFullGrade = grade;
+                }
+            } else {
+                if (partials) {
+                    // Make sure a valid partial climb was logged; find highest partial percentage for this grade
+                    const highestPercentage = entries(partials).filter(([, val]) => val > 0).map(([key,]) => key).reduce((a, b) => Math.max(a, b), 0)
+                    if (highestPercentage > 0) {
+                        // Keep track of max grade for partial completions
+                        const partialGrade = {
+                            ...grade,
+                            percentage: highestPercentage
+                        };
+
+                        if (compareGrades(partialGrade, maxPartialGrade) > 0) {
+                            maxPartialGrade = partialGrade;
+                        }
+                    }
+                }
+            }
+        });
+    return {maxFullGrade, maxPartialGrade};
+}
+
 const calculateProgression = (sessionsForUser, routes, allowSuffixes, allowedTypes, allowPartials, Header: keyof JSX.IntrinsicElements = 'h3') => {
     // For each style of climb...
     return allowedTypes.map((type, j) => {
         // Go through all sessions, oldest to newest
         const firsts = sessionsForUser.sort((a, b) => b.value.startTime - a.value.startTime)
-            .reduce((arr, {key, value: {startTime, customRoutes = [], standardRoutes = []}}: Persisted<Session>) => {
-                // Get all grades climbed in that session
-                let maxFullGrade = null;
-                let maxPartialGrade = null;
-
-                // Get the max difficulty for this session
-                [...customRoutes.map(({key, count, partials}) => ({
-                    grade: routes[key].grade,
-                    count,
-                    partials
-                })), ...standardRoutes.map(({key, count, partials}) => ({grade: key, count, partials}))]
-                    // Filter down to the current type
-                    .filter(route => type === route.grade.style)
-                    .forEach(({grade, count, partials}) => {
-                        if (count > 0) {
-                            // Keep track of max grade for full completions
-                            if (compareGrades(grade, maxFullGrade) > 0) {
-                                maxFullGrade = grade;
-                            }
-                        } else {
-                            if (partials && allowPartials) {
-                                // Make sure a valid partial climb was logged; find highest partial percentage for this grade
-                                const highestPercentage = entries(partials).filter(([, val]) => val > 0).map(([key,]) => key).reduce((a, b) => Math.max(a, b), 0)
-                                if (highestPercentage > 0) {
-                                    // Keep track of max grade for partial completions
-                                    const partialGrade = {
-                                        ...grade,
-                                        percentage: highestPercentage
-                                    };
-
-                                    if (compareGrades(partialGrade, maxPartialGrade) > 0) {
-                                        maxPartialGrade = partialGrade;
-                                    }
-                                }
-                            }
-                        }
-                    });
+            .reduce((arr, {key, value}: Persisted<Session>) => {
+                const {
+                    maxFullGrade,
+                    maxPartialGrade
+                } = highestGradeForSession(value, routes, type);
 
                 // Max could be undefined if no routes of that style were climbed this session
-                if (maxPartialGrade) {
+                if (maxPartialGrade && allowPartials) {
                     // Filter out other partial maxes that are more recent but not a higher grade
                     arr = arr.filter(entry => !isPartial(entry.grade) || compareGrades(entry.grade, maxPartialGrade, allowSuffixes, allowPartials) > 0);
                     // Add this entry; include session key for linking
-                    arr.push({date: startTime, grade: maxPartialGrade, key});
+                    arr.push({date: value.startTime, grade: maxPartialGrade, key});
                 }
                 if (maxFullGrade) {
                     // Filter out other maxes that are more recent but not a higher grade
                     arr = arr.filter(entry => compareGrades(entry.grade, maxFullGrade, allowSuffixes) > 0);
                     // Add this entry; include session key for linking
-                    arr.push({date: startTime, grade: maxFullGrade, key});
+                    arr.push({date: value.startTime, grade: maxFullGrade, key});
                 }
 
                 return arr;

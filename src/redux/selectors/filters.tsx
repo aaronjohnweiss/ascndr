@@ -31,6 +31,12 @@ export const routeFilters: StateFilter<Route> = databaseState => ({
         if (!isLoaded(sessionsForRoute)) return undefined
 
         return sessionsForRoute.length > 0
+    },
+    'viewer': (viewers?: string[]) => route => {
+        const gyms = databaseState.gyms.getOrdered(['gymKey', route.value.gymId], ['viewer', viewers]);
+
+        if (!isLoaded(gyms)) return undefined
+        return gyms.length > 0
     }
 })
 export const sessionFilters: StateFilter<Session> = databaseState => ({
@@ -77,5 +83,9 @@ export const hasFriend = (databaseState: DatabaseState) => normalizeFilterValue(
     return friendUids.includes(uid) || friendUids.some(friend => user.friends.includes(friend))
 })
 export const workoutFilters: StateFilter<Workout> = databaseState => ({
-    'owner': (owners?: string[]) => (workout) => owners?.includes(workout.value.uid)
+    'owner': (owners?: string[]) => (workout) => owners?.includes(workout.value.uid),
+    'viewer': (viewers?: string[]) => (session) => {
+        const hasOwnerAsFriend = databaseState.users.hasFriend(session.value.uid)
+        return viewers?.some(hasOwnerAsFriend);
+    },
 })

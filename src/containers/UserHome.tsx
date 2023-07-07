@@ -1,11 +1,11 @@
 import React from 'react'
 import {isLoaded} from 'react-redux-firebase';
 import {findEntry, findUser, getSessionsForUser} from '../helpers/filterUtils';
-import SessionCard from '../components/SessionCard';
 import moment from 'moment';
 import ResponsiveActivityCalendar from '../components/ResponsiveActivityCalendar';
 import {getCalendarData} from "../helpers/activityCalendarEntries";
 import {getUser, useDatabase} from "../redux/selectors/selectors";
+import ActivityFeed from "./ActivityFeed";
 
 const UserHome = () => {
     const {uid} = getUser()
@@ -33,12 +33,13 @@ const UserHome = () => {
         <>
             <h2>Welcome{user.name ? `, ${user.name}` : ' back'}!</h2>
             <ResponsiveActivityCalendar getData={getData} minCutoffDate={calendarCutoffDate}/>
-            {latestSession &&
-            <>
-                <h3>Last Session:</h3>
-                <SessionCard session={latestSession} gym={gym} user={user} routes={routes}/>
-            </>
-            }
+            <ActivityFeed />
+            {/*{latestSession &&*/}
+            {/*<>*/}
+            {/*    <h3>Last Session:</h3>*/}
+            {/*    <SessionCard session={latestSession} gym={gym} user={user} routes={routes}/>*/}
+            {/*</>*/}
+            {/*}*/}
         </>
     )
 }
