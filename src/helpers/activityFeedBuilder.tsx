@@ -58,6 +58,10 @@ const FeedItemTypes: FeedItemType[] = [
     'session',
     'workout',
 ]
+
+/**
+ * Build a sorted list of activity feed items based on the provided data
+ */
 export const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedList<Session>, users: OrderedList<User>, routes: OrderedList<Route>, workouts: OrderedList<Workout>): FeedItem[] => {
     const feedData = [
         ...getSessionFeedItems(sessions),
@@ -74,6 +78,10 @@ export const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: Ord
         sortBy<FeedItem>()('data', contramap(data => FeedItemTypes.indexOf(data._type))).ascending
     ))
 }
+
+/**
+ * Simple feed item for each session
+ */
 const getSessionFeedItems = (sessions: OrderedList<Session>): FeedItem[] =>
     sessions.map(session => ({
         date: session.value.startTime,
@@ -84,6 +92,10 @@ const getSessionFeedItems = (sessions: OrderedList<Session>): FeedItem[] =>
             value: session
         }
     }))
+
+/**
+ * Simple feed item for each workout
+ */
 const getWorkoutFeedItems = (workouts: OrderedList<Workout>): FeedItem[] =>
     workouts.map(workout => ({
         date: workout.value.startTime,
@@ -93,6 +105,10 @@ const getWorkoutFeedItems = (workouts: OrderedList<Workout>): FeedItem[] =>
             value: workout
         }
     }))
+
+/**
+ * Aggregated session milestones (total hours climbed, total sessions climbed) per user
+ */
 const getSessionMilestoneFeedItems = (sessions: OrderedList<Session>): FeedItem[] => {
     const sessionsByUser = groupBy(sessions, 'uid')
     return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
@@ -107,9 +123,14 @@ const getSessionMilestoneFeedItems = (sessions: OrderedList<Session>): FeedItem[
         }))
     })
 }
+
+/**
+ * New highest grades per user
+ */
 const getGradeMilestoneFeedItems = (sessions: OrderedList<Session>, routes: OrderedList<Route>): FeedItem[] => {
     const sessionsByUser = groupBy(sessions, 'uid')
     return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
+        // For each user, calculate their full progression history in all styles. This ignores hiatuses.
         const milestones = calculateProgression(userSessions, toObj(routes), true, [...ALL_STYLES], false)
         return milestones.flatMap(({firsts}) => firsts).map(milestone => ({
             date: milestone.date,
@@ -125,6 +146,10 @@ const getGradeMilestoneFeedItems = (sessions: OrderedList<Session>, routes: Orde
         }))
     })
 }
+
+/**
+ * Video uploads
+ */
 const getVideoFeedItems = (routes: OrderedList<Route>): FeedItem[] => {
     return routes.flatMap(({key, value}) => value.videos?.map(video => ({
         date: video.date,
@@ -138,7 +163,14 @@ const getVideoFeedItems = (routes: OrderedList<Route>): FeedItem[] => {
         }
     })) || [])
 }
+
+/**
+ * Minimum number of sessions for a project to show up in the feed
+ */
 const MIN_PROJECT_SESSIONS = 2
+/**
+ * Projects sent by each user (routes that took at least {@link MIN_PROJECT_SESSIONS} sessions to climb successfully)
+ */
 const getProjectFeedItems = (routes: OrderedList<Route>, sessions: OrderedList<Session>): FeedItem[] => {
     const sessionsByUser = groupBy(sessions, 'uid')
 
@@ -163,8 +195,19 @@ const getProjectFeedItems = (routes: OrderedList<Route>, sessions: OrderedList<S
             }
         }))
 }
+
+/**
+ * Milestone counts for aggregated session info
+ */
 const lowMilestones = [1, 5, 10, 25, 50, 75]
+/**
+ * Determine if this is a milestone session count (any entry of {@link lowMilestones} or any multiple of 100)
+ */
 const isMilestoneCount = (n: number) => lowMilestones.some(milestone => n === milestone) || n % 100 === 0
+
+/**
+ * Return any milestone duration passed in this session (any session that brings the total above {@link lowMilestones} or any multiple of 100 hrs climbed)
+ */
 const getMilestoneDuration = (before: number, after: number): number | undefined => {
     const lowMilestone = lowMilestones.findLast(milestone => before < milestone && milestone <= after);
     if (lowMilestone !== undefined) return lowMilestone
@@ -178,15 +221,24 @@ const getMilestoneDuration = (before: number, after: number): number | undefined
 
     return afterHundred * 100
 }
-const getSessionCountMilestones = (sessions: OrderedList<Session>): (AggregateSessionMilestone & {
+
+
+type SessionCountMilestone = AggregateSessionMilestone & {
     date: number
-})[] => {
+}
+/**
+ * Get milestones based off of the provided sessions. This will not slice up the provided sessions, unlike {@link getSessionMilestoneFeedItems} which slices by user.
+ */
+const getSessionCountMilestones = (sessions: OrderedList<Session>): SessionCountMilestone[] => {
 
     const sortedSessions = sessions.map(session => session.value)
+        // Ignore in-progress sessions (milestones should come after a session is finishes)
         .filter(session => session.endTime !== undefined)
+        // Sort by oldest first
         .sort(sortBy<Session>()('endTime').ascending)
 
-    const milestones: (AggregateSessionMilestone & { date: number })[] = []
+    const milestones: SessionCountMilestone[] = []
+    // Cumulative duration climbed
     let duration = 0
     for (let i = 0; i < sortedSessions.length; i++) {
         const session = sortedSessions[i]
@@ -207,6 +259,7 @@ const getSessionCountMilestones = (sessions: OrderedList<Session>): (AggregateSe
                 unit: 'duration'
             })
         }
+        // Update running total for duration
         duration = duration + sessionDuration
     }
     return milestones
