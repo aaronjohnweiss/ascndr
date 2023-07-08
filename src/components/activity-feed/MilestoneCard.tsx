@@ -1,10 +1,11 @@
 import React from 'react'
-import {AggregateSessionMilestone, IconProps} from "../../containers/ActivityFeed";
+import {AggregateSessionMilestone} from "../../containers/ActivityFeed";
 import {pluralize} from "../../helpers/mathUtils";
 import {FaAward} from "react-icons/fa";
 import {IconContext} from "react-icons";
 import assertNever from "assert-never/index";
 import {prettyPrint} from "../../helpers/gradeUtils";
+import {defaultIconContext, iconColors} from "./iconStyle";
 
 interface Props {
     milestone: AggregateSessionMilestone
@@ -35,7 +36,7 @@ export const MilestoneCard = ({milestone}: Props) => {
     return <>New Milestone - {milestoneText}</>
 }
 
-export const MilestoneIcon = ({baseStyle}: IconProps) =>
-    <IconContext.Provider value={{...baseStyle, color: 'goldenrod'}}>
+export const MilestoneIcon = () =>
+    <IconContext.Provider value={{...defaultIconContext, color: iconColors.success}}>
         <FaAward/>
     </IconContext.Provider>

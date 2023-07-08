@@ -3,8 +3,7 @@ import {Route, RouteVideo} from "../../types/Route";
 import {Data} from "react-redux-firebase";
 import {prettyPrint} from "../../helpers/gradeUtils";
 import {Gym} from "../../types/Gym";
-import {BAD_IMAGE} from "../../containers/RoutePage";
-import {Image} from "react-bootstrap";
+import {RoutePicture} from "./RoutePicture";
 
 interface Props {
     routeKey: string,
@@ -27,8 +26,7 @@ export const VideoCard = ({routeKey, video, routes, gyms}: Props) => {
                     {gymLocation && ` in ${gymLocation}`}
                 </p>
                 <a href={video.url} target='_blank' rel="noopener noreferrer">
-                    {route && route.picture && !BAD_IMAGE.includes(route.picture) &&
-                        <Image fluid className='d-block mx-auto' src={route.picture}/>}
+                    <RoutePicture route={route} />
                     <div className='text-center'>Watch video</div>
                 </a>
             </>

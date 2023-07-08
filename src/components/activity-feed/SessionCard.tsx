@@ -6,11 +6,11 @@ import {Card, Col, Container, Row} from 'react-bootstrap';
 import {Route} from "../../types/Route";
 import {FaPersonFalling} from 'react-icons/fa6'
 import {IconContext} from "react-icons";
-import {IconProps} from "../../containers/ActivityFeed";
 import {sessionDuration} from "../../helpers/durationUtils";
 import {highestGradeForSession} from "../GradeHistory";
 import {ALL_STYLES, prettyPrint} from "../../helpers/gradeUtils";
 import {heightForSession} from "../StatsIndex";
+import {defaultIconContext, iconColors} from "./iconStyle";
 
 interface Props {
     session: Persisted<Session>
@@ -74,7 +74,7 @@ export const SessionCard = ({session, gyms, routes}: Props) => {
 
 
 export const SessionIcon =
-    ({session, baseStyle}: Pick<Props, 'session'> & IconProps) => session.value.endTime === undefined ?
-        <IconContext.Provider value={{...baseStyle, color: 'forestgreen'}}>
+    ({session}: Pick<Props, 'session'>) => session.value.endTime === undefined ?
+        <IconContext.Provider value={{...defaultIconContext, color: iconColors.active}}>
             <FaPersonFalling/>
         </IconContext.Provider> : <></>

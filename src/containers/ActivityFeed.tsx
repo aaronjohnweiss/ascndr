@@ -7,14 +7,13 @@ import {Session} from "../types/Session";
 import {User} from "../types/User";
 import {Route, RouteVideo} from "../types/Route";
 import {Workout} from "../types/Workout";
-import {sortBy} from "../helpers/sortUtils";
+import {buildSort, contramap, sortBy} from "../helpers/sortUtils";
 import {SessionCard, SessionIcon} from "../components/activity-feed/SessionCard";
 import {toObj} from "../helpers/objectConverters";
 import {findUser, groupBy} from "../helpers/filterUtils";
 import {entries} from "../helpers/recordUtils";
 import {MilestoneCard, MilestoneIcon} from "../components/activity-feed/MilestoneCard";
 import moment from "moment";
-import {IconContext} from "react-icons";
 import {Card, Col, Container, Row} from "react-bootstrap";
 import {preciseTimeFromNow} from "../helpers/dateUtils";
 import assertNever from "assert-never/index";
@@ -28,6 +27,8 @@ import {VideoCard} from "../components/activity-feed/VideoCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 import {useHistory, useLocation} from "react-router-dom";
 import {getNumberFromQuery, getQuery} from "../helpers/queryParser";
+import {calculateProjectTimes, Project} from "../components/RoutesIndex";
+import {ProjectCard, ProjectIcon} from "../components/activity-feed/ProjectCard";
 
 
 export type AggregateSessionMilestone = {
@@ -38,35 +39,45 @@ export type AggregateSessionMilestone = {
     unit: 'grade'
 }
 
+type FeedData = {
+    _type: 'session',
+    value: Persisted<Session>
+} | {
+    _type: 'milestone',
+    value: AggregateSessionMilestone
+} | {
+    _type: 'workout',
+    value: Persisted<Workout>
+} | {
+    _type: 'video',
+    value: {
+        routeKey: string,
+        video: RouteVideo
+    }
+} | {
+    _type: 'project',
+    value: {
+        routeKey: string,
+        project: Project
+    }
+}
+
 type FeedItem = {
     date: number,
     uid: string,
     link?: string,
-    data: {
-        _type: 'session',
-        value: Persisted<Session>
-    } | {
-        _type: 'milestone',
-        value: AggregateSessionMilestone
-    } | {
-        _type: 'workout',
-        value: Persisted<Workout>
-    } | {
-        _type: 'video',
-        value: {
-            routeKey: string,
-            video: RouteVideo
-        }
-    }
+    data: FeedData
 }
 
-const defaultIconContext: IconContext = {
-    size: '30'
-}
+type FeedItemType = FeedData['_type']
 
-export interface IconProps {
-    baseStyle: IconContext
-}
+const FeedItemTypes: FeedItemType[] = [
+    'project',
+    'milestone',
+    'video',
+    'session',
+    'workout',
+]
 
 const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedList<Session>, users: OrderedList<User>, routes: OrderedList<Route>, workouts: OrderedList<Workout>): FeedItem[] => {
     const feedData = [
@@ -76,9 +87,14 @@ const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedLis
         ...getGradeMilestoneFeedItems(sessions, routes),
         ...getWorkoutFeedItems(workouts),
         ...getVideoFeedItems(routes),
+        ...getProjectFeedItems(routes, sessions),
     ]
 
-    return feedData.sort(sortBy<FeedItem>()('date').descending)
+    return feedData.sort(buildSort(
+        sortBy<FeedItem>()('date').descending,
+        // Break ties according to the order of FeedItemTypes: earlier types in the array should come first
+        sortBy<FeedItem>()('data', contramap('_type', (t1, t2) => FeedItemTypes.indexOf(t1) - FeedItemTypes.indexOf(t2))).ascending
+    ))
 }
 
 const getSessionFeedItems = (sessions: OrderedList<Session>): FeedItem[] =>
@@ -161,6 +177,32 @@ const getVideoFeedItems = (routes: OrderedList<Route>): FeedItem[] => {
             }
         }
     })) || [])
+}
+
+const MIN_PROJECT_SESSIONS = 2
+const getProjectFeedItems = (routes: OrderedList<Route>, sessions: OrderedList<Session>): FeedItem[] => {
+    const sessionsByUser = groupBy(sessions, 'uid')
+
+    return routes
+        .flatMap(route => calculateProjectTimes(route.key, sessionsByUser).map(project => ({
+            ...project,
+            key: route.key
+        })))
+        .filter(project => project.isSent)
+        .filter(project => project.sessionCount >= MIN_PROJECT_SESSIONS)
+        .map(project => ({
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            date: project.sentDate!,
+            uid: project.uid,
+            link: `/routes/${project.key}`,
+            data: {
+                _type: 'project',
+                value: {
+                    routeKey: project.key,
+                    project
+                }
+            }
+        }))
 }
 
 
@@ -264,11 +306,11 @@ const ActivityFeed = () => {
                         case "session":
                             cardContent =
                                 <SessionCard session={feedItem.data.value} gyms={toObj(gyms)} routes={toObj(routes)}/>
-                            cardIcon = <SessionIcon session={feedItem.data.value} baseStyle={defaultIconContext}/>
+                            cardIcon = <SessionIcon session={feedItem.data.value}/>
                             break
                         case "milestone":
                             cardContent = <MilestoneCard milestone={feedItem.data.value}/>
-                            cardIcon = <MilestoneIcon baseStyle={defaultIconContext}/>
+                            cardIcon = <MilestoneIcon/>
                             break
                         case 'workout':
                             cardContent = <WorkoutCard workout={feedItem.data.value}/>
@@ -277,6 +319,12 @@ const ActivityFeed = () => {
                             cardContent =
                                 <VideoCard routeKey={feedItem.data.value.routeKey} video={feedItem.data.value.video}
                                            routes={toObj(routes)} gyms={toObj(gyms)}/>
+                            break
+                        case 'project':
+                            cardContent =
+                                <ProjectCard routeKey={feedItem.data.value.routeKey}
+                                             project={feedItem.data.value.project} routes={toObj(routes)}/>
+                            cardIcon = <ProjectIcon/>
                             break
                         default:
                             assertNever(feedItem.data)

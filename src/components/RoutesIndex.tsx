@@ -11,9 +11,10 @@ import {Route} from "../types/Route";
 import {Session} from "../types/Session";
 import {RouteStyle} from "../types/Grade";
 import {entries} from "../helpers/recordUtils";
-import {findUser, getUserName} from "../helpers/filterUtils";
+import {findUser, getUserName, groupBy} from "../helpers/filterUtils";
 import {User} from "../types/User";
 import {LinkContainer} from 'react-router-bootstrap'
+import {toArray} from "../helpers/objectConverters";
 
 
 export const SORT_FIELDS = [
@@ -143,9 +144,9 @@ const RoutesIndex = (props: RoutesFilterProps) => {
 
 type RouteWithStats = Route & { count: Record<string, number>, time: number | null, project: Project | null }
 const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, allowPartials: boolean): RouteWithStats => {
-    const sessionsForRoute = Object.values(sessions).filter(s => s.customRoutes.some(r => r.key === routeKey))
+    const sessionsForRoute = toArray(sessions).filter(s => s.value.customRoutes.some(r => r.key === routeKey))
 
-    const sessionStats = sessionsForRoute.flatMap(session => (session.customRoutes).map((rt) => [rt, session.startTime] as const))
+    const sessionStats = sessionsForRoute.flatMap(session => (session.value.customRoutes).map((rt) => [rt, session.value.startTime] as const))
         .filter(([customRoute]) => customRoute.key === routeKey)
         .map(([customRoute, time]) => [allowPartials ? splitRouteCount(customRoute) : ({[PARTIAL_MAX]: routeCount(customRoute, allowPartials)}), time] as const)
         .reduce((acc, [count, time]) => ({count: sumByKey(acc.count, count), times: [...acc.times, time]}), {
@@ -161,31 +162,34 @@ const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, 
     }
 }
 
-interface Project {
+export type Project = {
     uid: string,
     sessionCount: number,
-    isSent: boolean,
-}
+} & ({
+    isSent: false,
+    sentDate: undefined,
+} | {
+    isSent: true,
+    sentDate: number,
+})
 
-const calculateLongestProject = (routeKey: string, sessionsForRoute: Session[], allowPartials: boolean): Project | null => {
-    const sessionsByUser = sessionsForRoute.reduce((map, s) => {
-        (map[s.uid] = map[s.uid] || []).push(s);
-        return map
-    }, {} as Record<string, Session[]>)
+const calculateLongestProject = (routeKey: string, sessionsForRoute: OrderedList<Session>, allowPartials: boolean): Project | null => {
+    const sessionsByUser = groupBy(sessionsForRoute, 'uid')
 
     return calculateProjectTimes(routeKey, sessionsByUser)
         .filter(proj => allowPartials || proj.isSent)
         .reduce((longest: Project | null, x) => longest != null && longest.sessionCount > x.sessionCount ? longest : x, null)
 }
-const calculateProjectTimes = (routeKey: string, sessionsByUser: Record<string, Session[]>): Project[] => {
+export const calculateProjectTimes = (routeKey: string, sessionsByUser: Record<string, OrderedList<Session>>): Project[] => {
     return entries(sessionsByUser)
+        .map(([uid, sessions]) => [uid, sessions.filter(s => s.value.customRoutes.some(r => r.key === routeKey))] as const)
         .map(([uid, sessions]) => {
             // Order sessions by oldest first
-            sessions.sort((s1, s2) => s1.startTime - s2.startTime)
+            sessions.sort((s1, s2) => s1.value.startTime - s2.value.startTime)
             // Find the leftmost (earliest) session where the route was sent
-            const firstSend = sessions.findIndex(s => s.customRoutes.some(r => r.key === routeKey && r.count >= 1))
+            const firstSend = sessions.findIndex(s => s.value.customRoutes.some(r => r.key === routeKey && r.count >= 1))
 
-            let sessionCount, isSent
+            let sessionCount, isSent, sentDate
             if (firstSend === -1) {
                 sessionCount = sessions.length
                 isSent = false
@@ -193,9 +197,10 @@ const calculateProjectTimes = (routeKey: string, sessionsByUser: Record<string, 
                 // + 1 to convert out of 0-indexing
                 sessionCount = firstSend + 1
                 isSent = true
+                sentDate = sessions[firstSend].value.endTime || sessions[firstSend].value.startTime
             }
 
-            return {uid, sessionCount, isSent}
+            return {uid, sessionCount, isSent, sentDate}
         })
 }
 
