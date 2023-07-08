@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useEffect, useState} from 'react'
 import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {isLoaded} from 'react-redux-firebase'
 import {OrderedList, Persisted} from "../types/Firebase";
@@ -13,7 +13,7 @@ import {toObj} from "../helpers/objectConverters";
 import {findUser, groupBy} from "../helpers/filterUtils";
 import {entries} from "../helpers/recordUtils";
 import {MilestoneCard, MilestoneIcon} from "../components/activity-feed/MilestoneCard";
-import moment, {duration} from "moment";
+import moment from "moment";
 import {IconContext} from "react-icons";
 import {Card, Col, Container, Row} from "react-bootstrap";
 import {preciseTimeFromNow} from "../helpers/dateUtils";
@@ -25,6 +25,9 @@ import {ALL_STYLES} from "../helpers/gradeUtils";
 import {Grade} from "../types/Grade";
 import {WorkoutCard} from "../components/activity-feed/WorkoutCard";
 import {VideoCard} from "../components/activity-feed/VideoCard";
+import InfiniteScroll from "react-infinite-scroll-component";
+import {useHistory, useLocation} from "react-router-dom";
+import {getNumberFromQuery, getQuery} from "../helpers/queryParser";
 
 
 export type AggregateSessionMilestone = {
@@ -223,6 +226,9 @@ const getSessionDurationMilestones = (sessions: OrderedList<Session>): (Aggregat
     return milestones
 }
 
+const PAGE_SIZE = 20
+const DEFAULT_ITEMS = PAGE_SIZE * 3
+
 const ActivityFeed = () => {
     const {uid} = getUser()
     const firebaseState = useDatabase()
@@ -232,54 +238,70 @@ const ActivityFeed = () => {
     const routes = firebaseState.routes.getOrdered(['viewer', uid])
     const workouts = firebaseState.workouts.getOrdered(['viewer', uid])
 
+    const history = useHistory()
+    const location = useLocation()
+
+    const [feedLength, setFeedLength] = useState(getNumberFromQuery(getQuery(location), 'n', DEFAULT_ITEMS))
+
+    useEffect(
+        () => {
+            history.replace({pathname: location.pathname, search: `?n=${feedLength}`})
+        }, [feedLength]
+    )
+
     if (!isLoaded(gyms) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(routes) || !isLoaded(workouts)) return <></>
 
     const feedData = buildFeedData(uid, gyms, sessions, users, routes, workouts)
 
     return (
         <div className='activity-feed'>
-            {feedData.map((feedItem, idx) => {
-                let cardContent: JSX.Element;
-                let cardIcon: Optional<JSX.Element>;
-                switch (feedItem.data._type) {
-                    case "session":
-                        cardContent =
-                            <SessionCard session={feedItem.data.value} gyms={toObj(gyms)} routes={toObj(routes)}/>
-                        cardIcon = <SessionIcon session={feedItem.data.value} baseStyle={defaultIconContext}/>
-                        break
-                    case "milestone":
-                        cardContent = <MilestoneCard milestone={feedItem.data.value}/>
-                        cardIcon = <MilestoneIcon baseStyle={defaultIconContext}/>
-                        break
-                    case 'workout':
-                        cardContent = <WorkoutCard workout={feedItem.data.value} />
-                        break
-                    case 'video':
-                        cardContent = <VideoCard routeKey={feedItem.data.value.routeKey} video={feedItem.data.value.video} routes={toObj(routes)} gyms={toObj(gyms)} />
-                        break
-                    default:
-                        assertNever(feedItem.data)
-                }
-                const card = <Card key={idx}>
-                    <Card.Body>
-                        <Container>
-                            <Row>
-                                <Col xs={10}>
-                                    <Card.Title
-                                        className={'w-100'}>{uid === feedItem.uid ? 'You' : findUser(users, feedItem.uid).name}</Card.Title>
-                                    <Card.Subtitle>{preciseTimeFromNow(feedItem.date)}</Card.Subtitle>
-                                </Col>
-                                {cardIcon !== undefined &&
-                                    <Col xs={2} className={'d-flex flex-row justify-content-end'}>{cardIcon}</Col>}
-                            </Row>
-                        </Container>
-                        <Card.Text as={'div'}>{cardContent}</Card.Text>
-                    </Card.Body>
-                </Card>
-                return (feedItem.link !== undefined ?
-                    <LinkContainer key={idx} to={feedItem.link}>{card}</LinkContainer> : card)
+            <InfiniteScroll next={() => setFeedLength((len) => len + PAGE_SIZE)} hasMore={feedLength < feedData.length}
+                            dataLength={feedLength} loader={<></>}>
+                {feedData.slice(0, feedLength).map((feedItem, idx) => {
+                    let cardContent: JSX.Element;
+                    let cardIcon: Optional<JSX.Element>;
+                    switch (feedItem.data._type) {
+                        case "session":
+                            cardContent =
+                                <SessionCard session={feedItem.data.value} gyms={toObj(gyms)} routes={toObj(routes)}/>
+                            cardIcon = <SessionIcon session={feedItem.data.value} baseStyle={defaultIconContext}/>
+                            break
+                        case "milestone":
+                            cardContent = <MilestoneCard milestone={feedItem.data.value}/>
+                            cardIcon = <MilestoneIcon baseStyle={defaultIconContext}/>
+                            break
+                        case 'workout':
+                            cardContent = <WorkoutCard workout={feedItem.data.value}/>
+                            break
+                        case 'video':
+                            cardContent =
+                                <VideoCard routeKey={feedItem.data.value.routeKey} video={feedItem.data.value.video}
+                                           routes={toObj(routes)} gyms={toObj(gyms)}/>
+                            break
+                        default:
+                            assertNever(feedItem.data)
+                    }
+                    const card = <Card key={idx}>
+                        <Card.Body>
+                            <Container>
+                                <Row>
+                                    <Col xs={10}>
+                                        <Card.Title
+                                            className={'w-100'}>{uid === feedItem.uid ? 'You' : findUser(users, feedItem.uid).name}</Card.Title>
+                                        <Card.Subtitle>{preciseTimeFromNow(feedItem.date)}</Card.Subtitle>
+                                    </Col>
+                                    {cardIcon !== undefined &&
+                                        <Col xs={2} className={'d-flex flex-row justify-content-end'}>{cardIcon}</Col>}
+                                </Row>
+                            </Container>
+                            <Card.Text as={'div'}>{cardContent}</Card.Text>
+                        </Card.Body>
+                    </Card>
+                    return (feedItem.link !== undefined ?
+                        <LinkContainer key={idx} to={feedItem.link}>{card}</LinkContainer> : card)
 
-            })}
+                })}
+            </InfiniteScroll>
         </div>
     )
 

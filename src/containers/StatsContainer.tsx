@@ -14,6 +14,7 @@ import {Gym} from "../types/Gym";
 import {User} from "../types/User";
 import {FilterParam} from "../redux/selectors/types";
 import {LinkContainer} from 'react-router-bootstrap'
+import {getBooleanFromQuery} from "../helpers/queryParser";
 
 const StatsHeader = ({location}) => (
     <>
@@ -21,8 +22,6 @@ const StatsHeader = ({location}) => (
         <LinkContainer to={filtersLink(location)} style={{float: 'right'}}><Button>Filters</Button></LinkContainer>
     </>
 );
-
-export const getBooleanFromQuery = (query, name, valueIfMissing = false) => query.has(name) ? query.get(name) === 'true' : valueIfMissing;
 
 const StatsContainer = () => {
     const { uid } = getUser()
