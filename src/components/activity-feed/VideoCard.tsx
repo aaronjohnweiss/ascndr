@@ -12,7 +12,7 @@ interface Props {
     gyms: Data<Gym>
 }
 
-export const VideoCard = ({routeKey, video, routes, gyms}: Props) => {
+export const VideoCardBody = ({routeKey, video, routes, gyms}: Props) => {
     const route = routes[routeKey]
     const gym = route && gyms[route.gymId]
     const gymName = gym && gym.name

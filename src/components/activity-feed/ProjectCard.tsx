@@ -15,7 +15,7 @@ interface Props {
     routes: Data<Route>
 }
 
-export const ProjectCard = ({routeKey, project, routes}: Props) => {
+export const ProjectCardBody = ({routeKey, project, routes}: Props) => {
     const route = routes[routeKey]
 
     return (

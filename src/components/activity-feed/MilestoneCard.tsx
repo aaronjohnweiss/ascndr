@@ -11,7 +11,7 @@ interface Props {
     milestone: AggregateSessionMilestone
 }
 
-export const MilestoneCard = ({milestone}: Props) => {
+export const MilestoneCardBody = ({milestone}: Props) => {
 
     let milestoneText;
 

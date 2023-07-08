@@ -18,7 +18,7 @@ interface Props {
     routes: Data<Route>
 }
 
-export const SessionCard = ({session, gyms, routes}: Props) => {
+export const SessionCardBody = ({session, gyms, routes}: Props) => {
     const gym = gyms[session.value.gymId];
     const gymName = gym?.name || 'Unknown gym'
     const gymLocation = gym && gym.location

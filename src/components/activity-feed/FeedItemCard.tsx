@@ -1,11 +1,11 @@
 import React from 'react'
 import {Optional} from "../../redux/selectors/types";
-import {SessionCard, SessionIcon} from "./SessionCard";
+import {SessionCardBody, SessionIcon} from "./SessionCard";
 import {toObj} from "../../helpers/objectConverters";
-import {MilestoneCard, MilestoneIcon} from "./MilestoneCard";
-import {WorkoutCard} from "./WorkoutCard";
-import {VideoCard} from "./VideoCard";
-import {ProjectCard, ProjectIcon} from "./ProjectCard";
+import {MilestoneCardBody, MilestoneIcon} from "./MilestoneCard";
+import {WorkoutCardBody} from "./WorkoutCard";
+import {VideoCardBody} from "./VideoCard";
+import {ProjectCardBody, ProjectIcon} from "./ProjectCard";
 import assertNever from "assert-never";
 import {Card, Col, Container, Row} from "react-bootstrap";
 import {findUser} from "../../helpers/filterUtils";
@@ -35,25 +35,25 @@ const FeedItemCard = ({feedItem, uid, gyms, users, routes}: Props) => {
     switch (feedItem.data._type) {
         case "session":
             cardContent =
-                <SessionCard session={feedItem.data.value} gyms={toObj(gyms)} routes={toObj(routes)}/>
+                <SessionCardBody session={feedItem.data.value} gyms={toObj(gyms)} routes={toObj(routes)}/>
             cardIcon = <SessionIcon session={feedItem.data.value}/>
             break
         case "milestone":
-            cardContent = <MilestoneCard milestone={feedItem.data.value}/>
+            cardContent = <MilestoneCardBody milestone={feedItem.data.value}/>
             cardIcon = <MilestoneIcon/>
             break
         case 'workout':
-            cardContent = <WorkoutCard workout={feedItem.data.value}/>
+            cardContent = <WorkoutCardBody workout={feedItem.data.value}/>
             break
         case 'video':
             cardContent =
-                <VideoCard routeKey={feedItem.data.value.routeKey} video={feedItem.data.value.video}
-                           routes={toObj(routes)} gyms={toObj(gyms)}/>
+                <VideoCardBody routeKey={feedItem.data.value.routeKey} video={feedItem.data.value.video}
+                               routes={toObj(routes)} gyms={toObj(gyms)}/>
             break
         case 'project':
             cardContent =
-                <ProjectCard routeKey={feedItem.data.value.routeKey}
-                             project={feedItem.data.value.project} routes={toObj(routes)}/>
+                <ProjectCardBody routeKey={feedItem.data.value.routeKey}
+                                 project={feedItem.data.value.project} routes={toObj(routes)}/>
             cardIcon = <ProjectIcon/>
             break
         default:

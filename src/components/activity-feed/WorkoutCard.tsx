@@ -6,7 +6,7 @@ interface Props {
     workout: Persisted<Workout>
 }
 
-export const WorkoutCard = ({workout}: Props) => {
+export const WorkoutCardBody = ({workout}: Props) => {
     return (
             <>
                         Workout Session (Intensity - {workout.value.intensity}) <br/>
