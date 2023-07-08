@@ -5,7 +5,7 @@ import {OrderedList, Persisted} from "../types/Firebase";
 import {Gym} from "../types/Gym";
 import {Session} from "../types/Session";
 import {User} from "../types/User";
-import {Route} from "../types/Route";
+import {Route, RouteVideo} from "../types/Route";
 import {Workout} from "../types/Workout";
 import {sortBy} from "../helpers/sortUtils";
 import {SessionCard, SessionIcon} from "../components/activity-feed/SessionCard";
@@ -24,6 +24,7 @@ import {calculateProgression} from "../components/GradeHistory";
 import {ALL_STYLES} from "../helpers/gradeUtils";
 import {Grade} from "../types/Grade";
 import {WorkoutCard} from "../components/activity-feed/WorkoutCard";
+import {VideoCard} from "../components/activity-feed/VideoCard";
 
 
 export type AggregateSessionMilestone = {
@@ -47,6 +48,12 @@ type FeedItem = {
     } | {
         _type: 'workout',
         value: Persisted<Workout>
+    } | {
+        _type: 'video',
+        value: {
+            routeKey: string,
+            video: RouteVideo
+        }
     }
 }
 
@@ -65,6 +72,7 @@ const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedLis
         ...getSessionDurationFeedItems(sessions),
         ...getGradeMilestoneFeedItems(sessions, routes),
         ...getWorkoutFeedItems(workouts),
+        ...getVideoFeedItems(routes),
     ]
 
     return feedData.sort(sortBy<FeedItem>()('date').descending)
@@ -136,6 +144,20 @@ const getGradeMilestoneFeedItems = (sessions: OrderedList<Session>, routes: Orde
             }
         }))
     })
+}
+
+const getVideoFeedItems = (routes: OrderedList<Route>): FeedItem[] => {
+    return routes.flatMap(({key, value}) => value.videos?.map(video => ({
+        date: video.date,
+        uid: video.uid,
+        data: {
+            _type: 'video',
+            value: {
+                routeKey: key,
+                video,
+            }
+        }
+    })) || [])
 }
 
 
@@ -231,6 +253,9 @@ const ActivityFeed = () => {
                         break
                     case 'workout':
                         cardContent = <WorkoutCard workout={feedItem.data.value} />
+                        break
+                    case 'video':
+                        cardContent = <VideoCard routeKey={feedItem.data.value.routeKey} video={feedItem.data.value.video} routes={toObj(routes)} gyms={toObj(gyms)} />
                         break
                     default:
                         assertNever(feedItem.data)
