@@ -94,7 +94,7 @@ const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedLis
     return feedData.sort(buildSort(
         sortBy<FeedItem>()('date').descending,
         // Break ties according to the order of FeedItemTypes: earlier types in the array should come first
-        sortBy<FeedItem>()('data', contramap('_type', (t1, t2) => FeedItemTypes.indexOf(t1) - FeedItemTypes.indexOf(t2))).ascending
+        sortBy<FeedItem>()('data', contramap(data => FeedItemTypes.indexOf(data._type))).ascending
     ))
 }
 
