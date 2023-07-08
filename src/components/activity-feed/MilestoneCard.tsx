@@ -1,11 +1,11 @@
 import React from 'react'
-import {AggregateSessionMilestone} from "../../containers/ActivityFeed";
 import {pluralize} from "../../helpers/mathUtils";
 import {FaAward} from "react-icons/fa";
 import {IconContext} from "react-icons";
 import assertNever from "assert-never/index";
 import {prettyPrint} from "../../helpers/gradeUtils";
 import {defaultIconContext, iconColors} from "./iconStyle";
+import {AggregateSessionMilestone} from "../../helpers/activityFeedBuilder";
 
 interface Props {
     milestone: AggregateSessionMilestone
