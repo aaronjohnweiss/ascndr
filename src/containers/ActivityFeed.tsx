@@ -13,10 +13,10 @@ import {toObj} from "../helpers/objectConverters";
 import {findUser, groupBy} from "../helpers/filterUtils";
 import {entries} from "../helpers/recordUtils";
 import {MilestoneCard, MilestoneIcon} from "../components/activity-feed/MilestoneCard";
-import moment from "moment";
+import moment, {duration} from "moment";
 import {IconContext} from "react-icons";
 import {Card, Col, Container, Row} from "react-bootstrap";
-import {timeFromNow} from "../helpers/dateUtils";
+import {preciseTimeFromNow} from "../helpers/dateUtils";
 import assertNever from "assert-never/index";
 import {Optional} from "../redux/selectors/types";
 import {LinkContainer} from 'react-router-bootstrap'
@@ -267,13 +267,13 @@ const ActivityFeed = () => {
                                 <Col xs={10}>
                                     <Card.Title
                                         className={'w-100'}>{uid === feedItem.uid ? 'You' : findUser(users, feedItem.uid).name}</Card.Title>
-                                    <Card.Subtitle>{timeFromNow(feedItem.date)}</Card.Subtitle>
+                                    <Card.Subtitle>{preciseTimeFromNow(feedItem.date)}</Card.Subtitle>
                                 </Col>
                                 {cardIcon !== undefined &&
                                     <Col xs={2} className={'d-flex flex-row justify-content-end'}>{cardIcon}</Col>}
                             </Row>
                         </Container>
-                        <Card.Text>{cardContent}</Card.Text>
+                        <Card.Text as={'div'}>{cardContent}</Card.Text>
                     </Card.Body>
                 </Card>
                 return (feedItem.link !== undefined ?
