@@ -23,6 +23,7 @@ import {LinkContainer} from 'react-router-bootstrap'
 import {calculateProgression} from "../components/GradeHistory";
 import {ALL_STYLES} from "../helpers/gradeUtils";
 import {Grade} from "../types/Grade";
+import {WorkoutCard} from "../components/activity-feed/WorkoutCard";
 
 
 export type AggregateSessionMilestone = {
@@ -40,7 +41,13 @@ type FeedItem = {
     data: {
         _type: 'session',
         value: Persisted<Session>
-    } | { _type: 'milestone', value: AggregateSessionMilestone }
+    } | {
+        _type: 'milestone',
+        value: AggregateSessionMilestone
+    } | {
+        _type: 'workout',
+        value: Persisted<Workout>
+    }
 }
 
 const defaultIconContext: IconContext = {
@@ -50,12 +57,14 @@ const defaultIconContext: IconContext = {
 export interface IconProps {
     baseStyle: IconContext
 }
+
 const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedList<Session>, users: OrderedList<User>, routes: OrderedList<Route>, workouts: OrderedList<Workout>): FeedItem[] => {
     const feedData = [
         ...getSessionFeedItems(sessions),
         ...getSessionCountFeedItems(sessions),
         ...getSessionDurationFeedItems(sessions),
-        ...getGradeMilestoneFeedItems(sessions, routes)
+        ...getGradeMilestoneFeedItems(sessions, routes),
+        ...getWorkoutFeedItems(workouts),
     ]
 
     return feedData.sort(sortBy<FeedItem>()('date').descending)
@@ -72,6 +81,15 @@ const getSessionFeedItems = (sessions: OrderedList<Session>): FeedItem[] =>
         }
     }))
 
+const getWorkoutFeedItems = (workouts: OrderedList<Workout>): FeedItem[] =>
+    workouts.map(workout => ({
+        date: workout.value.startTime,
+        uid: workout.value.uid,
+        data: {
+            _type: 'workout',
+            value: workout
+        }
+    }))
 const getSessionCountFeedItems = (sessions: OrderedList<Session>): FeedItem[] => {
     const sessionsByUser = groupBy(sessions, 'uid')
     return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
@@ -138,13 +156,15 @@ const getMilestoneDuration = (before: number, after: number): number | undefined
 
     return afterHundred * 100
 }
-const getSessionCountMilestones = (sessions: OrderedList<Session>): (AggregateSessionMilestone & {date: number})[] => {
+const getSessionCountMilestones = (sessions: OrderedList<Session>): (AggregateSessionMilestone & {
+    date: number
+})[] => {
 
     const sortedSessions = sessions.map(session => session.value)
         .filter(session => session.endTime !== undefined)
         .sort(sortBy<Session>()('endTime').ascending)
 
-    const milestones: (AggregateSessionMilestone & {date: number})[] = []
+    const milestones: (AggregateSessionMilestone & { date: number })[] = []
     for (let i = 0; i < sortedSessions.length; i++) {
         if (isMilestoneCount(i + 1)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -154,13 +174,15 @@ const getSessionCountMilestones = (sessions: OrderedList<Session>): (AggregateSe
     return milestones
 }
 
-const getSessionDurationMilestones = (sessions: OrderedList<Session>): (AggregateSessionMilestone & {date: number})[] => {
+const getSessionDurationMilestones = (sessions: OrderedList<Session>): (AggregateSessionMilestone & {
+    date: number
+})[] => {
 
     const sortedSessions = sessions.map(session => session.value)
         .filter(session => session.endTime !== undefined)
         .sort(sortBy<Session>()('endTime').ascending)
 
-    const milestones: (AggregateSessionMilestone & {date: number})[] = []
+    const milestones: (AggregateSessionMilestone & { date: number })[] = []
     let duration = 0
     for (const sortedSession of sortedSessions) {
         const sessionDuration = moment(sortedSession.endTime!).diff(moment(sortedSession.startTime), 'h', true)
@@ -199,12 +221,16 @@ const ActivityFeed = () => {
                 let cardIcon: Optional<JSX.Element>;
                 switch (feedItem.data._type) {
                     case "session":
-                        cardContent = <SessionCard session={feedItem.data.value} gyms={toObj(gyms)} routes={toObj(routes)}/>
-                        cardIcon = <SessionIcon session={feedItem.data.value} baseStyle={defaultIconContext} />
+                        cardContent =
+                            <SessionCard session={feedItem.data.value} gyms={toObj(gyms)} routes={toObj(routes)}/>
+                        cardIcon = <SessionIcon session={feedItem.data.value} baseStyle={defaultIconContext}/>
                         break
                     case "milestone":
-                        cardContent = <MilestoneCard milestone={feedItem.data.value} />
+                        cardContent = <MilestoneCard milestone={feedItem.data.value}/>
                         cardIcon = <MilestoneIcon baseStyle={defaultIconContext}/>
+                        break
+                    case 'workout':
+                        cardContent = <WorkoutCard workout={feedItem.data.value} />
                         break
                     default:
                         assertNever(feedItem.data)
@@ -214,16 +240,19 @@ const ActivityFeed = () => {
                         <Container>
                             <Row>
                                 <Col xs={10}>
-                                    <Card.Title className={'w-100'}>{uid === feedItem.uid ? 'You' : findUser(users, feedItem.uid).name}</Card.Title>
+                                    <Card.Title
+                                        className={'w-100'}>{uid === feedItem.uid ? 'You' : findUser(users, feedItem.uid).name}</Card.Title>
                                     <Card.Subtitle>{timeFromNow(feedItem.date)}</Card.Subtitle>
                                 </Col>
-                                {cardIcon !== undefined && <Col xs={2} className={'d-flex flex-row justify-content-end'}>{cardIcon}</Col> }
+                                {cardIcon !== undefined &&
+                                    <Col xs={2} className={'d-flex flex-row justify-content-end'}>{cardIcon}</Col>}
                             </Row>
                         </Container>
                         <Card.Text>{cardContent}</Card.Text>
                     </Card.Body>
                 </Card>
-                return (feedItem.link !== undefined ? <LinkContainer key={idx} to={feedItem.link}>{card}</LinkContainer> : card)
+                return (feedItem.link !== undefined ?
+                    <LinkContainer key={idx} to={feedItem.link}>{card}</LinkContainer> : card)
 
             })}
         </div>

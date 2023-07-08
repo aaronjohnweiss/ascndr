@@ -102,6 +102,12 @@
         > * {
             padding-left: 0.25em;
             padding-right: 0.25em;
+            &:first-child {
+                padding-left: 0;
+            }
+            &:last-child {
+                padding-right: 0;
+            }
         }
 
     }
@@ -110,7 +116,7 @@
         font-weight: 300;
     }
     .card-body {
-        padding: 0.5rem;
+        padding: 0.5rem 0.75rem;
     }
     .card-text {
         font-size: 0.8rem;
@@ -133,6 +139,7 @@
             align-items: center;
             justify-content: center;
             flex-direction: column;
+            padding: 0.5rem 0.25rem;
         }
         .h5 {
             font-size: 0.8rem;

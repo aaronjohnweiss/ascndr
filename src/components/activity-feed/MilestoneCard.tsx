@@ -1,5 +1,4 @@
 import React from 'react'
-import {Col, Container, Row} from 'react-bootstrap';
 import {AggregateSessionMilestone, IconProps} from "../../containers/ActivityFeed";
 import {pluralize} from "../../helpers/mathUtils";
 import {FaAward} from "react-icons/fa";
@@ -33,16 +32,10 @@ export const MilestoneCard = ({milestone}: Props) => {
             assertNever(milestone)
     }
 
-    return <Container>
-        <Row>
-            <Col xs={12}>New Milestone - {milestoneText}</Col>
-        </Row>
-    </Container>
+    return <>New Milestone - {milestoneText}</>
 }
 
-// FaHotjar (fire)
-// FaThinkPeaks (mountain)
-// FaMedal (medal)
-// FaRocket (rocket)
-// FaVolcano
-export const MilestoneIcon = ({baseStyle}: IconProps) => <IconContext.Provider value={{...baseStyle, color: 'goldenrod'}}><FaAward /></IconContext.Provider>
+export const MilestoneIcon = ({baseStyle}: IconProps) =>
+    <IconContext.Provider value={{...baseStyle, color: 'goldenrod'}}>
+        <FaAward/>
+    </IconContext.Provider>

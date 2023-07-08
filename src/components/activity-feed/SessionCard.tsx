@@ -73,8 +73,8 @@ export const SessionCard = ({session, gyms, routes}: Props) => {
 }
 
 
-export const SessionIcon = ({
-                                session,
-                                baseStyle
-                            }: Pick<Props, 'session'> & IconProps) => session.value.endTime === undefined ?
-    <IconContext.Provider value={{...baseStyle, color: 'forestgreen'}}><FaPersonFalling/></IconContext.Provider> : <></>
+export const SessionIcon =
+    ({session, baseStyle}: Pick<Props, 'session'> & IconProps) => session.value.endTime === undefined ?
+        <IconContext.Provider value={{...baseStyle, color: 'forestgreen'}}>
+            <FaPersonFalling/>
+        </IconContext.Provider> : <></>
