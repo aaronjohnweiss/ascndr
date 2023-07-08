@@ -83,8 +83,7 @@ const FeedItemTypes: FeedItemType[] = [
 const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: OrderedList<Session>, users: OrderedList<User>, routes: OrderedList<Route>, workouts: OrderedList<Workout>): FeedItem[] => {
     const feedData = [
         ...getSessionFeedItems(sessions),
-        ...getSessionCountFeedItems(sessions),
-        ...getSessionDurationFeedItems(sessions),
+        ...getSessionMilestoneFeedItems(sessions),
         ...getGradeMilestoneFeedItems(sessions, routes),
         ...getWorkoutFeedItems(workouts),
         ...getVideoFeedItems(routes),
@@ -118,24 +117,10 @@ const getWorkoutFeedItems = (workouts: OrderedList<Workout>): FeedItem[] =>
             value: workout
         }
     }))
-const getSessionCountFeedItems = (sessions: OrderedList<Session>): FeedItem[] => {
+const getSessionMilestoneFeedItems = (sessions: OrderedList<Session>): FeedItem[] => {
     const sessionsByUser = groupBy(sessions, 'uid')
     return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
         const milestones = getSessionCountMilestones(userSessions)
-        return milestones.map((milestone) => ({
-            date: milestone.date,
-            uid,
-            data: {
-                _type: 'milestone',
-                value: milestone
-            }
-        }))
-    })
-}
-const getSessionDurationFeedItems = (sessions: OrderedList<Session>): FeedItem[] => {
-    const sessionsByUser = groupBy(sessions, 'uid')
-    return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
-        const milestones = getSessionDurationMilestones(userSessions)
         return milestones.map((milestone) => ({
             date: milestone.date,
             uid,
@@ -233,39 +218,28 @@ const getSessionCountMilestones = (sessions: OrderedList<Session>): (AggregateSe
         .sort(sortBy<Session>()('endTime').ascending)
 
     const milestones: (AggregateSessionMilestone & { date: number })[] = []
+    let duration = 0
     for (let i = 0; i < sortedSessions.length; i++) {
+        const session = sortedSessions[i]
+        // Check session count for milestone
         if (isMilestoneCount(i + 1)) {
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            milestones.push({count: i + 1, date: sortedSessions[i].endTime!, unit: 'sessionCount'})
+            milestones.push({count: i + 1, date: session.endTime!, unit: 'sessionCount'})
         }
-    }
-    return milestones
-}
-
-const getSessionDurationMilestones = (sessions: OrderedList<Session>): (AggregateSessionMilestone & {
-    date: number
-})[] => {
-
-    const sortedSessions = sessions.map(session => session.value)
-        .filter(session => session.endTime !== undefined)
-        .sort(sortBy<Session>()('endTime').ascending)
-
-    const milestones: (AggregateSessionMilestone & { date: number })[] = []
-    let duration = 0
-    for (const sortedSession of sortedSessions) {
-        const sessionDuration = moment(sortedSession.endTime!).diff(moment(sortedSession.startTime), 'h', true)
+        // Check cumulative session duration for milestone
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const sessionDuration = moment(session.endTime!).diff(moment(session.startTime), 'hours', true)
         const milestoneDuration = getMilestoneDuration(duration, duration + sessionDuration)
         if (milestoneDuration !== undefined) {
             milestones.push({
                 count: milestoneDuration,
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                date: sortedSession.endTime!,
+                date: session.endTime!,
                 unit: 'duration'
             })
         }
         duration = duration + sessionDuration
     }
-
     return milestones
 }
 
