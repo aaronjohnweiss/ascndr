@@ -363,7 +363,7 @@ const ActivityFeed = () => {
                         </Card.Body>
                     </Card>
                     return (feedItem.link !== undefined ?
-                        <LinkContainer key={idx} to={feedItem.link}>{card}</LinkContainer> : card)
+                        <LinkContainer key={idx} to={feedItem.link} className='link-card'>{card}</LinkContainer> : card)
 
                 })}
             </InfiniteScroll>
