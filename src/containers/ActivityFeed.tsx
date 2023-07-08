@@ -71,6 +71,7 @@ type FeedItem = {
 
 type FeedItemType = FeedData['_type']
 
+// Sort order - earlier items in this list will be displayed before later items, in case the items' dates are the same
 const FeedItemTypes: FeedItemType[] = [
     'project',
     'milestone',
