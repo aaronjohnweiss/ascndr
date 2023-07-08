@@ -162,16 +162,24 @@ const statsForRoute = (routeKey: string, route: Route, sessions: Data<Session>, 
     }
 }
 
-export type Project = {
+interface ProjectBase {
     uid: string,
     sessionCount: number,
-} & ({
+}
+
+type WorkingProject = ProjectBase & {
     isSent: false,
     sentDate: undefined,
-} | {
+}
+
+type SentProject = ProjectBase & {
     isSent: true,
     sentDate: number,
-})
+}
+
+export const isSent = (project: Project): project is SentProject => project.isSent
+
+export type Project = WorkingProject | SentProject
 
 const calculateLongestProject = (routeKey: string, sessionsForRoute: OrderedList<Session>, allowPartials: boolean): Project | null => {
     const sessionsByUser = groupBy(sessionsForRoute, 'uid')

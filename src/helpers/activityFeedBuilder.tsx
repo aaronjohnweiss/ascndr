@@ -1,8 +1,8 @@
 import {OrderedList, Persisted} from "../types/Firebase";
 import {Route, RouteVideo} from "../types/Route";
-import {Session} from "../types/Session";
+import {FinishedSession, isFinished, Session} from "../types/Session";
 import {groupBy} from "./filterUtils";
-import {calculateProjectTimes, Project} from "../components/RoutesIndex";
+import {calculateProjectTimes, isSent, Project} from "../components/RoutesIndex";
 import {buildSort, contramap, sortBy} from "./sortBuilder";
 import moment from "moment";
 import {Workout} from "../types/Workout";
@@ -174,26 +174,23 @@ const MIN_PROJECT_SESSIONS = 2
 const getProjectFeedItems = (routes: OrderedList<Route>, sessions: OrderedList<Session>): FeedItem[] => {
     const sessionsByUser = groupBy(sessions, 'uid')
 
-    return routes
-        .flatMap(route => calculateProjectTimes(route.key, sessionsByUser).map(project => ({
-            ...project,
-            key: route.key
-        })))
-        .filter(project => project.isSent)
+    return routes.flatMap(route => calculateProjectTimes(route.key, sessionsByUser)
+        // Exclude in-progress projects
+        .filter(isSent)
+        // Exclude projects below session count threshold
         .filter(project => project.sessionCount >= MIN_PROJECT_SESSIONS)
         .map(project => ({
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            date: project.sentDate!,
+            date: project.sentDate,
             uid: project.uid,
-            link: `/routes/${project.key}`,
+            link: `/routes/${route.key}`,
             data: {
                 _type: 'project',
                 value: {
-                    routeKey: project.key,
+                    routeKey: route.key,
                     project
                 }
             }
-        }))
+        })))
 }
 
 /**
@@ -233,9 +230,9 @@ const getSessionCountMilestones = (sessions: OrderedList<Session>): SessionCount
 
     const sortedSessions = sessions.map(session => session.value)
         // Ignore in-progress sessions (milestones should come after a session is finishes)
-        .filter(session => session.endTime !== undefined)
+        .filter(isFinished)
         // Sort by oldest first
-        .sort(sortBy<Session>()('endTime').ascending)
+        .sort(sortBy<FinishedSession>()('endTime').ascending)
 
     const milestones: SessionCountMilestone[] = []
     // Cumulative duration climbed
@@ -244,18 +241,15 @@ const getSessionCountMilestones = (sessions: OrderedList<Session>): SessionCount
         const session = sortedSessions[i]
         // Check session count for milestone
         if (isMilestoneCount(i + 1)) {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            milestones.push({count: i + 1, date: session.endTime!, unit: 'sessionCount'})
+            milestones.push({count: i + 1, date: session.endTime, unit: 'sessionCount'})
         }
         // Check cumulative session duration for milestone
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const sessionDuration = moment(session.endTime!).diff(moment(session.startTime), 'hours', true)
+        const sessionDuration = moment(session.endTime).diff(moment(session.startTime), 'hours', true)
         const milestoneDuration = getMilestoneDuration(duration, duration + sessionDuration)
         if (milestoneDuration !== undefined) {
             milestones.push({
                 count: milestoneDuration,
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                date: session.endTime!,
+                date: session.endTime,
                 unit: 'duration'
             })
         }
