@@ -33,7 +33,7 @@ export const MilestoneCard = ({milestone}: Props) => {
             assertNever(milestone)
     }
 
-    return <>New Milestone - {milestoneText}</>
+    return <>New milestone - {milestoneText}</>
 }
 
 export const MilestoneIcon = () =>
