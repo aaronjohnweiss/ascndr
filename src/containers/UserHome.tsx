@@ -34,12 +34,6 @@ const UserHome = () => {
             <h2>Welcome{user.name ? `, ${user.name}` : ' back'}!</h2>
             <ResponsiveActivityCalendar getData={getData} minCutoffDate={calendarCutoffDate}/>
             <ActivityFeed />
-            {/*{latestSession &&*/}
-            {/*<>*/}
-            {/*    <h3>Last Session:</h3>*/}
-            {/*    <SessionCard session={latestSession} gym={gym} user={user} routes={routes}/>*/}
-            {/*</>*/}
-            {/*}*/}
         </>
     )
 }
