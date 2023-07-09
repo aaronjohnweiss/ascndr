@@ -19,11 +19,11 @@ type FilterFunction<T> = (values: Optional<string[]>) => FilterPredicate<T>
  * Object that can be filtered upon; should define a constant _type for disambiguation
  */
 export type Filterable = Gym | Route | Session | User | Workout
-type FilterableType = Filterable['_type']
+
 /**
  * All filters that can be provided for each type
  */
-const FilterableFields: Record<FilterableType, readonly string[]> = {
+const FilterableFields = {
     'gym': ['owner', 'editor', 'viewer', 'gymKey'],
     'route': ['gym', 'session', 'viewer'],
     'session': ['gym', 'owner', 'viewer', 'route', 'sessionKey'],
