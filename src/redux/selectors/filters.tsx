@@ -51,6 +51,9 @@ export const sessionFilters: StateFilter<Session> = databaseState => ({
     'route': (routeKeys?: string[]) => (session) => routeKeys ? session.value.customRoutes && session.value.customRoutes.some(route => routeKeys.includes(route.key)) : undefined,
     'sessionKey': (sessionKeys?: string[]) => session => sessionKeys?.includes(session.key)
 })
+
+export const canEditSession = (session: Optional<Session>) => normalizeFilterValue((editors: Optional<string[]>) => session && editors?.includes(session.uid))
+
 export const userFilters: StateFilter<User> = databaseState => ({
     'uid': (uids?: string[]) => (user) => uids?.includes(user.value.uid),
     'friendOf': (uids) => user => databaseState.users.isFriendOf(uids)(user.value.uid),

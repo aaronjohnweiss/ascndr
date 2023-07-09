@@ -17,6 +17,7 @@ interface Props {
     customPartialCount: number
     customsWithPartials: OrderedList<Route>
     customRoutesMap: Record<string, RouteCount<string>>
+    canEdit: boolean
     quickEditButtons: QuickEditButtons
 }
 
@@ -28,6 +29,7 @@ export const PartialRoutesAccordion = ({
                                            customPartialCount,
                                            customsWithPartials,
                                            customRoutesMap,
+                                           canEdit,
                                            quickEditButtons
                                        }: Props) => {
     return (
@@ -48,7 +50,7 @@ export const PartialRoutesAccordion = ({
                                             {printPercentage(percentage)} ({count})
                                         </Col>
                                         <Col xs={6}>
-                                            {quickEditButtons(count, {
+                                            {canEdit && quickEditButtons(count, {
                                                 key: {
                                                     ...grade,
                                                     percentage
@@ -73,7 +75,7 @@ export const PartialRoutesAccordion = ({
                                                     {printPercentage(percentage)} ({count})
                                                 </Col>
                                                 <Col xs={6}>
-                                                    {quickEditButtons(count, {
+                                                    {canEdit && quickEditButtons(count, {
                                                         key: {
                                                             key: route.key,
                                                             percentage

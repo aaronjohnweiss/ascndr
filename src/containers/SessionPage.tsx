@@ -34,6 +34,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
     const routesForGym = firebaseState.routes.getOrdered(['gym', session?.gymId])?.filter(route => !route.value.isRetired)
     const routesForSession = firebaseState.routes.getOrdered(['gym', session?.gymId], ['session', id])
     const users = firebaseState.users.getOrdered()
+    const canEdit = firebaseState.sessions.canEdit(session)(uid)
 
     const firebase = useFirebase()
 
@@ -41,7 +42,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
     const [showStandardRoutes, openStandardRoutes, closeStandardRoutes] = useModalState()
     const [showEditSession, openEditSession, closeEditSession] = useModalState()
 
-    if (!isLoaded(session) || !isLoaded(routesForGym) || !isLoaded(routesForSession) || !isLoaded(gym) || !isLoaded(users)) return <>Loading</>
+    if (!isLoaded(session) || !isLoaded(routesForGym) || !isLoaded(routesForSession) || !isLoaded(gym) || !isLoaded(users) || !isLoaded(canEdit)) return <>Loading</>
 
     const updateSession = (session) => {
         firebase.update(`sessions/${id}`, session)
@@ -196,8 +197,6 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
 
     const isFinished = !!session.endTime;
 
-    const canEdit = uid === session.uid;
-
     const customModal = <CustomRouteModal show={showCustomRoutes}
                                           handleClose={closeCustomRoutes}
                                           handleSubmit={addCustomRoute}
@@ -299,6 +298,7 @@ export const SessionPage = ({match: {params: {id}}, history}) => {
                                                                 customPartialCount={customPartialCount}
                                                                 customsWithPartials={customsWithPartials}
                                                                 customRoutesMap={customRoutesMap}
+                                                                canEdit={canEdit}
                                                                 quickEditButtons={quickEditButtons}/>
                                     </Row>
                                 }

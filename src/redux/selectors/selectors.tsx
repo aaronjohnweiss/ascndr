@@ -7,6 +7,7 @@ import {defaultWorkout} from "../../types/Workout";
 import {useFirebaseConnect} from 'react-redux-firebase'
 import {Optional} from "./types";
 import {
+    canEditSession,
     getUserByUid,
     gymFilters,
     hasFriend,
@@ -48,6 +49,7 @@ export class DatabaseState {
     }
     sessions = {
         ...buildSelectors(this, this.#state.sessions, sessionFilters),
+        canEdit: canEditSession
     }
     users = {
         ...buildSelectors(this, this.#state.users, userFilters),
