@@ -17,6 +17,9 @@ import {getFirst} from "../redux/selectors/utils";
 export const PENDING_IMAGE = 'PENDING';
 export const FAILED_IMAGE = 'FAILED';
 
+export const FAILED_OR_PENDING_IMAGE = [PENDING_IMAGE, FAILED_IMAGE]
+export const isFailedOrPendingImage = (url: string): boolean => FAILED_OR_PENDING_IMAGE.includes(url)
+
 export const uploadImage = (routeRef, picture) => {
     // Post to imgur
     const pictureData = new FormData()

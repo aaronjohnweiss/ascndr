@@ -25,10 +25,10 @@ type FilterableType = Filterable['_type']
  */
 const FilterableFields: Record<FilterableType, readonly string[]> = {
     'gym': ['owner', 'editor', 'viewer', 'gymKey'],
-    'route': ['gym', 'session'],
+    'route': ['gym', 'session', 'viewer'],
     'session': ['gym', 'owner', 'viewer', 'route', 'sessionKey'],
     'user': ['uid', 'friendOf'],
-    'workout': ['owner'],
+    'workout': ['owner', 'viewer'],
 } as const
 /**
  * All applicable filters for a given Filterable type

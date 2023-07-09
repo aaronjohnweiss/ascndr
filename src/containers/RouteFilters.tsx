@@ -3,13 +3,13 @@ import {isLoaded} from 'react-redux-firebase';
 import {useLocation} from 'react-router-dom';
 import {Button, Form} from 'react-bootstrap';
 import {ALL_STYLES, printType} from '../helpers/gradeUtils';
-import {getBooleanFromQuery} from './StatsContainer';
 import {parseSort} from "./RoutesContainer";
 import {MultiSelect} from "./StatFilters";
 import {getUser, useDatabase} from "../redux/selectors/selectors";
 import {entries} from "../helpers/recordUtils";
 import {sortOptions} from "../components/RoutesIndex";
 import {LinkContainer} from 'react-router-bootstrap'
+import {getBooleanFromQuery} from "../helpers/queryParser";
 
 
 const defaultIfEmpty = (a1, a2) => {

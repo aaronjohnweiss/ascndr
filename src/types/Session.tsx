@@ -26,3 +26,9 @@ export const defaultSession = (part: FirebaseSession): Session => ({
     standardRoutes: [],
     ...part
 })
+
+export type FinishedSession = Session & {
+    endTime: number
+}
+
+export const isFinished = (session: Session): session is FinishedSession => session.endTime !== undefined
