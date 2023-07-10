@@ -154,16 +154,16 @@ const getVideoFeedItems = (routes: OrderedList<Route>, users: OrderedList<User>)
     return routes.flatMap(({key, value}) => value.videos
         ?.filter(video => users.some(u => u.value.uid === video.uid))
         .map(video => ({
-        date: video.date,
-        uid: video.uid,
-        data: {
-            _type: 'video',
-            value: {
-                routeKey: key,
-                video,
+            date: video.date,
+            uid: video.uid,
+            data: {
+                _type: 'video',
+                value: {
+                    routeKey: key,
+                    video,
+                }
             }
-        }
-    })) || [])
+        })) || [])
 }
 
 /**
