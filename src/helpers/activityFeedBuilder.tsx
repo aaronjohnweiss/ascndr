@@ -68,7 +68,7 @@ export const buildFeedData = (uid: string, gyms: OrderedList<Gym>, sessions: Ord
         ...getSessionMilestoneFeedItems(sessions),
         ...getGradeMilestoneFeedItems(sessions, routes),
         ...getWorkoutFeedItems(workouts),
-        ...getVideoFeedItems(routes),
+        ...getVideoFeedItems(routes, users),
         ...getProjectFeedItems(routes, sessions),
     ]
 
@@ -150,8 +150,10 @@ const getGradeMilestoneFeedItems = (sessions: OrderedList<Session>, routes: Orde
 /**
  * Video uploads
  */
-const getVideoFeedItems = (routes: OrderedList<Route>): FeedItem[] => {
-    return routes.flatMap(({key, value}) => value.videos?.map(video => ({
+const getVideoFeedItems = (routes: OrderedList<Route>, users: OrderedList<User>): FeedItem[] => {
+    return routes.flatMap(({key, value}) => value.videos
+        ?.filter(video => users.some(u => u.value.uid === video.uid))
+        .map(video => ({
         date: video.date,
         uid: video.uid,
         data: {
