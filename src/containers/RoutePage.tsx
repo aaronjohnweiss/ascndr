@@ -135,6 +135,8 @@ const RoutePage = ({match: {params: {id}}}) => {
     const uidsForRoute = distinct(sessions.map(session => session.value.uid));
     const usersForRoute = uidsForRoute.map(uid => findUser(users, uid));
 
+    const displayVideos = route.videos?.filter(video => users.some(u => u.value.uid === video.uid)) || []
+
     return (
         <Container>
             <Row>
@@ -163,7 +165,7 @@ const RoutePage = ({match: {params: {id}}}) => {
                     <br/>
                     <div className='d-flex align-items-center mb-1'><h3 className='me-auto'>Videos</h3> <Button onClick={openVideoModal}>Add video</Button></div>
                     <ListGroup>
-                        {(route.videos || []).map((video, idx) => <ListGroup.Item className='d-flex align-items-center'
+                        {displayVideos.map((video, idx) => <ListGroup.Item className='d-flex align-items-center'
                                                                                   key={idx}>
                             <div className='me-auto'>{getUserName(findUser(users, video.uid))}:&nbsp;
                                 <a href={video.url} target="_blank" rel="noopener noreferrer">
