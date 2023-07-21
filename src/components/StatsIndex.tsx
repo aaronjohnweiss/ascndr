@@ -84,7 +84,7 @@ export const printSplitRouteCount = (splitCount: SplitCount, maxOnly = false) =>
     .map(([percentage, count]) =>
       percentage == PARTIAL_MAX
         ? `${count} ${pluralize('time', count)}`
-        : `${count} x ${printPercentage(percentage)}`
+        : `${count} x ${printPercentage(percentage)}`,
     )
     .join(', ')
 }
@@ -98,11 +98,11 @@ export const routeCountForSession = (
   { customRoutes = [], standardRoutes = [] }: Session,
   routes: Data<Route>,
   allowedTypes: RouteStyle[],
-  allowPartials = false
+  allowPartials = false,
 ) =>
   [
     ...customRoutes.filter(customRoute =>
-      allowedTypes.includes(routes[customRoute.key].grade?.style)
+      allowedTypes.includes(routes[customRoute.key].grade?.style),
     ),
     ...standardRoutes.filter(standardRoute => allowedTypes.includes(standardRoute.key.style)),
   ]
@@ -114,7 +114,7 @@ export const heightForSession = (
   routes: Data<Route>,
   gym: Gym,
   allowedTypes: RouteStyle[] = [],
-  allowPartials = false
+  allowPartials = false,
 ) =>
   allowedTypes
     .map(type => {
@@ -157,7 +157,7 @@ const StatsIndex = ({
           startTime,
           endTime,
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        }) => endTime! - startTime
+        }) => endTime! - startTime,
       )
       .reduce(sum, 0)
   const totalRoutes =
@@ -169,7 +169,7 @@ const StatsIndex = ({
     numSessions &&
     sessionValues
       .map(session =>
-        heightForSession(session, routes, gyms[session.gymId], allowedTypes, allowPartials)
+        heightForSession(session, routes, gyms[session.gymId], allowedTypes, allowPartials),
       )
       .reduce(sum, 0)
   // Figure out max grades by type
@@ -195,7 +195,7 @@ const StatsIndex = ({
         }
         return obj
       },
-      {} as Record<RouteStyle, Grade>
+      {} as Record<RouteStyle, Grade>,
     )
 
   return (

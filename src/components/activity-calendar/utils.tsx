@@ -74,7 +74,7 @@ const flattenDays = (data: CountForDate[][]) => {
       const thisDay = flatDays.get(date)!
       thisDay.counts[i] = count
       thisDay.levels[i] = level
-    })
+    }),
   )
 
   return [...flatDays.values()]
@@ -82,7 +82,7 @@ const flattenDays = (data: CountForDate[][]) => {
 
 export function normalizeCalendarDays(
   days: MultiCountForDate[],
-  numCategories: number
+  numCategories: number,
 ): MultiCountForDate[] {
   const daysMap = days.reduce((map, day) => {
     map.set(day.date, day)
@@ -107,7 +107,7 @@ export const getLatestDate = (data: LabeledData[]): string => {
       .reduce(
         (maxDate: string | undefined, currentDate) =>
           maxDate && maxDate > currentDate ? maxDate : currentDate,
-        undefined
+        undefined,
       ) || new Date().toDateString()
   )
 }
@@ -181,11 +181,11 @@ export const createColorLevels = baseColor => ({
 
 export const createCalendarTheme = (
   numCategories,
-  emptyColor = color('white').darken(8).toHslString()
+  emptyColor = color('white').darken(8).toHslString(),
 ) => ({
   level0: emptyColor,
   theme: rainbowColors({ n: numCategories }).map(([baseColor]) =>
-    createColorLevels(color(baseColor))
+    createColorLevels(color(baseColor)),
   ),
 })
 
@@ -266,7 +266,7 @@ export const getLegendRows = ({
           calculateSize(label.name, {
             fontSize: `${fontSize}px`,
             font: fontFamily,
-          }).width + padding
+          }).width + padding,
       )
       .reduce((acc, x) => acc + x, 0)
 

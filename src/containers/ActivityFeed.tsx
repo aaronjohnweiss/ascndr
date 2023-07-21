@@ -23,7 +23,7 @@ const ActivityFeed = () => {
   const location = useLocation()
 
   const [feedLength, setFeedLength] = useState(
-    getNumberFromQuery(getQuery(location), 'n', DEFAULT_ITEMS)
+    getNumberFromQuery(getQuery(location), 'n', DEFAULT_ITEMS),
   )
 
   const [feedData, setFeedData] = useState<FeedItem[]>([])

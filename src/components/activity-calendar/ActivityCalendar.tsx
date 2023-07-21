@@ -158,7 +158,7 @@ function ActivityCalendar({
               />
             </g>
           )
-        })
+        }),
       )
       .map((week, x) => (
         <g key={x} transform={`translate(${(blockSize + blockMargin) * x}, 0)`}>

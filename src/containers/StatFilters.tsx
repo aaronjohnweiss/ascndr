@@ -55,11 +55,11 @@ const StatFilters = () => {
 
   const [allowSuffixes, setAllowSuffixes] = useState(getBooleanFromQuery(query, 'allowSuffixes'))
   const [allowPartials, setAllowPartials] = useState(
-    getBooleanFromQuery(query, 'allowPartials', true)
+    getBooleanFromQuery(query, 'allowPartials', true),
   )
 
   const [allowedTypes, setAllowedTypes] = useState(
-    defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES)
+    defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES),
   )
 
   useEffect(() => {

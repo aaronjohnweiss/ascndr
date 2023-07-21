@@ -14,12 +14,12 @@ export const sortBy =
   <T,>() =>
   <K extends keyof T>(
     field: K,
-    compareFn: SortFn<T[K]> = (a: any, b: any) => a - b
+    compareFn: SortFn<T[K]> = (a: any, b: any) => a - b,
   ): SortBy<T> => ({
     ascending: contramap(x => x[field], compareFn),
     descending: contramap(
       x => x[field],
-      (a, b) => compareFn(a, b) * -1
+      (a, b) => compareFn(a, b) * -1,
     ),
   })
 

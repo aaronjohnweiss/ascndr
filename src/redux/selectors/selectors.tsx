@@ -37,12 +37,12 @@ export class DatabaseState {
     routes: withDefault(() => useAppSelector(state => state.firebase.ordered.routes), defaultRoute),
     sessions: withDefault(
       () => useAppSelector(state => state.firebase.ordered.sessions),
-      defaultSession
+      defaultSession,
     ),
     users: withDefault(() => useAppSelector(state => state.firebase.ordered.users), defaultUser),
     workouts: withDefault(
       () => useAppSelector(state => state.firebase.ordered.workouts),
-      defaultWorkout
+      defaultWorkout,
     ),
   }
   gyms = {

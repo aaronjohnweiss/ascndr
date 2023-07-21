@@ -54,7 +54,7 @@ const StatsContainer = () => {
   const users = firebaseState.users.getOrdered(...userParams)
   const sessions = firebaseState.sessions.getData(
     ['gym', gymKeys],
-    ['owner', users?.map(u => u.value.uid)]
+    ['owner', users?.map(u => u.value.uid)],
   )
 
   if (!isLoaded(routes) || !isLoaded(sessions) || !isLoaded(users) || !isLoaded(gyms))

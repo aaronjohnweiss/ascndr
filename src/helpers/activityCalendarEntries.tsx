@@ -74,7 +74,7 @@ export const buildCounts = <T,>({
           level: reduceLevel(acc[entry.date].level, entry.level),
         },
       }),
-      getEmptyCounts(cutoffDate)
+      getEmptyCounts(cutoffDate),
     )
 
 export const getLevelByPercentile = (data: CountForDate[]) => {
@@ -127,7 +127,7 @@ const mergeData = ({ data, label }: { data: LabeledData[]; label: string }): Lab
           level: reduceLevel(acc[entry.date] && acc[entry.date].level, entry.level),
         },
       }),
-      {} as Record<string, Count>
+      {} as Record<string, Count>,
     )
 
   return [{ label, data: buildArray(dataByDay) }]
@@ -160,7 +160,7 @@ export const getCalendarData = ({
         mergeData({
           data: getUserData({ user: u, preferences, sessions, routes, workouts, cutoffDate }),
           label: getUserName(u),
-        })
+        }),
       )
       .flat()
     return excludeEmpty(userData)
@@ -212,7 +212,7 @@ export const getWorkoutData = ({
         getTime: workout => workout.startTime,
         getLevel: workout => workout.intensity,
       }),
-    }))
+    })),
   )
 
   if (!preferences.splitWorkouts) return mergeData({ data: allWorkoutData, label: 'Workout' })

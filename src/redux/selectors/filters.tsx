@@ -28,7 +28,7 @@ export const routeFilters: StateFilter<Route> = databaseState => ({
   session: (sessionKeys?: string[]) => route => {
     const sessionsForRoute = databaseState.sessions.getOrdered(
       ['sessionKey', sessionKeys],
-      ['route', route.key]
+      ['route', route.key],
     )
 
     if (!isLoaded(sessionsForRoute)) return undefined
@@ -97,7 +97,7 @@ export const hasFriend = (databaseState: DatabaseState) =>
         if (!isLoaded(user) || !isLoaded(friendUids)) return undefined
 
         return friendUids.includes(uid) || friendUids.some(friend => user.friends.includes(friend))
-      }
+      },
   )
 export const workoutFilters: StateFilter<Workout> = databaseState => ({
   owner: (owners?: string[]) => workout => owners?.includes(workout.value.uid),

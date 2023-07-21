@@ -51,7 +51,7 @@ const HiatusModel = ({ value, onChange }) => {
 
   const updateHiatus = updateIdx => updatedHiatus => {
     const newHiatuses = hiatuses.map((hiatus, idx) =>
-      idx === updateIdx ? updatedHiatus : { ...hiatus }
+      idx === updateIdx ? updatedHiatus : { ...hiatus },
     )
     setHiatuses(newHiatuses)
   }

@@ -39,7 +39,7 @@ export const findEntry = <T,>(array: OrderedList<T>, key: string): Persisted<T> 
 export const findUser = (
   users: OrderedList<User>,
   uid: string,
-  fallback: User = missingUser(uid)
+  fallback: User = missingUser(uid),
 ) => {
   const user = isEmpty(users) ? undefined : users.find(user => user.value.uid === uid)
   return user ? user.value : fallback
@@ -53,12 +53,12 @@ export const getUserName = (user: User): string => user.name || user.uid
 
 export const getSessionsForUser = (
   sessions: OrderedList<Session>,
-  uid: string
+  uid: string,
 ): OrderedList<Session> => filterList(sessions, 'uid', uid)
 
 export const getWorkoutsForUser = (
   workouts: OrderedList<Workout>,
-  uid: string
+  uid: string,
 ): OrderedList<Workout> => filterList(workouts, 'uid', uid)
 
 export const hasRoutes = (session: Session): boolean =>
@@ -69,7 +69,7 @@ export const getLatestSession = (sessions: OrderedList<Session> = []): Persisted
   sessions.reduce(
     (prev: Persisted<Session> | null, current) =>
       prev && prev.value && prev.value.startTime > current.value.startTime ? prev : current,
-    null
+    null,
   )
 
 export const distinct = <T,>(values: T[]): T[] => [...new Set(values)]

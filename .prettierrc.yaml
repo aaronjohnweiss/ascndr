@@ -1,5 +1,6 @@
 singleQuote: true
 semi: false
 printWidth: 100
-trailingComma: es5
+trailingComma: all
 arrowParens: avoid
+tabWidth: 2

@@ -27,7 +27,7 @@ export const parseSort = (query: URLSearchParams): SortEntry[] => {
         desc: field.charAt(0) === '-',
       }))
       .filter(
-        (sortEntry): sortEntry is SortEntry => SORT_FIELDS.findIndex(s => s === sortEntry.key) >= 0
+        (sortEntry): sortEntry is SortEntry => SORT_FIELDS.findIndex(s => s === sortEntry.key) >= 0,
       ) || []
 
   return [...sort, defaultSort]

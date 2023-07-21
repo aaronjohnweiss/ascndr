@@ -21,7 +21,7 @@ const RouteHistory = ({ routeKey, users, sessions }) => {
 const UserRouteHistory = ({ routeKey, user, sessions }) => {
   const name = user.name || user.uid
   const sessionsForUser = getSessionsForUser(sessions, user.uid).sort(
-    (a, b) => b.value.startTime - a.value.startTime
+    (a, b) => b.value.startTime - a.value.startTime,
   )
   const overallCount = countForRoute(routeKey, sessionsForUser, true)
   return (

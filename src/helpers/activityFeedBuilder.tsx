@@ -69,7 +69,7 @@ export const buildFeedData = (
   sessions: OrderedList<Session>,
   users: OrderedList<User>,
   routes: OrderedList<Route>,
-  workouts: OrderedList<Workout>
+  workouts: OrderedList<Workout>,
 ): FeedItem[] => {
   const feedData = [
     ...getSessionFeedItems(sessions),
@@ -86,9 +86,9 @@ export const buildFeedData = (
       // Break ties according to the order of FeedItemTypes: earlier types in the array should come first
       sortBy<FeedItem>()(
         'data',
-        contramap(data => FeedItemTypes.indexOf(data._type))
-      ).ascending
-    )
+        contramap(data => FeedItemTypes.indexOf(data._type)),
+      ).ascending,
+    ),
   )
 }
 
@@ -142,7 +142,7 @@ const getSessionMilestoneFeedItems = (sessions: OrderedList<Session>): FeedItem[
  */
 const getGradeMilestoneFeedItems = (
   sessions: OrderedList<Session>,
-  routes: OrderedList<Route>
+  routes: OrderedList<Route>,
 ): FeedItem[] => {
   const sessionsByUser = groupBy(sessions, 'uid')
   return entries(sessionsByUser).flatMap(([uid, userSessions]) => {
@@ -152,7 +152,7 @@ const getGradeMilestoneFeedItems = (
       toObj(routes),
       true,
       [...ALL_STYLES],
-      false
+      false,
     )
     return milestones
       .flatMap(({ firsts }) => firsts)
@@ -189,7 +189,7 @@ const getVideoFeedItems = (routes: OrderedList<Route>, users: OrderedList<User>)
               video,
             },
           },
-        })) || []
+        })) || [],
   )
 }
 
@@ -202,7 +202,7 @@ const MIN_PROJECT_SESSIONS = 2
  */
 const getProjectFeedItems = (
   routes: OrderedList<Route>,
-  sessions: OrderedList<Session>
+  sessions: OrderedList<Session>,
 ): FeedItem[] => {
   const sessionsByUser = groupBy(sessions, 'uid')
 
@@ -223,7 +223,7 @@ const getProjectFeedItems = (
             project,
           },
         },
-      }))
+      })),
   )
 }
 

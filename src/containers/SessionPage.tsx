@@ -32,7 +32,7 @@ export type QuickEditButtons = (
         key: { percentage?: number; key: string }
         isCustom: true
       }
-    | { key: { percentage?: number } & Grade; isCustom?: false }
+    | { key: { percentage?: number } & Grade; isCustom?: false },
 ) => JSX.Element
 export const SessionPage = ({
   match: {
@@ -220,7 +220,7 @@ export const SessionPage = ({
   // Convert to maps for easier consumption
   const customRoutesMap = session.customRoutes.reduce(
     (acc, entry) => ({ ...acc, [entry.key]: entry }),
-    {}
+    {},
   )
   // console.log(session, customRoutesMap, routesForSession)
   const standardRoutesMap = session.standardRoutes.reduce(
@@ -228,7 +228,7 @@ export const SessionPage = ({
       ...acc,
       [prettyPrint(entry.key)]: entry,
     }),
-    {}
+    {},
   )
 
   const allGrades = [
@@ -314,7 +314,7 @@ export const SessionPage = ({
             grades.map(grade => {
               const gradeLabel = prettyPrint(grade)
               const customRoutesForGrade = routesForSession.filter(route =>
-                gradeEquals(route.value.grade, grade)
+                gradeEquals(route.value.grade, grade),
               )
               const standardRoutesForGrade = standardRoutesMap[gradeLabel] || {}
               const standardCountForGrade = standardRoutesForGrade.count || 0
@@ -325,7 +325,7 @@ export const SessionPage = ({
               const partialsForGrade = standardRoutesForGrade.partials || {}
               const standardPartialCount = countPartials(partialsForGrade)
               const customsWithPartials = customRoutesForGrade.filter(route =>
-                hasPartialCompletions(customRoutesMap[route.key])
+                hasPartialCompletions(customRoutesMap[route.key]),
               )
               const customPartialCount: number = customsWithPartials
                 .map(route => customRoutesMap[route.key].partials)

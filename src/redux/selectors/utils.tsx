@@ -17,7 +17,7 @@ import { DatabaseState } from './selectors'
  */
 const filterOrdered = <T,>(
   ordered: Optional<OrderedList<T>>,
-  predicates: FilterPredicate<Persisted<T>>[]
+  predicates: FilterPredicate<Persisted<T>>[],
 ): Optional<OrderedList<T>> => {
   if (!ordered) return undefined
   if (predicates.length === 0) {
@@ -43,7 +43,7 @@ const filterOrdered = <T,>(
  */
 const evaluatePredicates = <T,>(
   obj: Persisted<T>,
-  predicates: FilterPredicate<Persisted<T>>[]
+  predicates: FilterPredicate<Persisted<T>>[],
 ): Optional<boolean> => {
   let result = true
   for (const predicate of predicates) {
@@ -60,7 +60,7 @@ const evaluatePredicates = <T,>(
  */
 const toData =
   <Whole extends Filterable>(
-    orderedSelector: ParameterizedSelector<Whole, OrderedList<Whole>>
+    orderedSelector: ParameterizedSelector<Whole, OrderedList<Whole>>,
   ): ParameterizedSelector<Whole, Data<Whole>> =>
   (...params) => {
     const ordered = orderedSelector(...params)
@@ -79,7 +79,7 @@ export const getFirst = <T,>(arr: Optional<T[]>): Optional<T> => (arr?.length ? 
 const getFilterable =
   <T extends Filterable>(
     selector: Optional<OrderedList<T>>,
-    filters: Filter<T>
+    filters: Filter<T>,
   ): ParameterizedSelector<T, OrderedList<T>> =>
   (...params) => {
     const predicates = getPredicates(params, filters)
@@ -93,7 +93,7 @@ const getFilterable =
  */
 export const withDefault = <Part, Whole extends Filterable>(
   selector: () => Optional<OrderedList<Part>>,
-  converter: (part: Part) => Whole
+  converter: (part: Part) => Whole,
 ): Optional<OrderedList<Whole>> =>
   selector()?.map(persisted => ({
     ...persisted,
@@ -131,7 +131,7 @@ const getPredicates = <T extends Filterable>(params: FilterParam<T>[], filters: 
 export const buildSelectors = <T extends Filterable>(
   state: DatabaseState,
   model: Optional<OrderedList<T>>,
-  filters: StateFilter<T>
+  filters: StateFilter<T>,
 ): Selectors<T> => {
   const getOrdered = getFilterable(model, filters(state))
   const getData = toData(getOrdered)

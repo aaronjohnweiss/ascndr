@@ -27,11 +27,11 @@ const RouteFilters = () => {
 
   const [selfOnly, setSelfOnly] = useState(getBooleanFromQuery(query, 'selfOnly'))
   const [allowPartials, setAllowPartials] = useState(
-    getBooleanFromQuery(query, 'allowPartials', true)
+    getBooleanFromQuery(query, 'allowPartials', true),
   )
 
   const [allowedTypes, setAllowedTypes] = useState(
-    defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES)
+    defaultIfEmpty(query.getAll('allowedTypes'), ALL_STYLES),
   )
 
   useEffect(() => {

@@ -8,7 +8,7 @@ const getOrDefault = <T,>(
   query: URLSearchParams,
   name: string,
   f: (s: string) => T,
-  valueIfMissing: T
+  valueIfMissing: T,
 ) => (query.has(name) ? f(query.get(name)!) : valueIfMissing)
 
 export const getBooleanFromQuery = (query: URLSearchParams, name: string, valueIfMissing = false) =>
@@ -22,5 +22,5 @@ export const getNumberFromQuery = (query: URLSearchParams, name: string, valueIf
       if (isNaN(num)) return valueIfMissing
       return num
     },
-    valueIfMissing
+    valueIfMissing,
   )

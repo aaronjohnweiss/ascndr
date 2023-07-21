@@ -19,7 +19,7 @@ const calculateAllProgressions = (
   routes,
   allowSuffixes,
   allowedTypes,
-  allowPartials
+  allowPartials,
 ) => {
   // Given hiatuses: Split up and section off data around the hiatuses
   if (hiatuses && hiatuses.length > 0) {
@@ -33,7 +33,7 @@ const calculateAllProgressions = (
       const sessionsInRange = sessionsForUser.filter(
         session =>
           (rangeStartDate === null || session.value.startTime >= rangeStartDate) &&
-          (rangeEndDate === null || session.value.startTime < rangeEndDate)
+          (rangeEndDate === null || session.value.startTime < rangeEndDate),
       )
       const progression = displayProgression(
         sessionsInRange,
@@ -41,7 +41,7 @@ const calculateAllProgressions = (
         allowSuffixes,
         allowedTypes,
         allowPartials,
-        'h4'
+        'h4',
       )
       if (progression.filter(entry => entry != null).length !== 0) {
         let headerString
@@ -60,7 +60,7 @@ const calculateAllProgressions = (
               <Accordion.Header>{headerString}</Accordion.Header>
               <Accordion.Body>{progression}</Accordion.Body>
             </Accordion.Item>
-          </Accordion>
+          </Accordion>,
         )
       }
     }
@@ -74,7 +74,7 @@ const calculateAllProgressions = (
 export const highestGradeForSession = (
   session: Session,
   routes: Data<Route>,
-  type: RouteStyle
+  type: RouteStyle,
 ): { maxFullGrade?: Grade; maxPartialGrade?: Grade } => {
   // Get all grades climbed in that session
   let maxFullGrade: Optional<Grade> = undefined
@@ -127,7 +127,7 @@ const displayProgression = (
   allowSuffixes,
   allowedTypes,
   allowPartials,
-  Header: keyof JSX.IntrinsicElements = 'h3'
+  Header: keyof JSX.IntrinsicElements = 'h3',
 ) => {
   // List the firsts, their corresponding dates, with links to the session. Already sorted by date/grade descending.
   return calculateProgression(
@@ -135,7 +135,7 @@ const displayProgression = (
     routes,
     allowSuffixes,
     allowedTypes,
-    allowPartials
+    allowPartials,
   ).map(({ type, firsts }, j) => (
     <Fragment key={j}>
       <Header>{printType(type)}</Header>
@@ -144,7 +144,7 @@ const displayProgression = (
           <StatItem
             key={k}
             label={`${prettyPrint(grade, allowSuffixes, allowPartials)}: ${new Date(
-              date
+              date,
             ).toDateString()}`}
             link={`/sessions/${key}`}
           />
@@ -168,7 +168,7 @@ export const calculateProgression = (
   routes: Data<Route>,
   allowSuffixes: boolean,
   allowedTypes: RouteStyle[],
-  allowPartials: boolean
+  allowPartials: boolean,
 ): GradeProgression[] => {
   // For each style of climb...
   return allowedTypes
@@ -185,7 +185,7 @@ export const calculateProgression = (
             arr = arr.filter(
               entry =>
                 !isPartial(entry.grade) ||
-                compareGrades(entry.grade, maxPartialGrade, allowSuffixes, allowPartials) > 0
+                compareGrades(entry.grade, maxPartialGrade, allowSuffixes, allowPartials) > 0,
             )
             // Add this entry; include session key for linking
             arr.push({ date: value.startTime, grade: maxPartialGrade, key })
@@ -228,7 +228,7 @@ const GradeHistory = ({
           routes,
           allowSuffixes,
           allowedTypes,
-          allowPartials
+          allowPartials,
         )
 
         // Show user name and their grade history

@@ -31,7 +31,7 @@ export const GymIndex = () => {
   gyms.sort(
     (gymA, gymB) =>
       (getLatestSession(sessionsByGym[gymB.key])?.value?.startTime || 0) -
-      (getLatestSession(sessionsByGym[gymA.key])?.value?.startTime || 0)
+      (getLatestSession(sessionsByGym[gymA.key])?.value?.startTime || 0),
   )
 
   return (

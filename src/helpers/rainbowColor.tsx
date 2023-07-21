@@ -14,7 +14,7 @@ const rgb2hex = ({ r, g, b }) =>
     .map(x =>
       Math.round(x * 255)
         .toString(16)
-        .padStart(2, '0')
+        .padStart(2, '0'),
     )
     .join('')
 

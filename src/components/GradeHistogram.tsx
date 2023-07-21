@@ -23,7 +23,7 @@ const addCount = <T,>(
   key: T,
   count: number,
   partialCount: number | false,
-  allowSuffixes: boolean
+  allowSuffixes: boolean,
 ) => {
   const entry = arr.find(val => gradeEquals(val.key, key, allowSuffixes))
   if (entry) {
@@ -45,7 +45,7 @@ function getGraphData(
   routes: Data<Route>,
   allowedTypes: RouteStyle[],
   allowSuffixes: boolean,
-  allowPartials: boolean
+  allowPartials: boolean,
 ) {
   // Maintain list of all grades for the x axis labels
   const allGrades: Grade[] = []
@@ -68,7 +68,7 @@ function getGraphData(
               grade,
               routeCount(customRoute),
               allowPartials && partialRouteCount(customRoute),
-              allowSuffixes
+              allowSuffixes,
             )
           }
         })
@@ -83,7 +83,7 @@ function getGraphData(
               standardRoute.key,
               routeCount(standardRoute),
               allowPartials && partialRouteCount(standardRoute),
-              allowSuffixes
+              allowSuffixes,
             )
           }
         })
@@ -204,7 +204,7 @@ const GradeHistogram = ({
     routes,
     allowedTypes,
     allowSuffixes,
-    allowPartials
+    allowPartials,
   )
 
   const allowedSessions = Object.values(sessions)
@@ -218,7 +218,7 @@ const GradeHistogram = ({
     routes,
     allowedTypes,
     allowSuffixes,
-    allowPartials
+    allowPartials,
   )
 
   return (

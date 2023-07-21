@@ -43,7 +43,7 @@ export const ActivityCalendarSettingsModal = ({
             label={'Include friends'}
             onChange={evt =>
               setPreference('mode')(
-                evt.target.checked ? CalendarMode.FRIENDS : CalendarMode.USER_ONLY
+                evt.target.checked ? CalendarMode.FRIENDS : CalendarMode.USER_ONLY,
               )
             }
           />

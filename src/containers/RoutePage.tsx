@@ -106,7 +106,7 @@ const RoutePage = ({
     updateRoute({
       ...route,
       videos: [...(route.videos || []), { uid, url, date: date || new Date().getTime() }].sort(
-        (a, b) => b.date - a.date
+        (a, b) => b.date - a.date,
       ),
     })
     closeVideoModal()
