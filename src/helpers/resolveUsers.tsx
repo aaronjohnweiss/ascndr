@@ -1,19 +1,19 @@
-import {missingUser, User} from "../types/User";
-import {Data} from "../types/Firebase";
+import { missingUser, User } from '../types/User'
+import { Data } from '../types/Firebase'
 
 const resolveUsers = (users: Data<User>, uids: string[]) => {
-    let foundUsers: User[] = [];
+  let foundUsers: User[] = []
 
-    for (const uid of uids) {
-        const user = Object.values(users).find(user => uid === user.uid);
-        if (user) {
-            foundUsers = foundUsers.concat(user)
-        } else {
-            foundUsers = foundUsers.concat(missingUser(uid));
-        }
+  for (const uid of uids) {
+    const user = Object.values(users).find(user => uid === user.uid)
+    if (user) {
+      foundUsers = foundUsers.concat(user)
+    } else {
+      foundUsers = foundUsers.concat(missingUser(uid))
     }
+  }
 
-    return foundUsers;
+  return foundUsers
 }
 
 export default resolveUsers
