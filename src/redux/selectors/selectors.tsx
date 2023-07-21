@@ -1,9 +1,9 @@
 import { useAppSelector } from '../index'
 import { defaultGym, Gym } from '../../types/Gym'
-import { defaultRoute } from '../../types/Route'
-import { defaultSession } from '../../types/Session'
-import { defaultUser } from '../../types/User'
-import { defaultWorkout } from '../../types/Workout'
+import { defaultRoute, Route } from '../../types/Route'
+import { defaultSession, Session } from '../../types/Session'
+import { defaultUser, User } from '../../types/User'
+import { defaultWorkout, Workout } from '../../types/Workout'
 import { useFirebaseConnect } from 'react-redux-firebase'
 import { Optional } from './types'
 import {
@@ -19,6 +19,7 @@ import {
 } from './filters'
 import { buildSelectors, withDefault } from './utils'
 import firebase from 'firebase/app'
+import { OrderedList } from '../../types/Firebase'
 
 export const getUser = (): firebase.User => {
   const auth = useAppSelector(state => state.auth)
@@ -26,6 +27,14 @@ export const getUser = (): firebase.User => {
     throw new Error('uh oh')
   }
   return auth
+}
+
+export interface State {
+  gyms: Optional<OrderedList<Gym>>
+  routes: Optional<OrderedList<Route>>
+  sessions: Optional<OrderedList<Session>>
+  users: Optional<OrderedList<User>>
+  workouts: Optional<OrderedList<Workout>>
 }
 
 /**
