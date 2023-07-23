@@ -30,14 +30,15 @@ export interface ValidationError {
   message: string
   field: string
 }
-export interface Field<T> {
+
+export interface Field<T, U = any> {
   title: string
   placeholder?: string
   name: keyof T
   options?:
     | {
         type: 'custom'
-        component: <U>({ value, onChange }: { value: U; onChange: (val: U) => void }) => JSX.Element
+        component: ({ value, onChange }: { value: U; onChange: (val: U) => void }) => JSX.Element
       }
     | {
         type: 'file'
@@ -47,6 +48,7 @@ export interface Field<T> {
         type: 'number' | 'text' | 'checkbox'
       }
 }
+
 interface Props<T> {
   handleClose: () => void
   handleSubmit: (data: T) => void
@@ -58,6 +60,7 @@ interface Props<T> {
   validateState?: (data: T) => ValidationError[]
   initialValues?: object
 }
+
 const EntityModal = <T,>({
   handleClose,
   handleSubmit,
@@ -168,6 +171,7 @@ const EntityModal = <T,>({
                   <Form.Label>{title}</Form.Label>
                   <Form.Control
                     placeholder={placeholder}
+                    id={String(name)}
                     onChange={onChangeForInput(name)}
                     value={options && options.type === 'file' ? undefined : data[name]}
                     {...options}
@@ -190,7 +194,12 @@ const EntityModal = <T,>({
             <Button variant="secondary" onClick={handleClose}>
               Cancel
             </Button>
-            <Button variant="primary" disabled={validationErrors.length > 0} onClick={onSubmit}>
+            <Button
+              variant="primary"
+              id="modal-submit"
+              disabled={validationErrors.length > 0}
+              onClick={onSubmit}
+            >
               {submitText ? submitText : 'Submit'}
             </Button>
           </Modal.Footer>

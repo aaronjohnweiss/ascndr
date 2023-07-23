@@ -7,11 +7,13 @@ import firebase from 'firebase/app'
 import { ReactReduxFirebaseProvider } from 'react-redux-firebase'
 import 'firebase/database'
 import * as serviceWorker from './serviceWorker'
-import { store } from './redux'
+import { setupStore } from './redux'
 
 const rrfConfig = {
   userProfile: 'users',
 }
+
+const store = setupStore()
 
 const rrfProps = {
   firebase,

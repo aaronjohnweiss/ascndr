@@ -19,7 +19,7 @@ function auth(state: AuthState = false, action: UserAction) {
   }
 }
 
-interface FirebaseSchema {
+export interface FirebaseSchema {
   gyms: FirebaseGym
   routes: FirebaseRoute
   sessions: FirebaseSession

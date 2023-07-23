@@ -1,20 +1,15 @@
-import { DatabaseState, State } from './selectors'
-import { defaultGym } from '../../types/Gym'
-import { defaultUser, User } from '../../types/User'
-import { defaultRoute } from '../../types/Route'
-import { defaultSession } from '../../types/Session'
-import { defaultWorkout } from '../../types/Workout'
-import { createContext } from 'react'
-import { ReactReduxContextValue } from 'react-redux/src/components/Context'
-import { TypedUseSelectorHook } from 'react-redux'
-import { AppState } from '../reducer'
-import { useFirebaseConnect } from 'react-redux-firebase'
+import { DatabaseState, State } from '../selectors'
+import { defaultGym } from '../../../types/Gym'
+import { defaultUser } from '../../../types/User'
+import { defaultRoute } from '../../../types/Route'
+import { defaultSession } from '../../../types/Session'
+import { defaultWorkout } from '../../../types/Workout'
 
-import { useAppSelector } from '../index'
-import { Filterable, ParameterizedSelector } from './types'
-import { OrderedList } from '../../types/Firebase'
+import { useAppSelector } from '../../index'
+import { Filterable, ParameterizedSelector } from '../types'
+import { OrderedList } from '../../../types/Firebase'
 
-jest.mock('../index', () => ({
+jest.mock('../../index', () => ({
   useAppSelector: jest.fn(),
 }))
 
@@ -58,8 +53,6 @@ describe('selectors', () => {
     const badGymKey = 'badGym'
     const badSessionKey = 'badSession'
     const badRouteKey = 'badRoute'
-    const badUserKey = 'badUserKey'
-    const badWorkout = 'badWorkout'
     const mockState: State = {
       gyms: [
         {
@@ -105,7 +98,7 @@ describe('selectors', () => {
           value: followingUser,
         },
         {
-          key: badUserKey,
+          key: 'badUserKey',
           value: defaultUser({ uid: badUid }),
         },
       ],
@@ -115,7 +108,7 @@ describe('selectors', () => {
           value: workout,
         },
         {
-          key: badWorkout,
+          key: 'badWorkout',
           value: defaultWorkout({ uid: badUid }),
         },
       ],

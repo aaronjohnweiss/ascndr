@@ -1,0 +1,232 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`activity calendar settings should be hidden when passed show=false 1`] = `
+<Modal
+  animation={true}
+  autoFocus={true}
+  backdrop={true}
+  dialogAs={
+    Object {
+      "$$typeof": Symbol(react.forward_ref),
+      "displayName": "ModalDialog",
+      "render": [Function],
+    }
+  }
+  enforceFocus={true}
+  keyboard={true}
+  onHide={[MockFunction]}
+  restoreFocus={true}
+  show={false}
+>
+  <Form>
+    <ModalHeader
+      closeButton={true}
+      closeLabel="Close"
+    >
+      <ModalTitle>
+        Activity Calendar Settings
+      </ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <FormCheck
+        checked={false}
+        label="Include friends"
+        onChange={[Function]}
+      />
+      <FormCheck
+        checked={true}
+        label="Include workouts"
+        onChange={[Function]}
+      />
+      <FormCheck
+        checked={true}
+        label="Split workouts by type"
+        onChange={[Function]}
+      />
+    </ModalBody>
+    <ModalFooter>
+      <Button
+        active={false}
+        disabled={false}
+        onClick={[MockFunction]}
+        variant="secondary"
+      >
+        Cancel
+      </Button>
+      <Button
+        active={false}
+        disabled={false}
+        onClick={[Function]}
+        variant="primary"
+      >
+        Submit
+      </Button>
+    </ModalFooter>
+  </Form>
+</Modal>
+`;
+
+exports[`activity calendar settings should render with custom user preferences 1`] = `
+<Modal
+  animation={true}
+  autoFocus={true}
+  backdrop={true}
+  dialogAs={
+    Object {
+      "$$typeof": Symbol(react.forward_ref),
+      "displayName": "ModalDialog",
+      "render": [Function],
+    }
+  }
+  enforceFocus={true}
+  keyboard={true}
+  onHide={[MockFunction]}
+  restoreFocus={true}
+  show={true}
+>
+  <Form>
+    <ModalHeader
+      closeButton={true}
+      closeLabel="Close"
+    >
+      <ModalTitle>
+        Activity Calendar Settings
+      </ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <FormCheck
+        checked={true}
+        label="Include friends"
+        onChange={[Function]}
+      />
+      <FormCheck
+        checked={true}
+        label="Include workouts"
+        onChange={[Function]}
+      />
+      <FormLabel
+        column={false}
+        visuallyHidden={false}
+      >
+        Friends to Include
+      </FormLabel>
+      <MultiSelect
+        onChange={[Function]}
+        options={
+          Array [
+            Object {
+              "checked": true,
+              "key": "uid0",
+              "label": "user 0",
+            },
+            Object {
+              "checked": true,
+              "key": "uid1",
+              "label": "user 1",
+            },
+            Object {
+              "checked": false,
+              "key": "uid2",
+              "label": "user 2",
+            },
+            Object {
+              "checked": false,
+              "key": "uid3",
+              "label": "user 3",
+            },
+            Object {
+              "checked": false,
+              "key": "uid4",
+              "label": "user 4",
+            },
+          ]
+        }
+      />
+    </ModalBody>
+    <ModalFooter>
+      <Button
+        active={false}
+        disabled={false}
+        onClick={[MockFunction]}
+        variant="secondary"
+      >
+        Cancel
+      </Button>
+      <Button
+        active={false}
+        disabled={false}
+        onClick={[Function]}
+        variant="primary"
+      >
+        Submit
+      </Button>
+    </ModalFooter>
+  </Form>
+</Modal>
+`;
+
+exports[`activity calendar settings should render with default preferences 1`] = `
+<Modal
+  animation={true}
+  autoFocus={true}
+  backdrop={true}
+  dialogAs={
+    Object {
+      "$$typeof": Symbol(react.forward_ref),
+      "displayName": "ModalDialog",
+      "render": [Function],
+    }
+  }
+  enforceFocus={true}
+  keyboard={true}
+  onHide={[MockFunction]}
+  restoreFocus={true}
+  show={true}
+>
+  <Form>
+    <ModalHeader
+      closeButton={true}
+      closeLabel="Close"
+    >
+      <ModalTitle>
+        Activity Calendar Settings
+      </ModalTitle>
+    </ModalHeader>
+    <ModalBody>
+      <FormCheck
+        checked={false}
+        label="Include friends"
+        onChange={[Function]}
+      />
+      <FormCheck
+        checked={true}
+        label="Include workouts"
+        onChange={[Function]}
+      />
+      <FormCheck
+        checked={true}
+        label="Split workouts by type"
+        onChange={[Function]}
+      />
+    </ModalBody>
+    <ModalFooter>
+      <Button
+        active={false}
+        disabled={false}
+        onClick={[MockFunction]}
+        variant="secondary"
+      >
+        Cancel
+      </Button>
+      <Button
+        active={false}
+        disabled={false}
+        onClick={[Function]}
+        variant="primary"
+      >
+        Submit
+      </Button>
+    </ModalFooter>
+  </Form>
+</Modal>
+`;
