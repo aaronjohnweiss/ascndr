@@ -33,7 +33,7 @@ export const routeFilters: StateFilter<Route> = databaseState => ({
         return sessionsForRoute.length > 0
     },
     'viewer': (viewers?: string[]) => route => {
-        const gyms = databaseState.gyms.getOrdered(['gymKey', route.value.gymId], ['viewer', viewers]);
+        const gyms = databaseState.gyms.getOrdered(['gymKey', route.value.gymId]);
 
         if (!isLoaded(gyms)) return undefined
         return gyms.length > 0
