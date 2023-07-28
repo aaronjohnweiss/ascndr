@@ -34,10 +34,12 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "convert-dev-users": "yarn run ts-node dev-scripts/convert-dev-users.ts"
+    "convert-dev-users": "yarn run ts-node dev-scripts/convert-dev-users.ts",
+    "prettier": "prettier \"src/**/*.tsx\" --write",
+    "prepare": "husky install"
   },
   "engines": {
-    "node": "16.13.2"
+    "node": "16.18.1"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -53,6 +55,9 @@
     "@types/react-router-dom": "^5.3.3",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.2.3",
+    "prettier": "^3.0.0",
     "prompt-sync": "^4.2.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
@@ -63,5 +68,8 @@
       "react-dom": "$react-dom"
     },
     "typescript": "^5.0.4"
+  },
+  "lint-staged": {
+    "*.tsx": "prettier --write"
   }
 }

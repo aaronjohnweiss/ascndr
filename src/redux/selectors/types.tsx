@@ -1,10 +1,10 @@
-import {Data, OrderedList, Persisted} from "../../types/Firebase";
-import {Gym} from "../../types/Gym";
-import {Route} from "../../types/Route";
-import {Session} from "../../types/Session";
-import {User} from "../../types/User";
-import {Workout} from "../../types/Workout";
-import {DatabaseState} from "./selectors";
+import { Data, OrderedList, Persisted } from '../../types/Firebase'
+import { Gym } from '../../types/Gym'
+import { Route } from '../../types/Route'
+import { Session } from '../../types/Session'
+import { User } from '../../types/User'
+import { Workout } from '../../types/Workout'
+import { DatabaseState } from './selectors'
 
 export type Optional<T> = T | undefined
 /**
@@ -24,16 +24,16 @@ export type Filterable = Gym | Route | Session | User | Workout
  * All filters that can be provided for each type
  */
 const FilterableFields = {
-    'gym': ['owner', 'editor', 'viewer', 'gymKey'],
-    'route': ['gym', 'session', 'viewer'],
-    'session': ['gym', 'owner', 'viewer', 'route', 'sessionKey'],
-    'user': ['uid', 'friendOf'],
-    'workout': ['owner', 'viewer'],
+  gym: ['owner', 'editor', 'viewer', 'gymKey'],
+  route: ['gym', 'session', 'viewer'],
+  session: ['gym', 'owner', 'viewer', 'route', 'sessionKey'],
+  user: ['uid', 'friendOf'],
+  workout: ['owner', 'viewer'],
 } as const
 /**
  * All applicable filters for a given Filterable type
  */
-type FilterName<T extends Filterable> = typeof FilterableFields[T['_type']][number]
+type FilterName<T extends Filterable> = (typeof FilterableFields)[T['_type']][number]
 /**
  * A Filter defines FilterFunctions for every FilterName for a given Filterable type
  * (essentially, an implementation of all possible filters on a given type)
@@ -54,22 +54,25 @@ export type FilterParam<T extends Filterable> = [FilterName<T>, FilterValue]
 /**
  * Function that will take in filter parameters and return the relevant data
  */
-export type ParameterizedSelector<Whole extends Filterable, WrappedData extends OrderedList<Whole> | Data<Whole>> = (...params: FilterParam<Whole>[]) => Optional<WrappedData>
+export type ParameterizedSelector<
+  Whole extends Filterable,
+  WrappedData extends OrderedList<Whole> | Data<Whole>,
+> = (...params: FilterParam<Whole>[]) => Optional<WrappedData>
 
 /**
  * Selectors to expose to the caller
  */
 export interface Selectors<T extends Filterable> {
-    /**
-     * Return an array containing the requested data
-     */
-    getOrdered: ParameterizedSelector<T, OrderedList<T>>
-    /**
-     * Return a map from key->value for the requested data
-     */
-    getData: ParameterizedSelector<T, Data<T>>
-    /**
-     * Find the entry with the given id, if it exists
-     */
-    getOne: (id: string) => Optional<T>
+  /**
+   * Return an array containing the requested data
+   */
+  getOrdered: ParameterizedSelector<T, OrderedList<T>>
+  /**
+   * Return a map from key->value for the requested data
+   */
+  getData: ParameterizedSelector<T, Data<T>>
+  /**
+   * Find the entry with the given id, if it exists
+   */
+  getOne: (id: string) => Optional<T>
 }
