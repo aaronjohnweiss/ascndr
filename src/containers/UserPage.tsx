@@ -92,7 +92,7 @@ const UserPage = () => {
             </p>
           </Col>
           <Col xs="auto">
-            <Button className="float-end" onClick={openUserModal}>
+            <Button id="edit-user" className="float-end" onClick={openUserModal}>
               Edit User
             </Button>
           </Col>

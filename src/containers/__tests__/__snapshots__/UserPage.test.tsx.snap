@@ -1,1199 +1,1234 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`UserPage should render 1`] = `
-<Wrapper>
-  <Provider
-    store={
+<UserPage
+  history={
+    Object {
+      "action": "POP",
+      "block": [Function],
+      "canGo": [Function],
+      "createHref": [Function],
+      "entries": Array [
+        Object {
+          "hash": "",
+          "pathname": "/",
+          "search": "",
+          "state": undefined,
+        },
+      ],
+      "go": [Function],
+      "goBack": [Function],
+      "goForward": [Function],
+      "index": 0,
+      "length": 1,
+      "listen": [Function],
+      "location": Object {
+        "hash": "",
+        "pathname": "/",
+        "search": "",
+        "state": undefined,
+      },
+      "push": [Function],
+      "replace": [Function],
+    }
+  }
+  location={
+    Object {
+      "hash": "",
+      "pathname": "/",
+      "search": "",
+      "state": undefined,
+    }
+  }
+  match={
+    Object {
+      "isExact": true,
+      "params": Object {},
+      "path": "/",
+      "url": "/",
+    }
+  }
+>
+  <p>
+    Your uid: 
+    <b>
+      myUid
+    </b>
+  </p>
+  <div
+    className="align-items-center"
+  >
+    <Row
+      className="align-items-center"
+    >
+      <div
+        className="align-items-center row"
+      >
+        <Col>
+          <div
+            className="col"
+          >
+            <p
+              className="align-middle m-0"
+            >
+              Your display name: 
+              <b>
+                Mr. User
+              </b>
+            </p>
+          </div>
+        </Col>
+        <Col
+          xs="auto"
+        >
+          <div
+            className="col-auto"
+          >
+            <Button
+              active={false}
+              className="float-end"
+              disabled={false}
+              id="edit-user"
+              onClick={[Function]}
+              variant="primary"
+            >
+              <button
+                className="float-end btn btn-primary"
+                disabled={false}
+                id="edit-user"
+                onClick={[Function]}
+                type="button"
+              >
+                Edit User
+              </button>
+            </Button>
+          </div>
+        </Col>
+      </div>
+    </Row>
+  </div>
+  <h3>
+    Preferences
+  </h3>
+  <ListGroup>
+    <ForwardRef
+      as="div"
+      className="list-group"
+      onSelect={[Function]}
+    >
+      <div
+        className="list-group"
+        onKeyDown={[Function]}
+      >
+        <ListGroupItem
+          active={false}
+          className="align-items-center"
+          disabled={false}
+        >
+          <ForwardRef
+            as="div"
+            className="align-items-center list-group-item"
+            disabled={false}
+            onClick={[Function]}
+          >
+            <div
+              className="align-items-center list-group-item"
+              data-rb-event-key={null}
+              disabled={false}
+              onClick={[Function]}
+            >
+              <div
+                className="align-middle float-start"
+              >
+                Activity Calendar Settings
+              </div>
+              <Button
+                active={false}
+                className="float-end"
+                disabled={false}
+                onClick={[Function]}
+                size="sm"
+                variant="primary"
+              >
+                <button
+                  className="float-end btn btn-primary btn-sm"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Edit
+                </button>
+              </Button>
+            </div>
+          </ForwardRef>
+        </ListGroupItem>
+      </div>
+    </ForwardRef>
+  </ListGroup>
+  <h3>
+    Friends
+  </h3>
+  <ListGroup>
+    <ForwardRef
+      as="div"
+      className="list-group"
+      onSelect={[Function]}
+    >
+      <div
+        className="list-group"
+        onKeyDown={[Function]}
+      >
+        <ListGroupItem
+          active={false}
+          className="align-items-center"
+          disabled={false}
+          id="uid0"
+          key="0"
+        >
+          <ForwardRef
+            as="div"
+            className="align-items-center list-group-item"
+            disabled={false}
+            id="uid0"
+            onClick={[Function]}
+          >
+            <div
+              className="align-items-center list-group-item"
+              data-rb-event-key={null}
+              disabled={false}
+              id="uid0"
+              onClick={[Function]}
+            >
+              <div
+                className="align-middle float-start"
+              >
+                user 0
+              </div>
+              <ConfirmCancelButton
+                buttonProps={
+                  Object {
+                    "className": "float-end",
+                    "size": "sm",
+                  }
+                }
+                buttonText="-"
+                handleConfirm={[Function]}
+                modalBody="Remove user 0 from your friends list?"
+                modalTitle="Remove friend"
+              >
+                <WrappedButton>
+                  <ShowModalButton>
+                    <Button
+                      active={false}
+                      className="float-end"
+                      disabled={false}
+                      onClick={[Function]}
+                      size="sm"
+                      variant="danger"
+                    >
+                      <button
+                        className="float-end btn btn-danger btn-sm"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        -
+                      </button>
+                    </Button>
+                  </ShowModalButton>
+                </WrappedButton>
+                <ConfirmCancelModal
+                  handleConfirm={[Function]}
+                  hideModal={[Function]}
+                  modalBody="Remove user 0 from your friends list?"
+                  modalTitle="Remove friend"
+                  showModal={false}
+                >
+                  <Modal
+                    animation={true}
+                    autoFocus={true}
+                    backdrop={true}
+                    dialogAs={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "displayName": "ModalDialog",
+                        "render": [Function],
+                      }
+                    }
+                    enforceFocus={true}
+                    keyboard={true}
+                    onHide={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                  >
+                    <Modal
+                      autoFocus={true}
+                      backdrop={true}
+                      backdropTransition={[Function]}
+                      containerClassName="modal-open"
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        BootstrapModalManager {
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "modals": Array [],
+                          "scrollbarSize": 0,
+                        }
+                      }
+                      onEnter={[Function]}
+                      onEntering={[Function]}
+                      onEscapeKeyDown={[Function]}
+                      onExit={[Function]}
+                      onExited={[Function]}
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      renderDialog={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                      transition={[Function]}
+                    />
+                  </Modal>
+                </ConfirmCancelModal>
+              </ConfirmCancelButton>
+            </div>
+          </ForwardRef>
+        </ListGroupItem>
+        <ListGroupItem
+          active={false}
+          className="align-items-center"
+          disabled={false}
+          id="uid1"
+          key="1"
+        >
+          <ForwardRef
+            as="div"
+            className="align-items-center list-group-item"
+            disabled={false}
+            id="uid1"
+            onClick={[Function]}
+          >
+            <div
+              className="align-items-center list-group-item"
+              data-rb-event-key={null}
+              disabled={false}
+              id="uid1"
+              onClick={[Function]}
+            >
+              <div
+                className="align-middle float-start"
+              >
+                user 1
+              </div>
+              <ConfirmCancelButton
+                buttonProps={
+                  Object {
+                    "className": "float-end",
+                    "size": "sm",
+                  }
+                }
+                buttonText="-"
+                handleConfirm={[Function]}
+                modalBody="Remove user 1 from your friends list?"
+                modalTitle="Remove friend"
+              >
+                <WrappedButton>
+                  <ShowModalButton>
+                    <Button
+                      active={false}
+                      className="float-end"
+                      disabled={false}
+                      onClick={[Function]}
+                      size="sm"
+                      variant="danger"
+                    >
+                      <button
+                        className="float-end btn btn-danger btn-sm"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        -
+                      </button>
+                    </Button>
+                  </ShowModalButton>
+                </WrappedButton>
+                <ConfirmCancelModal
+                  handleConfirm={[Function]}
+                  hideModal={[Function]}
+                  modalBody="Remove user 1 from your friends list?"
+                  modalTitle="Remove friend"
+                  showModal={false}
+                >
+                  <Modal
+                    animation={true}
+                    autoFocus={true}
+                    backdrop={true}
+                    dialogAs={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "displayName": "ModalDialog",
+                        "render": [Function],
+                      }
+                    }
+                    enforceFocus={true}
+                    keyboard={true}
+                    onHide={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                  >
+                    <Modal
+                      autoFocus={true}
+                      backdrop={true}
+                      backdropTransition={[Function]}
+                      containerClassName="modal-open"
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        BootstrapModalManager {
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "modals": Array [],
+                          "scrollbarSize": 0,
+                        }
+                      }
+                      onEnter={[Function]}
+                      onEntering={[Function]}
+                      onEscapeKeyDown={[Function]}
+                      onExit={[Function]}
+                      onExited={[Function]}
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      renderDialog={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                      transition={[Function]}
+                    />
+                  </Modal>
+                </ConfirmCancelModal>
+              </ConfirmCancelButton>
+            </div>
+          </ForwardRef>
+        </ListGroupItem>
+        <ListGroupItem
+          active={false}
+          className="align-items-center"
+          disabled={false}
+          id="uid2"
+          key="2"
+        >
+          <ForwardRef
+            as="div"
+            className="align-items-center list-group-item"
+            disabled={false}
+            id="uid2"
+            onClick={[Function]}
+          >
+            <div
+              className="align-items-center list-group-item"
+              data-rb-event-key={null}
+              disabled={false}
+              id="uid2"
+              onClick={[Function]}
+            >
+              <div
+                className="align-middle float-start"
+              >
+                user 2
+              </div>
+              <ConfirmCancelButton
+                buttonProps={
+                  Object {
+                    "className": "float-end",
+                    "size": "sm",
+                  }
+                }
+                buttonText="-"
+                handleConfirm={[Function]}
+                modalBody="Remove user 2 from your friends list?"
+                modalTitle="Remove friend"
+              >
+                <WrappedButton>
+                  <ShowModalButton>
+                    <Button
+                      active={false}
+                      className="float-end"
+                      disabled={false}
+                      onClick={[Function]}
+                      size="sm"
+                      variant="danger"
+                    >
+                      <button
+                        className="float-end btn btn-danger btn-sm"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        -
+                      </button>
+                    </Button>
+                  </ShowModalButton>
+                </WrappedButton>
+                <ConfirmCancelModal
+                  handleConfirm={[Function]}
+                  hideModal={[Function]}
+                  modalBody="Remove user 2 from your friends list?"
+                  modalTitle="Remove friend"
+                  showModal={false}
+                >
+                  <Modal
+                    animation={true}
+                    autoFocus={true}
+                    backdrop={true}
+                    dialogAs={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "displayName": "ModalDialog",
+                        "render": [Function],
+                      }
+                    }
+                    enforceFocus={true}
+                    keyboard={true}
+                    onHide={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                  >
+                    <Modal
+                      autoFocus={true}
+                      backdrop={true}
+                      backdropTransition={[Function]}
+                      containerClassName="modal-open"
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        BootstrapModalManager {
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "modals": Array [],
+                          "scrollbarSize": 0,
+                        }
+                      }
+                      onEnter={[Function]}
+                      onEntering={[Function]}
+                      onEscapeKeyDown={[Function]}
+                      onExit={[Function]}
+                      onExited={[Function]}
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      renderDialog={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                      transition={[Function]}
+                    />
+                  </Modal>
+                </ConfirmCancelModal>
+              </ConfirmCancelButton>
+            </div>
+          </ForwardRef>
+        </ListGroupItem>
+        <ListGroupItem
+          active={false}
+          className="align-items-center"
+          disabled={false}
+          id="uid3"
+          key="3"
+        >
+          <ForwardRef
+            as="div"
+            className="align-items-center list-group-item"
+            disabled={false}
+            id="uid3"
+            onClick={[Function]}
+          >
+            <div
+              className="align-items-center list-group-item"
+              data-rb-event-key={null}
+              disabled={false}
+              id="uid3"
+              onClick={[Function]}
+            >
+              <div
+                className="align-middle float-start"
+              >
+                user 3
+              </div>
+              <ConfirmCancelButton
+                buttonProps={
+                  Object {
+                    "className": "float-end",
+                    "size": "sm",
+                  }
+                }
+                buttonText="-"
+                handleConfirm={[Function]}
+                modalBody="Remove user 3 from your friends list?"
+                modalTitle="Remove friend"
+              >
+                <WrappedButton>
+                  <ShowModalButton>
+                    <Button
+                      active={false}
+                      className="float-end"
+                      disabled={false}
+                      onClick={[Function]}
+                      size="sm"
+                      variant="danger"
+                    >
+                      <button
+                        className="float-end btn btn-danger btn-sm"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        -
+                      </button>
+                    </Button>
+                  </ShowModalButton>
+                </WrappedButton>
+                <ConfirmCancelModal
+                  handleConfirm={[Function]}
+                  hideModal={[Function]}
+                  modalBody="Remove user 3 from your friends list?"
+                  modalTitle="Remove friend"
+                  showModal={false}
+                >
+                  <Modal
+                    animation={true}
+                    autoFocus={true}
+                    backdrop={true}
+                    dialogAs={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "displayName": "ModalDialog",
+                        "render": [Function],
+                      }
+                    }
+                    enforceFocus={true}
+                    keyboard={true}
+                    onHide={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                  >
+                    <Modal
+                      autoFocus={true}
+                      backdrop={true}
+                      backdropTransition={[Function]}
+                      containerClassName="modal-open"
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        BootstrapModalManager {
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "modals": Array [],
+                          "scrollbarSize": 0,
+                        }
+                      }
+                      onEnter={[Function]}
+                      onEntering={[Function]}
+                      onEscapeKeyDown={[Function]}
+                      onExit={[Function]}
+                      onExited={[Function]}
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      renderDialog={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                      transition={[Function]}
+                    />
+                  </Modal>
+                </ConfirmCancelModal>
+              </ConfirmCancelButton>
+            </div>
+          </ForwardRef>
+        </ListGroupItem>
+        <ListGroupItem
+          active={false}
+          className="align-items-center"
+          disabled={false}
+          id="uid4"
+          key="4"
+        >
+          <ForwardRef
+            as="div"
+            className="align-items-center list-group-item"
+            disabled={false}
+            id="uid4"
+            onClick={[Function]}
+          >
+            <div
+              className="align-items-center list-group-item"
+              data-rb-event-key={null}
+              disabled={false}
+              id="uid4"
+              onClick={[Function]}
+            >
+              <div
+                className="align-middle float-start"
+              >
+                user 4
+              </div>
+              <ConfirmCancelButton
+                buttonProps={
+                  Object {
+                    "className": "float-end",
+                    "size": "sm",
+                  }
+                }
+                buttonText="-"
+                handleConfirm={[Function]}
+                modalBody="Remove user 4 from your friends list?"
+                modalTitle="Remove friend"
+              >
+                <WrappedButton>
+                  <ShowModalButton>
+                    <Button
+                      active={false}
+                      className="float-end"
+                      disabled={false}
+                      onClick={[Function]}
+                      size="sm"
+                      variant="danger"
+                    >
+                      <button
+                        className="float-end btn btn-danger btn-sm"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        -
+                      </button>
+                    </Button>
+                  </ShowModalButton>
+                </WrappedButton>
+                <ConfirmCancelModal
+                  handleConfirm={[Function]}
+                  hideModal={[Function]}
+                  modalBody="Remove user 4 from your friends list?"
+                  modalTitle="Remove friend"
+                  showModal={false}
+                >
+                  <Modal
+                    animation={true}
+                    autoFocus={true}
+                    backdrop={true}
+                    dialogAs={
+                      Object {
+                        "$$typeof": Symbol(react.forward_ref),
+                        "displayName": "ModalDialog",
+                        "render": [Function],
+                      }
+                    }
+                    enforceFocus={true}
+                    keyboard={true}
+                    onHide={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                  >
+                    <Modal
+                      autoFocus={true}
+                      backdrop={true}
+                      backdropTransition={[Function]}
+                      containerClassName="modal-open"
+                      enforceFocus={true}
+                      keyboard={true}
+                      manager={
+                        BootstrapModalManager {
+                          "containers": Array [],
+                          "data": Array [],
+                          "handleContainerOverflow": true,
+                          "hideSiblingNodes": true,
+                          "modals": Array [],
+                          "scrollbarSize": 0,
+                        }
+                      }
+                      onEnter={[Function]}
+                      onEntering={[Function]}
+                      onEscapeKeyDown={[Function]}
+                      onExit={[Function]}
+                      onExited={[Function]}
+                      onHide={[Function]}
+                      renderBackdrop={[Function]}
+                      renderDialog={[Function]}
+                      restoreFocus={true}
+                      show={false}
+                      transition={[Function]}
+                    />
+                  </Modal>
+                </ConfirmCancelModal>
+              </ConfirmCancelButton>
+            </div>
+          </ForwardRef>
+        </ListGroupItem>
+      </div>
+    </ForwardRef>
+  </ListGroup>
+  <br />
+  <div
+    className="d-grid d-block"
+  >
+    <Button
+      active={false}
+      disabled={false}
+      id="add-friend"
+      onClick={[Function]}
+      variant="primary"
+    >
+      <button
+        className="btn btn-primary"
+        disabled={false}
+        id="add-friend"
+        onClick={[Function]}
+        type="button"
+      >
+        Add Friend
+      </button>
+    </Button>
+  </div>
+  <EntityModal
+    fields={
+      Array [
+        Object {
+          "name": "name",
+          "placeholder": "Name..",
+          "title": "User Name",
+        },
+        Object {
+          "name": "hiatuses",
+          "options": Object {
+            "component": [Function],
+            "type": "custom",
+          },
+          "title": "Hiatuses",
+        },
+      ]
+    }
+    handleClose={[Function]}
+    handleSubmit={[Function]}
+    initialValues={
       Object {
-        "@@observable": [Function],
-        "dispatch": [Function],
-        "getState": [Function],
-        "replaceReducer": [Function],
-        "subscribe": [Function],
+        "_type": "user",
+        "friends": Array [
+          "uid0",
+          "uid1",
+          "uid2",
+          "uid3",
+          "uid4",
+        ],
+        "hiatuses": Array [],
+        "name": "Mr. User",
+        "preferences": Object {
+          "activityCalendar": Object {
+            "friends": Array [],
+            "includeWorkouts": true,
+            "mode": "User only",
+            "splitWorkouts": true,
+          },
+        },
+        "uid": "myUid",
+      }
+    }
+    show={false}
+    title="Edit User"
+    validateState={[Function]}
+  >
+    <Modal
+      animation={true}
+      autoFocus={true}
+      backdrop={true}
+      dialogAs={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "displayName": "ModalDialog",
+          "render": [Function],
+        }
+      }
+      enforceFocus={true}
+      keyboard={true}
+      onHide={[Function]}
+      restoreFocus={true}
+      show={false}
+    >
+      <Modal
+        autoFocus={true}
+        backdrop={true}
+        backdropTransition={[Function]}
+        containerClassName="modal-open"
+        enforceFocus={true}
+        keyboard={true}
+        manager={
+          BootstrapModalManager {
+            "containers": Array [],
+            "data": Array [],
+            "handleContainerOverflow": true,
+            "hideSiblingNodes": true,
+            "modals": Array [],
+            "scrollbarSize": 0,
+          }
+        }
+        onEnter={[Function]}
+        onEntering={[Function]}
+        onEscapeKeyDown={[Function]}
+        onExit={[Function]}
+        onExited={[Function]}
+        onHide={[Function]}
+        renderBackdrop={[Function]}
+        renderDialog={[Function]}
+        restoreFocus={true}
+        show={false}
+        transition={[Function]}
+      />
+    </Modal>
+    <ConfirmCancelModal
+      handleConfirm={[Function]}
+      hideModal={[Function]}
+      modalTitle="Delete session?"
+      showModal={false}
+    >
+      <Modal
+        animation={true}
+        autoFocus={true}
+        backdrop={true}
+        dialogAs={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "displayName": "ModalDialog",
+            "render": [Function],
+          }
+        }
+        enforceFocus={true}
+        keyboard={true}
+        onHide={[Function]}
+        restoreFocus={true}
+        show={false}
+      >
+        <Modal
+          autoFocus={true}
+          backdrop={true}
+          backdropTransition={[Function]}
+          containerClassName="modal-open"
+          enforceFocus={true}
+          keyboard={true}
+          manager={
+            BootstrapModalManager {
+              "containers": Array [],
+              "data": Array [],
+              "handleContainerOverflow": true,
+              "hideSiblingNodes": true,
+              "modals": Array [],
+              "scrollbarSize": 0,
+            }
+          }
+          onEnter={[Function]}
+          onEntering={[Function]}
+          onEscapeKeyDown={[Function]}
+          onExit={[Function]}
+          onExited={[Function]}
+          onHide={[Function]}
+          renderBackdrop={[Function]}
+          renderDialog={[Function]}
+          restoreFocus={true}
+          show={false}
+          transition={[Function]}
+        />
+      </Modal>
+    </ConfirmCancelModal>
+  </EntityModal>
+  <EntityModal
+    fields={
+      Array [
+        Object {
+          "name": "userValue",
+          "placeholder": "User...",
+          "title": "User ID or Name",
+        },
+      ]
+    }
+    handleClose={[Function]}
+    handleSubmit={[Function]}
+    show={false}
+    title="Add friend"
+    validateState={[Function]}
+  >
+    <Modal
+      animation={true}
+      autoFocus={true}
+      backdrop={true}
+      dialogAs={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "displayName": "ModalDialog",
+          "render": [Function],
+        }
+      }
+      enforceFocus={true}
+      keyboard={true}
+      onHide={[Function]}
+      restoreFocus={true}
+      show={false}
+    >
+      <Modal
+        autoFocus={true}
+        backdrop={true}
+        backdropTransition={[Function]}
+        containerClassName="modal-open"
+        enforceFocus={true}
+        keyboard={true}
+        manager={
+          BootstrapModalManager {
+            "containers": Array [],
+            "data": Array [],
+            "handleContainerOverflow": true,
+            "hideSiblingNodes": true,
+            "modals": Array [],
+            "scrollbarSize": 0,
+          }
+        }
+        onEnter={[Function]}
+        onEntering={[Function]}
+        onEscapeKeyDown={[Function]}
+        onExit={[Function]}
+        onExited={[Function]}
+        onHide={[Function]}
+        renderBackdrop={[Function]}
+        renderDialog={[Function]}
+        restoreFocus={true}
+        show={false}
+        transition={[Function]}
+      />
+    </Modal>
+    <ConfirmCancelModal
+      handleConfirm={[Function]}
+      hideModal={[Function]}
+      modalTitle="Delete session?"
+      showModal={false}
+    >
+      <Modal
+        animation={true}
+        autoFocus={true}
+        backdrop={true}
+        dialogAs={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "displayName": "ModalDialog",
+            "render": [Function],
+          }
+        }
+        enforceFocus={true}
+        keyboard={true}
+        onHide={[Function]}
+        restoreFocus={true}
+        show={false}
+      >
+        <Modal
+          autoFocus={true}
+          backdrop={true}
+          backdropTransition={[Function]}
+          containerClassName="modal-open"
+          enforceFocus={true}
+          keyboard={true}
+          manager={
+            BootstrapModalManager {
+              "containers": Array [],
+              "data": Array [],
+              "handleContainerOverflow": true,
+              "hideSiblingNodes": true,
+              "modals": Array [],
+              "scrollbarSize": 0,
+            }
+          }
+          onEnter={[Function]}
+          onEntering={[Function]}
+          onEscapeKeyDown={[Function]}
+          onExit={[Function]}
+          onExited={[Function]}
+          onHide={[Function]}
+          renderBackdrop={[Function]}
+          renderDialog={[Function]}
+          restoreFocus={true}
+          show={false}
+          transition={[Function]}
+        />
+      </Modal>
+    </ConfirmCancelModal>
+  </EntityModal>
+  <ActivityCalendarSettingsModal
+    friends={
+      Array [
+        Object {
+          "key": "uid0-key",
+          "value": Object {
+            "_type": "user",
+            "friends": Array [],
+            "hiatuses": Array [],
+            "name": "user 0",
+            "preferences": Object {
+              "activityCalendar": Object {
+                "friends": Array [],
+                "includeWorkouts": true,
+                "mode": "User only",
+                "splitWorkouts": true,
+              },
+            },
+            "uid": "uid0",
+          },
+        },
+        Object {
+          "key": "uid1-key",
+          "value": Object {
+            "_type": "user",
+            "friends": Array [],
+            "hiatuses": Array [],
+            "name": "user 1",
+            "preferences": Object {
+              "activityCalendar": Object {
+                "friends": Array [],
+                "includeWorkouts": true,
+                "mode": "User only",
+                "splitWorkouts": true,
+              },
+            },
+            "uid": "uid1",
+          },
+        },
+        Object {
+          "key": "uid2-key",
+          "value": Object {
+            "_type": "user",
+            "friends": Array [],
+            "hiatuses": Array [],
+            "name": "user 2",
+            "preferences": Object {
+              "activityCalendar": Object {
+                "friends": Array [],
+                "includeWorkouts": true,
+                "mode": "User only",
+                "splitWorkouts": true,
+              },
+            },
+            "uid": "uid2",
+          },
+        },
+        Object {
+          "key": "uid3-key",
+          "value": Object {
+            "_type": "user",
+            "friends": Array [],
+            "hiatuses": Array [],
+            "name": "user 3",
+            "preferences": Object {
+              "activityCalendar": Object {
+                "friends": Array [],
+                "includeWorkouts": true,
+                "mode": "User only",
+                "splitWorkouts": true,
+              },
+            },
+            "uid": "uid3",
+          },
+        },
+        Object {
+          "key": "uid4-key",
+          "value": Object {
+            "_type": "user",
+            "friends": Array [],
+            "hiatuses": Array [],
+            "name": "user 4",
+            "preferences": Object {
+              "activityCalendar": Object {
+                "friends": Array [],
+                "includeWorkouts": true,
+                "mode": "User only",
+                "splitWorkouts": true,
+              },
+            },
+            "uid": "uid4",
+          },
+        },
+      ]
+    }
+    handleClose={[Function]}
+    handleSubmit={[Function]}
+    show={false}
+    user={
+      Object {
+        "_type": "user",
+        "friends": Array [
+          "uid0",
+          "uid1",
+          "uid2",
+          "uid3",
+          "uid4",
+        ],
+        "hiatuses": Array [],
+        "name": "Mr. User",
+        "preferences": Object {
+          "activityCalendar": Object {
+            "friends": Array [],
+            "includeWorkouts": true,
+            "mode": "User only",
+            "splitWorkouts": true,
+          },
+        },
+        "uid": "myUid",
       }
     }
   >
-    <UserPage>
-      <p>
-        Your uid: 
-        <b>
-          myUid
-        </b>
-      </p>
-      <div
-        className="align-items-center"
-      >
-        <Row
-          className="align-items-center"
-        >
-          <div
-            className="align-items-center row"
-          >
-            <Col>
-              <div
-                className="col"
-              >
-                <p
-                  className="align-middle m-0"
-                >
-                  Your display name: 
-                  <b>
-                    Mr. User
-                  </b>
-                </p>
-              </div>
-            </Col>
-            <Col
-              xs="auto"
-            >
-              <div
-                className="col-auto"
-              >
-                <Button
-                  active={false}
-                  className="float-end"
-                  disabled={false}
-                  onClick={[Function]}
-                  variant="primary"
-                >
-                  <button
-                    className="float-end btn btn-primary"
-                    disabled={false}
-                    onClick={[Function]}
-                    type="button"
-                  >
-                    Edit User
-                  </button>
-                </Button>
-              </div>
-            </Col>
-          </div>
-        </Row>
-      </div>
-      <h3>
-        Preferences
-      </h3>
-      <ListGroup>
-        <ForwardRef
-          as="div"
-          className="list-group"
-          onSelect={[Function]}
-        >
-          <div
-            className="list-group"
-            onKeyDown={[Function]}
-          >
-            <ListGroupItem
-              active={false}
-              className="align-items-center"
-              disabled={false}
-            >
-              <ForwardRef
-                as="div"
-                className="align-items-center list-group-item"
-                disabled={false}
-                onClick={[Function]}
-              >
-                <div
-                  className="align-items-center list-group-item"
-                  data-rb-event-key={null}
-                  disabled={false}
-                  onClick={[Function]}
-                >
-                  <div
-                    className="align-middle float-start"
-                  >
-                    Activity Calendar Settings
-                  </div>
-                  <Button
-                    active={false}
-                    className="float-end"
-                    disabled={false}
-                    onClick={[Function]}
-                    size="sm"
-                    variant="primary"
-                  >
-                    <button
-                      className="float-end btn btn-primary btn-sm"
-                      disabled={false}
-                      onClick={[Function]}
-                      type="button"
-                    >
-                      Edit
-                    </button>
-                  </Button>
-                </div>
-              </ForwardRef>
-            </ListGroupItem>
-          </div>
-        </ForwardRef>
-      </ListGroup>
-      <h3>
-        Friends
-      </h3>
-      <ListGroup>
-        <ForwardRef
-          as="div"
-          className="list-group"
-          onSelect={[Function]}
-        >
-          <div
-            className="list-group"
-            onKeyDown={[Function]}
-          >
-            <ListGroupItem
-              active={false}
-              className="align-items-center"
-              disabled={false}
-              id="uid0"
-              key="0"
-            >
-              <ForwardRef
-                as="div"
-                className="align-items-center list-group-item"
-                disabled={false}
-                id="uid0"
-                onClick={[Function]}
-              >
-                <div
-                  className="align-items-center list-group-item"
-                  data-rb-event-key={null}
-                  disabled={false}
-                  id="uid0"
-                  onClick={[Function]}
-                >
-                  <div
-                    className="align-middle float-start"
-                  >
-                    user 0
-                  </div>
-                  <ConfirmCancelButton
-                    buttonProps={
-                      Object {
-                        "className": "float-end",
-                        "size": "sm",
-                      }
-                    }
-                    buttonText="-"
-                    handleConfirm={[Function]}
-                    modalBody="Remove user 0 from your friends list?"
-                    modalTitle="Remove friend"
-                  >
-                    <WrappedButton>
-                      <ShowModalButton>
-                        <Button
-                          active={false}
-                          className="float-end"
-                          disabled={false}
-                          onClick={[Function]}
-                          size="sm"
-                          variant="danger"
-                        >
-                          <button
-                            className="float-end btn btn-danger btn-sm"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            -
-                          </button>
-                        </Button>
-                      </ShowModalButton>
-                    </WrappedButton>
-                    <ConfirmCancelModal
-                      handleConfirm={[Function]}
-                      hideModal={[Function]}
-                      modalBody="Remove user 0 from your friends list?"
-                      modalTitle="Remove friend"
-                      showModal={false}
-                    >
-                      <Modal
-                        animation={true}
-                        autoFocus={true}
-                        backdrop={true}
-                        dialogAs={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "displayName": "ModalDialog",
-                            "render": [Function],
-                          }
-                        }
-                        enforceFocus={true}
-                        keyboard={true}
-                        onHide={[Function]}
-                        restoreFocus={true}
-                        show={false}
-                      >
-                        <Modal
-                          autoFocus={true}
-                          backdrop={true}
-                          backdropTransition={[Function]}
-                          containerClassName="modal-open"
-                          enforceFocus={true}
-                          keyboard={true}
-                          manager={
-                            BootstrapModalManager {
-                              "containers": Array [],
-                              "data": Array [],
-                              "handleContainerOverflow": true,
-                              "hideSiblingNodes": true,
-                              "modals": Array [],
-                              "scrollbarSize": 0,
-                            }
-                          }
-                          onEnter={[Function]}
-                          onEntering={[Function]}
-                          onEscapeKeyDown={[Function]}
-                          onExit={[Function]}
-                          onExited={[Function]}
-                          onHide={[Function]}
-                          renderBackdrop={[Function]}
-                          renderDialog={[Function]}
-                          restoreFocus={true}
-                          show={false}
-                          transition={[Function]}
-                        />
-                      </Modal>
-                    </ConfirmCancelModal>
-                  </ConfirmCancelButton>
-                </div>
-              </ForwardRef>
-            </ListGroupItem>
-            <ListGroupItem
-              active={false}
-              className="align-items-center"
-              disabled={false}
-              id="uid1"
-              key="1"
-            >
-              <ForwardRef
-                as="div"
-                className="align-items-center list-group-item"
-                disabled={false}
-                id="uid1"
-                onClick={[Function]}
-              >
-                <div
-                  className="align-items-center list-group-item"
-                  data-rb-event-key={null}
-                  disabled={false}
-                  id="uid1"
-                  onClick={[Function]}
-                >
-                  <div
-                    className="align-middle float-start"
-                  >
-                    user 1
-                  </div>
-                  <ConfirmCancelButton
-                    buttonProps={
-                      Object {
-                        "className": "float-end",
-                        "size": "sm",
-                      }
-                    }
-                    buttonText="-"
-                    handleConfirm={[Function]}
-                    modalBody="Remove user 1 from your friends list?"
-                    modalTitle="Remove friend"
-                  >
-                    <WrappedButton>
-                      <ShowModalButton>
-                        <Button
-                          active={false}
-                          className="float-end"
-                          disabled={false}
-                          onClick={[Function]}
-                          size="sm"
-                          variant="danger"
-                        >
-                          <button
-                            className="float-end btn btn-danger btn-sm"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            -
-                          </button>
-                        </Button>
-                      </ShowModalButton>
-                    </WrappedButton>
-                    <ConfirmCancelModal
-                      handleConfirm={[Function]}
-                      hideModal={[Function]}
-                      modalBody="Remove user 1 from your friends list?"
-                      modalTitle="Remove friend"
-                      showModal={false}
-                    >
-                      <Modal
-                        animation={true}
-                        autoFocus={true}
-                        backdrop={true}
-                        dialogAs={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "displayName": "ModalDialog",
-                            "render": [Function],
-                          }
-                        }
-                        enforceFocus={true}
-                        keyboard={true}
-                        onHide={[Function]}
-                        restoreFocus={true}
-                        show={false}
-                      >
-                        <Modal
-                          autoFocus={true}
-                          backdrop={true}
-                          backdropTransition={[Function]}
-                          containerClassName="modal-open"
-                          enforceFocus={true}
-                          keyboard={true}
-                          manager={
-                            BootstrapModalManager {
-                              "containers": Array [],
-                              "data": Array [],
-                              "handleContainerOverflow": true,
-                              "hideSiblingNodes": true,
-                              "modals": Array [],
-                              "scrollbarSize": 0,
-                            }
-                          }
-                          onEnter={[Function]}
-                          onEntering={[Function]}
-                          onEscapeKeyDown={[Function]}
-                          onExit={[Function]}
-                          onExited={[Function]}
-                          onHide={[Function]}
-                          renderBackdrop={[Function]}
-                          renderDialog={[Function]}
-                          restoreFocus={true}
-                          show={false}
-                          transition={[Function]}
-                        />
-                      </Modal>
-                    </ConfirmCancelModal>
-                  </ConfirmCancelButton>
-                </div>
-              </ForwardRef>
-            </ListGroupItem>
-            <ListGroupItem
-              active={false}
-              className="align-items-center"
-              disabled={false}
-              id="uid2"
-              key="2"
-            >
-              <ForwardRef
-                as="div"
-                className="align-items-center list-group-item"
-                disabled={false}
-                id="uid2"
-                onClick={[Function]}
-              >
-                <div
-                  className="align-items-center list-group-item"
-                  data-rb-event-key={null}
-                  disabled={false}
-                  id="uid2"
-                  onClick={[Function]}
-                >
-                  <div
-                    className="align-middle float-start"
-                  >
-                    user 2
-                  </div>
-                  <ConfirmCancelButton
-                    buttonProps={
-                      Object {
-                        "className": "float-end",
-                        "size": "sm",
-                      }
-                    }
-                    buttonText="-"
-                    handleConfirm={[Function]}
-                    modalBody="Remove user 2 from your friends list?"
-                    modalTitle="Remove friend"
-                  >
-                    <WrappedButton>
-                      <ShowModalButton>
-                        <Button
-                          active={false}
-                          className="float-end"
-                          disabled={false}
-                          onClick={[Function]}
-                          size="sm"
-                          variant="danger"
-                        >
-                          <button
-                            className="float-end btn btn-danger btn-sm"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            -
-                          </button>
-                        </Button>
-                      </ShowModalButton>
-                    </WrappedButton>
-                    <ConfirmCancelModal
-                      handleConfirm={[Function]}
-                      hideModal={[Function]}
-                      modalBody="Remove user 2 from your friends list?"
-                      modalTitle="Remove friend"
-                      showModal={false}
-                    >
-                      <Modal
-                        animation={true}
-                        autoFocus={true}
-                        backdrop={true}
-                        dialogAs={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "displayName": "ModalDialog",
-                            "render": [Function],
-                          }
-                        }
-                        enforceFocus={true}
-                        keyboard={true}
-                        onHide={[Function]}
-                        restoreFocus={true}
-                        show={false}
-                      >
-                        <Modal
-                          autoFocus={true}
-                          backdrop={true}
-                          backdropTransition={[Function]}
-                          containerClassName="modal-open"
-                          enforceFocus={true}
-                          keyboard={true}
-                          manager={
-                            BootstrapModalManager {
-                              "containers": Array [],
-                              "data": Array [],
-                              "handleContainerOverflow": true,
-                              "hideSiblingNodes": true,
-                              "modals": Array [],
-                              "scrollbarSize": 0,
-                            }
-                          }
-                          onEnter={[Function]}
-                          onEntering={[Function]}
-                          onEscapeKeyDown={[Function]}
-                          onExit={[Function]}
-                          onExited={[Function]}
-                          onHide={[Function]}
-                          renderBackdrop={[Function]}
-                          renderDialog={[Function]}
-                          restoreFocus={true}
-                          show={false}
-                          transition={[Function]}
-                        />
-                      </Modal>
-                    </ConfirmCancelModal>
-                  </ConfirmCancelButton>
-                </div>
-              </ForwardRef>
-            </ListGroupItem>
-            <ListGroupItem
-              active={false}
-              className="align-items-center"
-              disabled={false}
-              id="uid3"
-              key="3"
-            >
-              <ForwardRef
-                as="div"
-                className="align-items-center list-group-item"
-                disabled={false}
-                id="uid3"
-                onClick={[Function]}
-              >
-                <div
-                  className="align-items-center list-group-item"
-                  data-rb-event-key={null}
-                  disabled={false}
-                  id="uid3"
-                  onClick={[Function]}
-                >
-                  <div
-                    className="align-middle float-start"
-                  >
-                    user 3
-                  </div>
-                  <ConfirmCancelButton
-                    buttonProps={
-                      Object {
-                        "className": "float-end",
-                        "size": "sm",
-                      }
-                    }
-                    buttonText="-"
-                    handleConfirm={[Function]}
-                    modalBody="Remove user 3 from your friends list?"
-                    modalTitle="Remove friend"
-                  >
-                    <WrappedButton>
-                      <ShowModalButton>
-                        <Button
-                          active={false}
-                          className="float-end"
-                          disabled={false}
-                          onClick={[Function]}
-                          size="sm"
-                          variant="danger"
-                        >
-                          <button
-                            className="float-end btn btn-danger btn-sm"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            -
-                          </button>
-                        </Button>
-                      </ShowModalButton>
-                    </WrappedButton>
-                    <ConfirmCancelModal
-                      handleConfirm={[Function]}
-                      hideModal={[Function]}
-                      modalBody="Remove user 3 from your friends list?"
-                      modalTitle="Remove friend"
-                      showModal={false}
-                    >
-                      <Modal
-                        animation={true}
-                        autoFocus={true}
-                        backdrop={true}
-                        dialogAs={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "displayName": "ModalDialog",
-                            "render": [Function],
-                          }
-                        }
-                        enforceFocus={true}
-                        keyboard={true}
-                        onHide={[Function]}
-                        restoreFocus={true}
-                        show={false}
-                      >
-                        <Modal
-                          autoFocus={true}
-                          backdrop={true}
-                          backdropTransition={[Function]}
-                          containerClassName="modal-open"
-                          enforceFocus={true}
-                          keyboard={true}
-                          manager={
-                            BootstrapModalManager {
-                              "containers": Array [],
-                              "data": Array [],
-                              "handleContainerOverflow": true,
-                              "hideSiblingNodes": true,
-                              "modals": Array [],
-                              "scrollbarSize": 0,
-                            }
-                          }
-                          onEnter={[Function]}
-                          onEntering={[Function]}
-                          onEscapeKeyDown={[Function]}
-                          onExit={[Function]}
-                          onExited={[Function]}
-                          onHide={[Function]}
-                          renderBackdrop={[Function]}
-                          renderDialog={[Function]}
-                          restoreFocus={true}
-                          show={false}
-                          transition={[Function]}
-                        />
-                      </Modal>
-                    </ConfirmCancelModal>
-                  </ConfirmCancelButton>
-                </div>
-              </ForwardRef>
-            </ListGroupItem>
-            <ListGroupItem
-              active={false}
-              className="align-items-center"
-              disabled={false}
-              id="uid4"
-              key="4"
-            >
-              <ForwardRef
-                as="div"
-                className="align-items-center list-group-item"
-                disabled={false}
-                id="uid4"
-                onClick={[Function]}
-              >
-                <div
-                  className="align-items-center list-group-item"
-                  data-rb-event-key={null}
-                  disabled={false}
-                  id="uid4"
-                  onClick={[Function]}
-                >
-                  <div
-                    className="align-middle float-start"
-                  >
-                    user 4
-                  </div>
-                  <ConfirmCancelButton
-                    buttonProps={
-                      Object {
-                        "className": "float-end",
-                        "size": "sm",
-                      }
-                    }
-                    buttonText="-"
-                    handleConfirm={[Function]}
-                    modalBody="Remove user 4 from your friends list?"
-                    modalTitle="Remove friend"
-                  >
-                    <WrappedButton>
-                      <ShowModalButton>
-                        <Button
-                          active={false}
-                          className="float-end"
-                          disabled={false}
-                          onClick={[Function]}
-                          size="sm"
-                          variant="danger"
-                        >
-                          <button
-                            className="float-end btn btn-danger btn-sm"
-                            disabled={false}
-                            onClick={[Function]}
-                            type="button"
-                          >
-                            -
-                          </button>
-                        </Button>
-                      </ShowModalButton>
-                    </WrappedButton>
-                    <ConfirmCancelModal
-                      handleConfirm={[Function]}
-                      hideModal={[Function]}
-                      modalBody="Remove user 4 from your friends list?"
-                      modalTitle="Remove friend"
-                      showModal={false}
-                    >
-                      <Modal
-                        animation={true}
-                        autoFocus={true}
-                        backdrop={true}
-                        dialogAs={
-                          Object {
-                            "$$typeof": Symbol(react.forward_ref),
-                            "displayName": "ModalDialog",
-                            "render": [Function],
-                          }
-                        }
-                        enforceFocus={true}
-                        keyboard={true}
-                        onHide={[Function]}
-                        restoreFocus={true}
-                        show={false}
-                      >
-                        <Modal
-                          autoFocus={true}
-                          backdrop={true}
-                          backdropTransition={[Function]}
-                          containerClassName="modal-open"
-                          enforceFocus={true}
-                          keyboard={true}
-                          manager={
-                            BootstrapModalManager {
-                              "containers": Array [],
-                              "data": Array [],
-                              "handleContainerOverflow": true,
-                              "hideSiblingNodes": true,
-                              "modals": Array [],
-                              "scrollbarSize": 0,
-                            }
-                          }
-                          onEnter={[Function]}
-                          onEntering={[Function]}
-                          onEscapeKeyDown={[Function]}
-                          onExit={[Function]}
-                          onExited={[Function]}
-                          onHide={[Function]}
-                          renderBackdrop={[Function]}
-                          renderDialog={[Function]}
-                          restoreFocus={true}
-                          show={false}
-                          transition={[Function]}
-                        />
-                      </Modal>
-                    </ConfirmCancelModal>
-                  </ConfirmCancelButton>
-                </div>
-              </ForwardRef>
-            </ListGroupItem>
-          </div>
-        </ForwardRef>
-      </ListGroup>
-      <br />
-      <div
-        className="d-grid d-block"
-      >
-        <Button
-          active={false}
-          disabled={false}
-          id="add-friend"
-          onClick={[Function]}
-          variant="primary"
-        >
-          <button
-            className="btn btn-primary"
-            disabled={false}
-            id="add-friend"
-            onClick={[Function]}
-            type="button"
-          >
-            Add Friend
-          </button>
-        </Button>
-      </div>
-      <EntityModal
-        fields={
-          Array [
-            Object {
-              "name": "name",
-              "placeholder": "Name..",
-              "title": "User Name",
-            },
-            Object {
-              "name": "hiatuses",
-              "options": Object {
-                "component": [Function],
-                "type": "custom",
-              },
-              "title": "Hiatuses",
-            },
-          ]
+    <Modal
+      animation={true}
+      autoFocus={true}
+      backdrop={true}
+      dialogAs={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "displayName": "ModalDialog",
+          "render": [Function],
         }
-        handleClose={[Function]}
-        handleSubmit={[Function]}
-        initialValues={
-          Object {
-            "_type": "user",
-            "friends": Array [
-              "uid0",
-              "uid1",
-              "uid2",
-              "uid3",
-              "uid4",
-            ],
-            "hiatuses": Array [],
-            "name": "Mr. User",
-            "preferences": Object {
-              "activityCalendar": Object {
-                "friends": Array [],
-                "includeWorkouts": true,
-                "mode": "User only",
-                "splitWorkouts": true,
-              },
-            },
-            "uid": "myUid",
+      }
+      enforceFocus={true}
+      keyboard={true}
+      onHide={[Function]}
+      restoreFocus={true}
+      show={false}
+    >
+      <Modal
+        autoFocus={true}
+        backdrop={true}
+        backdropTransition={[Function]}
+        containerClassName="modal-open"
+        enforceFocus={true}
+        keyboard={true}
+        manager={
+          BootstrapModalManager {
+            "containers": Array [],
+            "data": Array [],
+            "handleContainerOverflow": true,
+            "hideSiblingNodes": true,
+            "modals": Array [],
+            "scrollbarSize": 0,
           }
         }
+        onEnter={[Function]}
+        onEntering={[Function]}
+        onEscapeKeyDown={[Function]}
+        onExit={[Function]}
+        onExited={[Function]}
+        onHide={[Function]}
+        renderBackdrop={[Function]}
+        renderDialog={[Function]}
+        restoreFocus={true}
         show={false}
-        title="Edit User"
-        validateState={[Function]}
-      >
-        <Modal
-          animation={true}
-          autoFocus={true}
-          backdrop={true}
-          dialogAs={
-            Object {
-              "$$typeof": Symbol(react.forward_ref),
-              "displayName": "ModalDialog",
-              "render": [Function],
-            }
-          }
-          enforceFocus={true}
-          keyboard={true}
-          onHide={[Function]}
-          restoreFocus={true}
-          show={false}
-        >
-          <Modal
-            autoFocus={true}
-            backdrop={true}
-            backdropTransition={[Function]}
-            containerClassName="modal-open"
-            enforceFocus={true}
-            keyboard={true}
-            manager={
-              BootstrapModalManager {
-                "containers": Array [],
-                "data": Array [],
-                "handleContainerOverflow": true,
-                "hideSiblingNodes": true,
-                "modals": Array [],
-                "scrollbarSize": 0,
-              }
-            }
-            onEnter={[Function]}
-            onEntering={[Function]}
-            onEscapeKeyDown={[Function]}
-            onExit={[Function]}
-            onExited={[Function]}
-            onHide={[Function]}
-            renderBackdrop={[Function]}
-            renderDialog={[Function]}
-            restoreFocus={true}
-            show={false}
-            transition={[Function]}
-          />
-        </Modal>
-        <ConfirmCancelModal
-          handleConfirm={[Function]}
-          hideModal={[Function]}
-          modalTitle="Delete session?"
-          showModal={false}
-        >
-          <Modal
-            animation={true}
-            autoFocus={true}
-            backdrop={true}
-            dialogAs={
-              Object {
-                "$$typeof": Symbol(react.forward_ref),
-                "displayName": "ModalDialog",
-                "render": [Function],
-              }
-            }
-            enforceFocus={true}
-            keyboard={true}
-            onHide={[Function]}
-            restoreFocus={true}
-            show={false}
-          >
-            <Modal
-              autoFocus={true}
-              backdrop={true}
-              backdropTransition={[Function]}
-              containerClassName="modal-open"
-              enforceFocus={true}
-              keyboard={true}
-              manager={
-                BootstrapModalManager {
-                  "containers": Array [],
-                  "data": Array [],
-                  "handleContainerOverflow": true,
-                  "hideSiblingNodes": true,
-                  "modals": Array [],
-                  "scrollbarSize": 0,
-                }
-              }
-              onEnter={[Function]}
-              onEntering={[Function]}
-              onEscapeKeyDown={[Function]}
-              onExit={[Function]}
-              onExited={[Function]}
-              onHide={[Function]}
-              renderBackdrop={[Function]}
-              renderDialog={[Function]}
-              restoreFocus={true}
-              show={false}
-              transition={[Function]}
-            />
-          </Modal>
-        </ConfirmCancelModal>
-      </EntityModal>
-      <EntityModal
-        fields={
-          Array [
-            Object {
-              "name": "userValue",
-              "placeholder": "User...",
-              "title": "User ID or Name",
-            },
-          ]
-        }
-        handleClose={[Function]}
-        handleSubmit={[Function]}
-        show={false}
-        title="Add friend"
-        validateState={[Function]}
-      >
-        <Modal
-          animation={true}
-          autoFocus={true}
-          backdrop={true}
-          dialogAs={
-            Object {
-              "$$typeof": Symbol(react.forward_ref),
-              "displayName": "ModalDialog",
-              "render": [Function],
-            }
-          }
-          enforceFocus={true}
-          keyboard={true}
-          onHide={[Function]}
-          restoreFocus={true}
-          show={false}
-        >
-          <Modal
-            autoFocus={true}
-            backdrop={true}
-            backdropTransition={[Function]}
-            containerClassName="modal-open"
-            enforceFocus={true}
-            keyboard={true}
-            manager={
-              BootstrapModalManager {
-                "containers": Array [],
-                "data": Array [],
-                "handleContainerOverflow": true,
-                "hideSiblingNodes": true,
-                "modals": Array [],
-                "scrollbarSize": 0,
-              }
-            }
-            onEnter={[Function]}
-            onEntering={[Function]}
-            onEscapeKeyDown={[Function]}
-            onExit={[Function]}
-            onExited={[Function]}
-            onHide={[Function]}
-            renderBackdrop={[Function]}
-            renderDialog={[Function]}
-            restoreFocus={true}
-            show={false}
-            transition={[Function]}
-          />
-        </Modal>
-        <ConfirmCancelModal
-          handleConfirm={[Function]}
-          hideModal={[Function]}
-          modalTitle="Delete session?"
-          showModal={false}
-        >
-          <Modal
-            animation={true}
-            autoFocus={true}
-            backdrop={true}
-            dialogAs={
-              Object {
-                "$$typeof": Symbol(react.forward_ref),
-                "displayName": "ModalDialog",
-                "render": [Function],
-              }
-            }
-            enforceFocus={true}
-            keyboard={true}
-            onHide={[Function]}
-            restoreFocus={true}
-            show={false}
-          >
-            <Modal
-              autoFocus={true}
-              backdrop={true}
-              backdropTransition={[Function]}
-              containerClassName="modal-open"
-              enforceFocus={true}
-              keyboard={true}
-              manager={
-                BootstrapModalManager {
-                  "containers": Array [],
-                  "data": Array [],
-                  "handleContainerOverflow": true,
-                  "hideSiblingNodes": true,
-                  "modals": Array [],
-                  "scrollbarSize": 0,
-                }
-              }
-              onEnter={[Function]}
-              onEntering={[Function]}
-              onEscapeKeyDown={[Function]}
-              onExit={[Function]}
-              onExited={[Function]}
-              onHide={[Function]}
-              renderBackdrop={[Function]}
-              renderDialog={[Function]}
-              restoreFocus={true}
-              show={false}
-              transition={[Function]}
-            />
-          </Modal>
-        </ConfirmCancelModal>
-      </EntityModal>
-      <ActivityCalendarSettingsModal
-        friends={
-          Array [
-            Object {
-              "key": "uid0-key",
-              "value": Object {
-                "_type": "user",
-                "friends": Array [],
-                "hiatuses": Array [],
-                "name": "user 0",
-                "preferences": Object {
-                  "activityCalendar": Object {
-                    "friends": Array [],
-                    "includeWorkouts": true,
-                    "mode": "User only",
-                    "splitWorkouts": true,
-                  },
-                },
-                "uid": "uid0",
-              },
-            },
-            Object {
-              "key": "uid1-key",
-              "value": Object {
-                "_type": "user",
-                "friends": Array [],
-                "hiatuses": Array [],
-                "name": "user 1",
-                "preferences": Object {
-                  "activityCalendar": Object {
-                    "friends": Array [],
-                    "includeWorkouts": true,
-                    "mode": "User only",
-                    "splitWorkouts": true,
-                  },
-                },
-                "uid": "uid1",
-              },
-            },
-            Object {
-              "key": "uid2-key",
-              "value": Object {
-                "_type": "user",
-                "friends": Array [],
-                "hiatuses": Array [],
-                "name": "user 2",
-                "preferences": Object {
-                  "activityCalendar": Object {
-                    "friends": Array [],
-                    "includeWorkouts": true,
-                    "mode": "User only",
-                    "splitWorkouts": true,
-                  },
-                },
-                "uid": "uid2",
-              },
-            },
-            Object {
-              "key": "uid3-key",
-              "value": Object {
-                "_type": "user",
-                "friends": Array [],
-                "hiatuses": Array [],
-                "name": "user 3",
-                "preferences": Object {
-                  "activityCalendar": Object {
-                    "friends": Array [],
-                    "includeWorkouts": true,
-                    "mode": "User only",
-                    "splitWorkouts": true,
-                  },
-                },
-                "uid": "uid3",
-              },
-            },
-            Object {
-              "key": "uid4-key",
-              "value": Object {
-                "_type": "user",
-                "friends": Array [],
-                "hiatuses": Array [],
-                "name": "user 4",
-                "preferences": Object {
-                  "activityCalendar": Object {
-                    "friends": Array [],
-                    "includeWorkouts": true,
-                    "mode": "User only",
-                    "splitWorkouts": true,
-                  },
-                },
-                "uid": "uid4",
-              },
-            },
-          ]
-        }
-        handleClose={[Function]}
-        handleSubmit={[Function]}
-        show={false}
-        user={
-          Object {
-            "_type": "user",
-            "friends": Array [
-              "uid0",
-              "uid1",
-              "uid2",
-              "uid3",
-              "uid4",
-            ],
-            "hiatuses": Array [],
-            "name": "Mr. User",
-            "preferences": Object {
-              "activityCalendar": Object {
-                "friends": Array [],
-                "includeWorkouts": true,
-                "mode": "User only",
-                "splitWorkouts": true,
-              },
-            },
-            "uid": "myUid",
-          }
-        }
-      >
-        <Modal
-          animation={true}
-          autoFocus={true}
-          backdrop={true}
-          dialogAs={
-            Object {
-              "$$typeof": Symbol(react.forward_ref),
-              "displayName": "ModalDialog",
-              "render": [Function],
-            }
-          }
-          enforceFocus={true}
-          keyboard={true}
-          onHide={[Function]}
-          restoreFocus={true}
-          show={false}
-        >
-          <Modal
-            autoFocus={true}
-            backdrop={true}
-            backdropTransition={[Function]}
-            containerClassName="modal-open"
-            enforceFocus={true}
-            keyboard={true}
-            manager={
-              BootstrapModalManager {
-                "containers": Array [],
-                "data": Array [],
-                "handleContainerOverflow": true,
-                "hideSiblingNodes": true,
-                "modals": Array [],
-                "scrollbarSize": 0,
-              }
-            }
-            onEnter={[Function]}
-            onEntering={[Function]}
-            onEscapeKeyDown={[Function]}
-            onExit={[Function]}
-            onExited={[Function]}
-            onHide={[Function]}
-            renderBackdrop={[Function]}
-            renderDialog={[Function]}
-            restoreFocus={true}
-            show={false}
-            transition={[Function]}
-          />
-        </Modal>
-      </ActivityCalendarSettingsModal>
-    </UserPage>
-  </Provider>
-</Wrapper>
+        transition={[Function]}
+      />
+    </Modal>
+  </ActivityCalendarSettingsModal>
+</UserPage>
 `;

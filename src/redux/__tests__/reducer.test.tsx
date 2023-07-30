@@ -11,7 +11,10 @@ import { Provider } from 'react-redux'
 import { AppStore } from '../index'
 import React from 'react'
 import { Substitute } from '@fluffy-spoon/substitute'
+import { mount, ReactWrapper } from 'enzyme'
+import { RouterParams, wrapWithRouter } from '../../__tests__/router.test'
 
+jest.useFakeTimers().setSystemTime(new Date('2022-12-25'))
 jest.mock('react-redux-firebase', () => ({
   ...jest.requireActual('react-redux-firebase'),
   useFirebaseConnect: jest.fn(),
@@ -61,7 +64,7 @@ const session = defaultSession({
     },
   ],
 })
-const sessionKey = 'sessionA'
+export const sessionKey = 'sessionA'
 
 const workout = defaultWorkout({
   uid: user.uid,
@@ -111,17 +114,52 @@ export const defaultState: RootState = {
   } as FirebaseReducer.Reducer<User, FirebaseSchema>,
 }
 
+type ReduxParams = {
+  preloadedState?: RootState
+  store?: AppStore
+}
 export const wrapWithProviders = (
   ui: React.ReactElement,
   {
     preloadedState = defaultState,
     store = createStore(rootReducer, preloadedState),
-  }: {
-    preloadedState?: RootState
-    store?: AppStore
-  } = {},
+  }: ReduxParams = {},
 ): { store: AppStore; wrapper: React.ReactElement } => {
   const Wrapper = ({ children }) => <Provider store={store}>{children}</Provider>
 
   return { store, wrapper: <Wrapper>{ui}</Wrapper> }
+}
+
+/**
+ * Utility function to mount the component with predefined redux state and react router context
+ * @param ui Component to render
+ * @param reduxParams Redux state configuration
+ * @param routerParams React router context configuration
+ * @returns <li>store - Redux store
+ * @returns <li>wrapper - fully wrapped mounted component
+ * @returns <li>component - mounted component from within the wrapper
+ */
+export const mountWithProviders = (
+  ui: React.ReactElement,
+  {
+    reduxParams,
+    routerParams,
+  }: {
+    reduxParams?: ReduxParams
+    routerParams?: RouterParams
+  } = {},
+): {
+  store: AppStore
+  wrapper: ReactWrapper
+  component: ReactWrapper
+} => {
+  const { store, wrapper } = wrapWithProviders(wrapWithRouter(ui, routerParams), reduxParams)
+
+  const mountedWrapper = mount(wrapper)
+
+  return {
+    store,
+    wrapper: mountedWrapper,
+    component: mountedWrapper.find(ui),
+  }
 }

@@ -101,11 +101,10 @@ const EntityModal = <T,>({
   }, [initialValues])
 
   const onChange = id => value => {
-    const newData = {
+    setData(data => ({
       ...data,
       [id]: value,
-    }
-    setData(newData)
+    }))
   }
 
   const onChangeEvent = id => evt => onChange(id)(evt.target.value)

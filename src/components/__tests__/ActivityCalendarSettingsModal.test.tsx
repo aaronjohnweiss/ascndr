@@ -72,7 +72,7 @@ describe('activity calendar settings', () => {
         },
       },
     }
-    const wrapper = shallow(<ActivityCalendarSettingsModal {...defaultProps()} />)
+    const wrapper = shallow(<ActivityCalendarSettingsModal {...props} />)
 
     wrapper
       .find('FormCheck[label="Include friends"]')

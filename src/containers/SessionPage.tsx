@@ -2,7 +2,7 @@ import React from 'react'
 import { Button, Col, Container, Row } from 'react-bootstrap'
 import { compareGrades, countPartials, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
 import GradeModal, { PARTIAL_MAX } from '../components/GradeModal'
-import { Link } from 'react-router-dom'
+import { Link, useHistory, useParams } from 'react-router-dom'
 import { sessionDuration } from '../helpers/durationUtils'
 import { isLoaded, useFirebase } from 'react-redux-firebase'
 import { sum } from '../helpers/mathUtils'
@@ -17,6 +17,7 @@ import { getUser, useDatabase } from '../redux/selectors/selectors'
 import { DecoratedCustomGrade, DecoratedGrade, Grade } from '../types/Grade'
 import { RouteCount } from '../types/Session'
 import { entries } from '../helpers/recordUtils'
+import { IdParams } from '../types/params'
 
 const hasPartialCompletions = ({ partials = {} }) =>
   entries(partials).some(([key, val]) => key > 0 && val > 0)
@@ -34,12 +35,11 @@ export type QuickEditButtons = (
       }
     | { key: { percentage?: number } & Grade; isCustom?: false },
 ) => JSX.Element
-export const SessionPage = ({
-  match: {
-    params: { id },
-  },
-  history,
-}) => {
+
+export const SessionPage = () => {
+  const history = useHistory()
+  const { id } = useParams<IdParams>()
+
   const { uid } = getUser()
   const firebaseState = useDatabase()
   const session = firebaseState.sessions.getOne(id)
