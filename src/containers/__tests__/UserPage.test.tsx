@@ -2,22 +2,24 @@ import { mount } from 'enzyme'
 import {
   defaultState,
   mockFirebase,
+  setupMockFirebase,
   user,
   userKey,
   wrapWithProviders,
 } from '../../redux/__tests__/reducer.test'
 import UserPage from '../UserPage'
 import { defaultUser } from '../../types/User'
-import { useFirebase } from 'react-redux-firebase'
 
 describe('UserPage', () => {
+  beforeEach(() => {
+    setupMockFirebase()
+  })
+
   it('should render', () => {
     expect(mount(wrapWithProviders(<UserPage />).wrapper)).toMatchSnapshot()
   })
 
   it('should allow adding a friend', () => {
-    const mockUseFirebase = useFirebase as jest.Mock
-    mockUseFirebase.mockImplementation(() => mockFirebase)
     const state = { ...defaultState }
     const newFriendUid = 'newFriend'
     state.firebase.ordered.users.push({

@@ -24,6 +24,12 @@ export const mockFirebase: ExtendedFirebaseInstance = {
   push: jest.fn(),
 }
 
+export const setupMockFirebase = () => {
+  const mockUseFirebase = useFirebase as jest.Mock
+  mockUseFirebase.mockReturnValue(mockFirebase)
+  return mockUseFirebase
+}
+
 export const friends = Array.from({ length: 5 }, (_, i) =>
   defaultUser({ uid: `uid${i}`, name: `user ${i}` }),
 )
