@@ -51,11 +51,11 @@ const gym = defaultGym({
 const route = defaultRoute({
   gymId: gymKey,
 })
-const routeKey = 'routeA'
-const session = defaultSession({
+export const routeKey = 'routeA'
+export const session = defaultSession({
   uid: user.uid,
   gymId: gymKey,
-  startTime: 0,
+  startTime: new Date().getTime(),
   customRoutes: [
     {
       key: routeKey,

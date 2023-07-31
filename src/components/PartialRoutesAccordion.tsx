@@ -1,6 +1,6 @@
 import React from 'react'
 import { Accordion, Col, Row } from 'react-bootstrap'
-import { printPercentage } from '../helpers/gradeUtils'
+import { prettyPrint, printPercentage } from '../helpers/gradeUtils'
 import { Grade } from '../types/Grade'
 import { PartialCount, RouteCount } from '../types/Session'
 import { OrderedList } from '../types/Firebase'
@@ -42,7 +42,11 @@ export const PartialRoutesAccordion = ({
               {entries(partialsForGrade)
                 .sort(([percentA], [percentB]) => percentB - percentA)
                 .map(([percentage, count], index) => (
-                  <Row key={index} className="align-items-center session-grade-row">
+                  <Row
+                    key={index}
+                    id={`${prettyPrint(grade)}-${percentage}`}
+                    className="align-items-center session-grade-row"
+                  >
                     <Col>
                       {printPercentage(percentage)} ({count})
                     </Col>
@@ -67,7 +71,11 @@ export const PartialRoutesAccordion = ({
                   {entries(customRoutesMap[route.key].partials)
                     .sort(([percentA], [percentB]) => percentB - percentA)
                     .map(([percentage, count], index) => (
-                      <Row key={index} className="align-items-center session-grade-row">
+                      <Row
+                        key={index}
+                        id={`${route.key}-${percentage}`}
+                        className="align-items-center session-grade-row"
+                      >
                         <Col>
                           {printPercentage(percentage)} ({count})
                         </Col>

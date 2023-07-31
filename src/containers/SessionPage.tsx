@@ -267,7 +267,7 @@ export const SessionPage = () => {
       <>
         <Button
           variant="outline-secondary"
-          className="plus-minus-button"
+          className="plus-minus-button plus"
           onClick={() => (isCustom ? addCustomRoute(key) : addStandardRoute(key))}
         >
           +
@@ -275,7 +275,7 @@ export const SessionPage = () => {
         {count > 0 && (
           <Button
             variant="outline-secondary"
-            className="plus-minus-button"
+            className="plus-minus-button minus"
             onClick={() => (isCustom ? removeCustomRoute(key) : removeStandardRoute(key))}
           >
             -
@@ -333,7 +333,7 @@ export const SessionPage = () => {
                 .reduce(sum, 0)
               const partialCountForGrade = standardPartialCount + customPartialCount
               return (
-                <div key={gradeLabel}>
+                <div key={gradeLabel} id={gradeLabel}>
                   <Row className="align-items-center session-grade-row" key={gradeLabel}>
                     <Col>
                       <h5 className="session-grade-header">
@@ -347,7 +347,11 @@ export const SessionPage = () => {
                   {customRoutesForGrade
                     .filter(route => hasFullCompletions(customRoutesMap[route.key]))
                     .map(route => (
-                      <Row className="align-items-center session-grade-row" key={route.key}>
+                      <Row
+                        className="align-items-center session-grade-row"
+                        key={route.key}
+                        id={route.key}
+                      >
                         <Col>
                           {route.value.name} ({customRoutesMap[route.key].count})
                         </Col>
