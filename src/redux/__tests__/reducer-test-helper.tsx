@@ -12,7 +12,7 @@ import { AppStore } from '../index'
 import React from 'react'
 import { Substitute } from '@fluffy-spoon/substitute'
 import { mount, ReactWrapper } from 'enzyme'
-import { RouterParams, wrapWithRouter } from '../../__tests__/router.test'
+import { RouterParams, wrapWithRouter } from '../../__tests__/router-test-helper'
 
 jest.useFakeTimers().setSystemTime(new Date('2022-12-25'))
 jest.mock('react-redux-firebase', () => ({
@@ -71,6 +71,7 @@ const workout = defaultWorkout({
 })
 
 const auth: firebase.User = {
+  ...Substitute.for<firebase.User>(),
   uid: user.uid,
 }
 
@@ -140,7 +141,7 @@ export const wrapWithProviders = (
  * @returns <li>component - mounted component from within the wrapper
  */
 export const mountWithProviders = (
-  ui: React.ReactElement,
+  ui: React.ComponentType<any>,
   {
     reduxParams,
     routerParams,

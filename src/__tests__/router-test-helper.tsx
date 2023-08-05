@@ -7,7 +7,7 @@ export type RouterParams = {
   initialEntries?: string[]
 }
 export const wrapWithRouter = (
-  ui: React.ReactElement,
+  ui: React.ComponentType<any>,
   { path = '/', route = '/', initialEntries = [route] }: RouterParams = {},
 ): React.ReactElement => (
   <MemoryRouter initialEntries={initialEntries} keyLength={0}>

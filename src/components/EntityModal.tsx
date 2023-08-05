@@ -170,7 +170,7 @@ const EntityModal = <T,>({
                   <Form.Label>{title}</Form.Label>
                   <Form.Control
                     placeholder={placeholder}
-                    id={String(name)}
+                    data-test={String(name)}
                     onChange={onChangeForInput(name)}
                     value={options && options.type === 'file' ? undefined : data[name]}
                     {...options}
@@ -195,7 +195,7 @@ const EntityModal = <T,>({
             </Button>
             <Button
               variant="primary"
-              id="modal-submit"
+              data-test="modal-submit"
               disabled={validationErrors.length > 0}
               onClick={onSubmit}
             >

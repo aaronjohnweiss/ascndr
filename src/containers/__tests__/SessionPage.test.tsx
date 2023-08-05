@@ -6,7 +6,7 @@ import {
   session,
   sessionKey,
   setupMockFirebase,
-} from '../../redux/__tests__/reducer.test'
+} from '../../redux/__tests__/reducer-test-helper'
 import SessionPage from '../SessionPage'
 import { LEAD, TOP_ROPE } from '../../helpers/gradeUtils'
 import { Grade } from '../../types/Grade'
@@ -135,7 +135,11 @@ describe('SessionPage', () => {
           reduxParams: { preloadedState },
         }).wrapper
 
-        wrapper.find(`div[id="${rowId}"]`).find(`Button.${buttonType}`).first().simulate('click')
+        wrapper
+          .find(`div[data-test="${rowId}"]`)
+          .find(`Button.${buttonType}`)
+          .first()
+          .simulate('click')
 
         expect(mockFirebase.update).toHaveBeenCalledWith(
           `sessions/${sessionKey}`,

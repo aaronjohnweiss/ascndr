@@ -333,7 +333,7 @@ export const SessionPage = () => {
                 .reduce(sum, 0)
               const partialCountForGrade = standardPartialCount + customPartialCount
               return (
-                <div key={gradeLabel} id={gradeLabel}>
+                <div key={gradeLabel} data-test={gradeLabel}>
                   <Row className="align-items-center session-grade-row" key={gradeLabel}>
                     <Col>
                       <h5 className="session-grade-header">
@@ -350,7 +350,7 @@ export const SessionPage = () => {
                       <Row
                         className="align-items-center session-grade-row"
                         key={route.key}
-                        id={route.key}
+                        data-test={route.key}
                       >
                         <Col>
                           {route.value.name} ({customRoutesMap[route.key].count})

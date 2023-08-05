@@ -237,7 +237,7 @@ exports[`SessionPage should render 1`] = `
                 Routes
               </h3>
               <div
-                id="5.7"
+                data-test="5.7"
                 key="5.7"
               >
                 <Row
@@ -289,12 +289,12 @@ exports[`SessionPage should render 1`] = `
                 </Row>
                 <Row
                   className="align-items-center session-grade-row"
-                  id="routeA"
+                  data-test="routeA"
                   key="routeA"
                 >
                   <div
                     className="align-items-center session-grade-row row"
-                    id="routeA"
+                    data-test="routeA"
                   >
                     <Col>
                       <div
@@ -946,7 +946,7 @@ exports[`SessionPage should render for an ended session 1`] = `
                 Routes
               </h3>
               <div
-                id="5.7"
+                data-test="5.7"
                 key="5.7"
               >
                 <Row
@@ -998,12 +998,12 @@ exports[`SessionPage should render for an ended session 1`] = `
                 </Row>
                 <Row
                   className="align-items-center session-grade-row"
-                  id="routeA"
+                  data-test="routeA"
                   key="routeA"
                 >
                   <div
                     className="align-items-center session-grade-row row"
-                    id="routeA"
+                    data-test="routeA"
                   >
                     <Col>
                       <div

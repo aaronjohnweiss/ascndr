@@ -44,7 +44,7 @@ export const PartialRoutesAccordion = ({
                 .map(([percentage, count], index) => (
                   <Row
                     key={index}
-                    id={`${prettyPrint(grade)}-${percentage}`}
+                    data-test={`${prettyPrint(grade)}-${percentage}`}
                     className="align-items-center session-grade-row"
                   >
                     <Col>
@@ -73,7 +73,7 @@ export const PartialRoutesAccordion = ({
                     .map(([percentage, count], index) => (
                       <Row
                         key={index}
-                        id={`${route.key}-${percentage}`}
+                        data-test={`${route.key}-${percentage}`}
                         className="align-items-center session-grade-row"
                       >
                         <Col>

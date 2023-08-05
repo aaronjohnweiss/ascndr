@@ -30,7 +30,7 @@ const WorkoutIndex = () => {
   return (
     <>
       <div className="d-grid d-block mb-4">
-        <Button id="add-workout" variant="primary" onClick={openModal}>
+        <Button data-test="add-workout" variant="primary" onClick={openModal}>
           Add Workout
         </Button>
       </div>

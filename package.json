@@ -77,5 +77,8 @@
   },
   "lint-staged": {
     "*.tsx": "prettier --write"
+  },
+  "jest": {
+    "testMatch": ["**/__tests__/**/*.{test,spec}.{ts,tsx}"]
   }
 }

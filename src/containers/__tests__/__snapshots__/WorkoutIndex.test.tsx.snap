@@ -54,15 +54,15 @@ exports[`WorkoutIndex should render 1`] = `
   >
     <Button
       active={false}
+      data-test="add-workout"
       disabled={false}
-      id="add-workout"
       onClick={[Function]}
       variant="primary"
     >
       <button
         className="btn btn-primary"
+        data-test="add-workout"
         disabled={false}
-        id="add-workout"
         onClick={[Function]}
         type="button"
       >

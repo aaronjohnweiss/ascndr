@@ -3,7 +3,7 @@ import {
   mountWithProviders,
   setupMockFirebase,
   user,
-} from '../../redux/__tests__/reducer.test'
+} from '../../redux/__tests__/reducer-test-helper'
 import WorkoutIndex from '../WorkoutIndex'
 import { WORKOUT_CATEGORIES } from '../../helpers/workouts'
 
@@ -22,11 +22,11 @@ describe('WorkoutIndex', () => {
     const intensity = 3
     const categories = WORKOUT_CATEGORIES.filter((category, idx) => idx % 2 === 0)
 
-    wrapper.find('Button#add-workout').simulate('click')
+    wrapper.find('Button[data-test="add-workout"]').simulate('click')
     const modal = wrapper.find('EntityModal')
     modal.find('IntensityPicker').invoke('onChange')(intensity)
     modal.find('CategoryPicker').invoke('onChange')(categories)
-    modal.find('Button#modal-submit').simulate('click')
+    modal.find('Button[data-test="modal-submit"]').simulate('click')
 
     expect(mockFirebase.push).toHaveBeenCalledWith(
       `workouts`,

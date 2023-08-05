@@ -5,7 +5,7 @@ import {
   setupMockFirebase,
   user,
   userKey,
-} from '../../redux/__tests__/reducer.test'
+} from '../../redux/__tests__/reducer-test-helper'
 import UserPage from '../UserPage'
 import { defaultUser } from '../../types/User'
 
@@ -28,10 +28,12 @@ describe('UserPage', () => {
 
     const wrapper = mountWithProviders(UserPage, { reduxParams: { preloadedState: state } }).wrapper
 
-    wrapper.find('Button#add-friend').simulate('click')
+    wrapper.find('Button[data-test="add-friend"]').simulate('click')
     const modal = wrapper.find('EntityModal[title="Add friend"]')
-    modal.find('input#userValue').simulate('change', { target: { value: newFriendUid } })
-    modal.find('Button#modal-submit').simulate('click')
+    modal
+      .find('input[data-test="userValue"]')
+      .simulate('change', { target: { value: newFriendUid } })
+    modal.find('Button[data-test="modal-submit"]').simulate('click')
 
     expect(mockFirebase.update).toHaveBeenCalledWith(
       `users/${userKey}`,
@@ -47,10 +49,10 @@ describe('UserPage', () => {
 
     const wrapper = mountWithProviders(UserPage).wrapper
 
-    wrapper.find('Button#edit-user').simulate('click')
+    wrapper.find('Button[data-test="edit-user"]').simulate('click')
     const modal = wrapper.find('EntityModal[title="Edit User"]')
-    modal.find('input#name').simulate('change', { target: { value: newName } })
-    modal.find('Button#modal-submit').simulate('click')
+    modal.find('input[data-test="name"]').simulate('change', { target: { value: newName } })
+    modal.find('Button[data-test="modal-submit"]').simulate('click')
 
     expect(mockFirebase.update).toHaveBeenCalledWith(
       `users/${userKey}`,

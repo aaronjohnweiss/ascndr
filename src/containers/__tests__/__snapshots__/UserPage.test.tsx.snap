@@ -87,15 +87,15 @@ exports[`UserPage should render 1`] = `
             <Button
               active={false}
               className="float-end"
+              data-test="edit-user"
               disabled={false}
-              id="edit-user"
               onClick={[Function]}
               variant="primary"
             >
               <button
                 className="float-end btn btn-primary"
+                data-test="edit-user"
                 disabled={false}
-                id="edit-user"
                 onClick={[Function]}
                 type="button"
               >
@@ -181,22 +181,22 @@ exports[`UserPage should render 1`] = `
         <ListGroupItem
           active={false}
           className="align-items-center"
+          data-test="uid0"
           disabled={false}
-          id="uid0"
           key="0"
         >
           <ForwardRef
             as="div"
             className="align-items-center list-group-item"
+            data-test="uid0"
             disabled={false}
-            id="uid0"
             onClick={[Function]}
           >
             <div
               className="align-items-center list-group-item"
               data-rb-event-key={null}
+              data-test="uid0"
               disabled={false}
-              id="uid0"
               onClick={[Function]}
             >
               <div
@@ -299,22 +299,22 @@ exports[`UserPage should render 1`] = `
         <ListGroupItem
           active={false}
           className="align-items-center"
+          data-test="uid1"
           disabled={false}
-          id="uid1"
           key="1"
         >
           <ForwardRef
             as="div"
             className="align-items-center list-group-item"
+            data-test="uid1"
             disabled={false}
-            id="uid1"
             onClick={[Function]}
           >
             <div
               className="align-items-center list-group-item"
               data-rb-event-key={null}
+              data-test="uid1"
               disabled={false}
-              id="uid1"
               onClick={[Function]}
             >
               <div
@@ -417,22 +417,22 @@ exports[`UserPage should render 1`] = `
         <ListGroupItem
           active={false}
           className="align-items-center"
+          data-test="uid2"
           disabled={false}
-          id="uid2"
           key="2"
         >
           <ForwardRef
             as="div"
             className="align-items-center list-group-item"
+            data-test="uid2"
             disabled={false}
-            id="uid2"
             onClick={[Function]}
           >
             <div
               className="align-items-center list-group-item"
               data-rb-event-key={null}
+              data-test="uid2"
               disabled={false}
-              id="uid2"
               onClick={[Function]}
             >
               <div
@@ -535,22 +535,22 @@ exports[`UserPage should render 1`] = `
         <ListGroupItem
           active={false}
           className="align-items-center"
+          data-test="uid3"
           disabled={false}
-          id="uid3"
           key="3"
         >
           <ForwardRef
             as="div"
             className="align-items-center list-group-item"
+            data-test="uid3"
             disabled={false}
-            id="uid3"
             onClick={[Function]}
           >
             <div
               className="align-items-center list-group-item"
               data-rb-event-key={null}
+              data-test="uid3"
               disabled={false}
-              id="uid3"
               onClick={[Function]}
             >
               <div
@@ -653,22 +653,22 @@ exports[`UserPage should render 1`] = `
         <ListGroupItem
           active={false}
           className="align-items-center"
+          data-test="uid4"
           disabled={false}
-          id="uid4"
           key="4"
         >
           <ForwardRef
             as="div"
             className="align-items-center list-group-item"
+            data-test="uid4"
             disabled={false}
-            id="uid4"
             onClick={[Function]}
           >
             <div
               className="align-items-center list-group-item"
               data-rb-event-key={null}
+              data-test="uid4"
               disabled={false}
-              id="uid4"
               onClick={[Function]}
             >
               <div
@@ -777,15 +777,15 @@ exports[`UserPage should render 1`] = `
   >
     <Button
       active={false}
+      data-test="add-friend"
       disabled={false}
-      id="add-friend"
       onClick={[Function]}
       variant="primary"
     >
       <button
         className="btn btn-primary"
+        data-test="add-friend"
         disabled={false}
-        id="add-friend"
         onClick={[Function]}
         type="button"
       >

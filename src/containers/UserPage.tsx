@@ -92,7 +92,7 @@ const UserPage = () => {
             </p>
           </Col>
           <Col xs="auto">
-            <Button id="edit-user" className="float-end" onClick={openUserModal}>
+            <Button data-test="edit-user" className="float-end" onClick={openUserModal}>
               Edit User
             </Button>
           </Col>
@@ -111,7 +111,7 @@ const UserPage = () => {
       <h3>Friends</h3>
       <ListGroup>
         {friends.map((friend, idx) => (
-          <ListGroup.Item key={idx} id={friend.value.uid} className="align-items-center">
+          <ListGroup.Item key={idx} data-test={friend.value.uid} className="align-items-center">
             <div className="align-middle float-start">{getUserName(friend.value)}</div>
             <ConfirmCancelButton
               buttonText="-"
@@ -125,7 +125,7 @@ const UserPage = () => {
       </ListGroup>
       <br />
       <div className="d-grid d-block">
-        <Button id="add-friend" variant="primary" onClick={openFriendModal}>
+        <Button data-test="add-friend" variant="primary" onClick={openFriendModal}>
           Add Friend
         </Button>
       </div>
