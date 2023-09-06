@@ -6,6 +6,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import { getNumberFromQuery, getQuery } from '../helpers/queryParser'
 import { buildFeedData, FeedItem } from '../helpers/activityFeedBuilder'
 import FeedItemCard from '../components/activity-feed/FeedItemCard'
+import { EmptyFeed } from '../components/activity-feed/EmptyFeed'
 
 const PAGE_SIZE = 20
 const DEFAULT_ITEMS = PAGE_SIZE * 3
@@ -26,7 +27,7 @@ const ActivityFeed = () => {
     getNumberFromQuery(getQuery(location), 'n', DEFAULT_ITEMS),
   )
 
-  const [feedData, setFeedData] = useState<FeedItem[]>([])
+  const [feedData, setFeedData] = useState<FeedItem[] | null>(null)
 
   useEffect(() => {
     history.replace({ pathname: location.pathname, search: `?n=${feedLength}` })
@@ -40,7 +41,7 @@ const ActivityFeed = () => {
       isLoaded(users) &&
       isLoaded(routes) &&
       isLoaded(workouts) &&
-      feedData.length === 0
+      feedData === null
     ) {
       setFeedData(buildFeedData(uid, gyms, sessions, users, routes, workouts))
     }
@@ -57,25 +58,29 @@ const ActivityFeed = () => {
 
   return (
     <div className="activity-feed">
-      <InfiniteScroll
-        next={() => setFeedLength(len => len + PAGE_SIZE)}
-        hasMore={feedLength < feedData.length}
-        dataLength={feedLength}
-        loader={<></>}
-      >
-        {feedData.slice(0, feedLength).map((feedItem, idx) => (
-          <FeedItemCard
-            key={idx}
-            feedItem={feedItem}
-            uid={uid}
-            gyms={gyms}
-            sessions={sessions}
-            users={users}
-            routes={routes}
-            workouts={workouts}
-          />
-        ))}
-      </InfiniteScroll>
+      {feedData && feedData.length ? (
+        <InfiniteScroll
+          next={() => setFeedLength(len => len + PAGE_SIZE)}
+          hasMore={feedLength < feedData.length}
+          dataLength={feedLength}
+          loader={<></>}
+        >
+          {feedData.slice(0, feedLength).map((feedItem, idx) => (
+            <FeedItemCard
+              key={idx}
+              feedItem={feedItem}
+              uid={uid}
+              gyms={gyms}
+              sessions={sessions}
+              users={users}
+              routes={routes}
+              workouts={workouts}
+            />
+          ))}
+        </InfiniteScroll>
+      ) : (
+        <EmptyFeed />
+      )}
     </div>
   )
 }
