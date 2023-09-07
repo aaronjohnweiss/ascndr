@@ -30,10 +30,10 @@ export const StatItem = ({
   const listItem = (
     <ListGroupItem {...listItemProps}>
       <Row style={{ marginBottom: '0' }}>
-        <Col xs={6}>{label}</Col>
-        {value && <Col>{value}</Col>}
+        <Col xs={7}>{label}</Col>
+        <Col xs={link ? 3 : 4}>{value}</Col>
         {link && (
-          <Col xs={2}>
+          <Col xs={2} className="d-flex align-items-center justify-content-end">
             <FaChevronRight />
           </Col>
         )}
@@ -222,7 +222,7 @@ const StatsIndex = ({
           value={totalRoutes}
           link={`/stats/gradeHistogram${filterParams}`}
         />
-        <StatItem label={'Total distance'} value={`${totalDistance} ft`} />
+        <StatItem label={'Total distance'} value={`${totalDistance}ft`} />
         <StatItem
           label={`Hardest grade${allowedTypes.length > 1 ? 's' : ''}`}
           value={Object.values(maxGrades)
@@ -239,10 +239,10 @@ const StatsIndex = ({
       </Row>
       <ListGroup>
         <StatItem label={'Time spent'} value={durationString(totalTime / numSessions)} />
-        <StatItem label={'Routes climbed'} value={Math.round(totalRoutes / numSessions)} />
+        <StatItem label={'Routes climbed'} value={Math.round(totalRoutes / numSessions) || 0} />
         <StatItem
           label={'Distance climbed'}
-          value={`${Math.round(totalDistance / numSessions)} ft`}
+          value={`${Math.round(totalDistance / numSessions) || 0}ft`}
         />
       </ListGroup>
     </>
