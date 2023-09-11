@@ -5,7 +5,7 @@ import { FaChevronRight } from 'react-icons/fa'
 import { useLocation } from 'react-router-dom'
 import { durationString } from '../helpers/durationUtils'
 import { filtersLink } from '../containers/StatFilters'
-import { max, pluralize, sum } from '../helpers/mathUtils'
+import { max, pluralize, round, sum } from '../helpers/mathUtils'
 import { PARTIAL_MAX } from './GradeModal'
 import { Route } from '../types/Route'
 import { RouteCount, Session } from '../types/Session'
@@ -239,11 +239,8 @@ const StatsIndex = ({
       </Row>
       <ListGroup>
         <StatItem label={'Time spent'} value={durationString(totalTime / numSessions)} />
-        <StatItem label={'Routes climbed'} value={Math.round(totalRoutes / numSessions) || 0} />
-        <StatItem
-          label={'Distance climbed'}
-          value={`${Math.round(totalDistance / numSessions) || 0}ft`}
-        />
+        <StatItem label={'Routes climbed'} value={round(totalRoutes / numSessions)} />
+        <StatItem label={'Distance climbed'} value={`${round(totalDistance / numSessions)}ft`} />
       </ListGroup>
     </>
   )
