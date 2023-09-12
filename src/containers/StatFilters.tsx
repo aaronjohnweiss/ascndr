@@ -50,7 +50,7 @@ const StatFilters = () => {
 
   const query = new URLSearchParams(useLocation().search)
 
-  const [gymIds, setGymIds] = useState<string[]>(defaultIfEmpty(query.getAll('gyms'), []))
+  const [gymIds, setGymIds] = useState<string[] | null>(defaultIfEmpty(query.getAll('gyms'), null))
   const [uids, setUids] = useState<string[]>(defaultIfEmpty(query.getAll('uids'), []))
 
   const [allowSuffixes, setAllowSuffixes] = useState(getBooleanFromQuery(query, 'allowSuffixes'))
@@ -63,7 +63,7 @@ const StatFilters = () => {
   )
 
   useEffect(() => {
-    if (isLoaded(gyms) && gymIds.length === 0) {
+    if (isLoaded(gyms) && gymIds === null) {
       setGymIds(gyms.map(gym => gym.key))
     }
   }, [gyms])
@@ -91,7 +91,7 @@ const StatFilters = () => {
   const gymOptions = gyms.map(({ key, value }) => ({
     key,
     label: value.name,
-    checked: gymIds.includes(key),
+    checked: gymIds && gymIds.includes(key),
   }))
 
   const styleOptions = ALL_STYLES.map(style => ({
@@ -102,7 +102,7 @@ const StatFilters = () => {
 
   const generateQueryParams = () => {
     const queryParams = new URLSearchParams()
-    gymIds.forEach(id => queryParams.append('gyms', id))
+    gymIds && gymIds.forEach(id => queryParams.append('gyms', id))
     uids.forEach(id => queryParams.append('uids', id))
     allowedTypes.forEach(type => queryParams.append('allowedTypes', type))
     queryParams.append('allowSuffixes', `${allowSuffixes}`)

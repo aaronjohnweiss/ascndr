@@ -24,3 +24,5 @@ export const sumByKey = (o1: Record<string, number>, o2: Record<string, number>)
   )
 
 export const pluralize = (str, count, plural = `${str}s`) => (count == 1 ? str : plural)
+
+export const round = (num: number) => Math.round(num) || 0
