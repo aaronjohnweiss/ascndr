@@ -30,7 +30,7 @@ const CustomRouteModal = ({
         <Modal.Body>
           {customRoutes.map(customRoute => (
             <Form.Check
-              id={customRoute.key}
+              data-test={customRoute.key}
               key={customRoute.key}
               type="radio"
               checked={selected === customRoute.key}

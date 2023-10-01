@@ -25,7 +25,7 @@ export type FirebaseRoute = Pick<Route, 'gymId'> & Partial<Route>
 export const defaultRoute = (part: FirebaseRoute): Route => ({
   _type: 'route',
   grade: {
-    difficulty: 0,
+    difficulty: 7,
     style: TOP_ROPE,
   },
   isRetired: false,

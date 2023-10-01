@@ -1,0 +1,264 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`WorkoutIndex should render 1`] = `
+<WorkoutIndex
+  history={
+    Object {
+      "action": "POP",
+      "block": [Function],
+      "canGo": [Function],
+      "createHref": [Function],
+      "entries": Array [
+        Object {
+          "hash": "",
+          "pathname": "/",
+          "search": "",
+          "state": undefined,
+        },
+      ],
+      "go": [Function],
+      "goBack": [Function],
+      "goForward": [Function],
+      "index": 0,
+      "length": 1,
+      "listen": [Function],
+      "location": Object {
+        "hash": "",
+        "pathname": "/",
+        "search": "",
+        "state": undefined,
+      },
+      "push": [Function],
+      "replace": [Function],
+    }
+  }
+  location={
+    Object {
+      "hash": "",
+      "pathname": "/",
+      "search": "",
+      "state": undefined,
+    }
+  }
+  match={
+    Object {
+      "isExact": true,
+      "params": Object {},
+      "path": "/",
+      "url": "/",
+    }
+  }
+>
+  <div
+    className="d-grid d-block mb-4"
+  >
+    <Button
+      active={false}
+      data-test="add-workout"
+      disabled={false}
+      onClick={[Function]}
+      variant="primary"
+    >
+      <button
+        className="btn btn-primary"
+        data-test="add-workout"
+        disabled={false}
+        onClick={[Function]}
+        type="button"
+      >
+        Add Workout
+      </button>
+    </Button>
+  </div>
+  <Workout
+    key="workoutA"
+    workout={
+      Object {
+        "_type": "workout",
+        "categories": Array [],
+        "intensity": 0,
+        "startTime": 1671926400000,
+        "uid": "myUid",
+      }
+    }
+  >
+    <Card
+      body={false}
+    >
+      <div
+        className="card"
+      >
+        <CardBody>
+          <div
+            className="card-body"
+          >
+            <CardTitle>
+              <ForwardRef
+                className="card-title"
+              >
+                <div
+                  className="card-title h5"
+                >
+                  Sat Dec 24 2022
+                </div>
+              </ForwardRef>
+            </CardTitle>
+            <CardSubtitle
+              className="mb-2 text-muted"
+            >
+              <ForwardRef
+                className="mb-2 text-muted card-subtitle"
+              >
+                <div
+                  className="mb-2 text-muted card-subtitle h6"
+                >
+                  Intensity: 
+                  0
+                </div>
+              </ForwardRef>
+            </CardSubtitle>
+            <CardText>
+              <p
+                className="card-text"
+              />
+            </CardText>
+          </div>
+        </CardBody>
+      </div>
+    </Card>
+  </Workout>
+  <EntityModal
+    fields={
+      Array [
+        Object {
+          "name": "intensity",
+          "options": Object {
+            "component": [Function],
+            "type": "custom",
+          },
+          "title": "Intensity",
+        },
+        Object {
+          "name": "categories",
+          "options": Object {
+            "component": [Function],
+            "type": "custom",
+          },
+          "title": "Categories",
+        },
+      ]
+    }
+    handleClose={[Function]}
+    handleSubmit={[Function]}
+    initialValues={
+      Object {
+        "intensity": 1,
+      }
+    }
+    show={false}
+    validateState={[Function]}
+  >
+    <Modal
+      animation={true}
+      autoFocus={true}
+      backdrop={true}
+      dialogAs={
+        Object {
+          "$$typeof": Symbol(react.forward_ref),
+          "displayName": "ModalDialog",
+          "render": [Function],
+        }
+      }
+      enforceFocus={true}
+      keyboard={true}
+      onHide={[Function]}
+      restoreFocus={true}
+      show={false}
+    >
+      <Modal
+        autoFocus={true}
+        backdrop={true}
+        backdropTransition={[Function]}
+        containerClassName="modal-open"
+        enforceFocus={true}
+        keyboard={true}
+        manager={
+          BootstrapModalManager {
+            "containers": Array [],
+            "data": Array [],
+            "handleContainerOverflow": true,
+            "hideSiblingNodes": true,
+            "modals": Array [],
+            "scrollbarSize": 0,
+          }
+        }
+        onEnter={[Function]}
+        onEntering={[Function]}
+        onEscapeKeyDown={[Function]}
+        onExit={[Function]}
+        onExited={[Function]}
+        onHide={[Function]}
+        renderBackdrop={[Function]}
+        renderDialog={[Function]}
+        restoreFocus={true}
+        show={false}
+        transition={[Function]}
+      />
+    </Modal>
+    <ConfirmCancelModal
+      handleConfirm={[Function]}
+      hideModal={[Function]}
+      modalTitle="Delete session?"
+      showModal={false}
+    >
+      <Modal
+        animation={true}
+        autoFocus={true}
+        backdrop={true}
+        dialogAs={
+          Object {
+            "$$typeof": Symbol(react.forward_ref),
+            "displayName": "ModalDialog",
+            "render": [Function],
+          }
+        }
+        enforceFocus={true}
+        keyboard={true}
+        onHide={[Function]}
+        restoreFocus={true}
+        show={false}
+      >
+        <Modal
+          autoFocus={true}
+          backdrop={true}
+          backdropTransition={[Function]}
+          containerClassName="modal-open"
+          enforceFocus={true}
+          keyboard={true}
+          manager={
+            BootstrapModalManager {
+              "containers": Array [],
+              "data": Array [],
+              "handleContainerOverflow": true,
+              "hideSiblingNodes": true,
+              "modals": Array [],
+              "scrollbarSize": 0,
+            }
+          }
+          onEnter={[Function]}
+          onEntering={[Function]}
+          onEscapeKeyDown={[Function]}
+          onExit={[Function]}
+          onExited={[Function]}
+          onHide={[Function]}
+          renderBackdrop={[Function]}
+          renderDialog={[Function]}
+          restoreFocus={true}
+          show={false}
+          transition={[Function]}
+        />
+      </Modal>
+    </ConfirmCancelModal>
+  </EntityModal>
+</WorkoutIndex>
+`;

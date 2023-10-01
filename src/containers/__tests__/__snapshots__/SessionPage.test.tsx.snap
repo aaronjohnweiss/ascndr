@@ -1,0 +1,1283 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SessionPage should render 1`] = `
+<SessionPage
+  history={
+    Object {
+      "action": "POP",
+      "block": [Function],
+      "canGo": [Function],
+      "createHref": [Function],
+      "entries": Array [
+        Object {
+          "hash": "",
+          "pathname": "/sessions/sessionA",
+          "search": "",
+          "state": undefined,
+        },
+      ],
+      "go": [Function],
+      "goBack": [Function],
+      "goForward": [Function],
+      "index": 0,
+      "length": 1,
+      "listen": [Function],
+      "location": Object {
+        "hash": "",
+        "pathname": "/sessions/sessionA",
+        "search": "",
+        "state": undefined,
+      },
+      "push": [Function],
+      "replace": [Function],
+    }
+  }
+  location={
+    Object {
+      "hash": "",
+      "pathname": "/sessions/sessionA",
+      "search": "",
+      "state": undefined,
+    }
+  }
+  match={
+    Object {
+      "isExact": true,
+      "params": Object {
+        "id": "sessionA",
+      },
+      "path": "/sessions/:id",
+      "url": "/sessions/sessionA",
+    }
+  }
+>
+  <Container
+    fluid={false}
+  >
+    <div
+      className="container"
+    >
+      <Row>
+        <div
+          className="row"
+        >
+          <Col
+            md="2"
+          >
+            <div
+              className="col-md-2"
+            />
+          </Col>
+          <Col
+            md="8"
+          >
+            <div
+              className="col-md-8"
+            >
+              <CustomRouteModal
+                customRoutes={
+                  Array [
+                    Object {
+                      "key": "routeA",
+                      "value": Object {
+                        "_type": "route",
+                        "grade": Object {
+                          "difficulty": 7,
+                          "style": "TOP_ROPE",
+                        },
+                        "gymId": "gymA",
+                        "isRetired": false,
+                        "name": "Unnamed",
+                      },
+                    },
+                  ]
+                }
+                handleClose={[Function]}
+                handleSubmit={[Function]}
+                show={false}
+              >
+                <Modal
+                  animation={true}
+                  autoFocus={true}
+                  backdrop={true}
+                  dialogAs={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "displayName": "ModalDialog",
+                      "render": [Function],
+                    }
+                  }
+                  enforceFocus={true}
+                  keyboard={true}
+                  onHide={[Function]}
+                  restoreFocus={true}
+                  show={false}
+                >
+                  <Modal
+                    autoFocus={true}
+                    backdrop={true}
+                    backdropTransition={[Function]}
+                    containerClassName="modal-open"
+                    enforceFocus={true}
+                    keyboard={true}
+                    manager={
+                      BootstrapModalManager {
+                        "containers": Array [],
+                        "data": Array [],
+                        "handleContainerOverflow": true,
+                        "hideSiblingNodes": true,
+                        "modals": Array [],
+                        "scrollbarSize": 0,
+                      }
+                    }
+                    onEnter={[Function]}
+                    onEntering={[Function]}
+                    onEscapeKeyDown={[Function]}
+                    onExit={[Function]}
+                    onExited={[Function]}
+                    onHide={[Function]}
+                    renderBackdrop={[Function]}
+                    renderDialog={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                    transition={[Function]}
+                  />
+                </Modal>
+              </CustomRouteModal>
+              <GradeModal
+                handleClose={[Function]}
+                handleSubmit={[Function]}
+                show={false}
+                title="Add generic route"
+              >
+                <Modal
+                  animation={true}
+                  autoFocus={true}
+                  backdrop={true}
+                  dialogAs={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "displayName": "ModalDialog",
+                      "render": [Function],
+                    }
+                  }
+                  enforceFocus={true}
+                  keyboard={true}
+                  onHide={[Function]}
+                  restoreFocus={true}
+                  show={false}
+                >
+                  <Modal
+                    autoFocus={true}
+                    backdrop={true}
+                    backdropTransition={[Function]}
+                    containerClassName="modal-open"
+                    enforceFocus={true}
+                    keyboard={true}
+                    manager={
+                      BootstrapModalManager {
+                        "containers": Array [],
+                        "data": Array [],
+                        "handleContainerOverflow": true,
+                        "hideSiblingNodes": true,
+                        "modals": Array [],
+                        "scrollbarSize": 0,
+                      }
+                    }
+                    onEnter={[Function]}
+                    onEntering={[Function]}
+                    onEscapeKeyDown={[Function]}
+                    onExit={[Function]}
+                    onExited={[Function]}
+                    onHide={[Function]}
+                    renderBackdrop={[Function]}
+                    renderDialog={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                    transition={[Function]}
+                  />
+                </Modal>
+              </GradeModal>
+              <Row>
+                <div
+                  className="row"
+                >
+                  <Col>
+                    <div
+                      className="col"
+                    >
+                      <h2>
+                        Session at 
+                        <Link
+                          to="/gyms/gymA"
+                        >
+                          <LinkAnchor
+                            href="/gyms/gymA"
+                            navigate={[Function]}
+                          >
+                            <a
+                              href="/gyms/gymA"
+                              onClick={[Function]}
+                            />
+                          </LinkAnchor>
+                        </Link>
+                      </h2>
+                    </div>
+                  </Col>
+                </div>
+              </Row>
+              <h5
+                className="fw-normal mb-3"
+              >
+                Sat Dec 24 2022
+                 in 
+                 
+              </h5>
+              <h3>
+                Routes
+              </h3>
+              <div
+                data-test="5.7"
+                key="5.7"
+              >
+                <Row
+                  className="align-items-center session-grade-row"
+                  key="5.7"
+                >
+                  <div
+                    className="align-items-center session-grade-row row"
+                  >
+                    <Col>
+                      <div
+                        className="col"
+                      >
+                        <h5
+                          className="session-grade-header"
+                        >
+                          5.7
+                           (
+                          1
+                          )
+                        </h5>
+                      </div>
+                    </Col>
+                    <Col
+                      xs={6}
+                    >
+                      <div
+                        className="col-6"
+                      >
+                        <Button
+                          active={false}
+                          className="plus-minus-button plus"
+                          disabled={false}
+                          onClick={[Function]}
+                          variant="outline-secondary"
+                        >
+                          <button
+                            className="plus-minus-button plus btn btn-outline-secondary"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            +
+                          </button>
+                        </Button>
+                      </div>
+                    </Col>
+                  </div>
+                </Row>
+                <Row
+                  className="align-items-center session-grade-row"
+                  data-test="routeA"
+                  key="routeA"
+                >
+                  <div
+                    className="align-items-center session-grade-row row"
+                    data-test="routeA"
+                  >
+                    <Col>
+                      <div
+                        className="col"
+                      >
+                        Unnamed
+                         (
+                        1
+                        )
+                      </div>
+                    </Col>
+                    <Col
+                      xs={6}
+                    >
+                      <div
+                        className="col-6"
+                      >
+                        <Button
+                          active={false}
+                          className="plus-minus-button plus"
+                          disabled={false}
+                          onClick={[Function]}
+                          variant="outline-secondary"
+                        >
+                          <button
+                            className="plus-minus-button plus btn btn-outline-secondary"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            +
+                          </button>
+                        </Button>
+                        <Button
+                          active={false}
+                          className="plus-minus-button minus"
+                          disabled={false}
+                          onClick={[Function]}
+                          variant="outline-secondary"
+                        >
+                          <button
+                            className="plus-minus-button minus btn btn-outline-secondary"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            -
+                          </button>
+                        </Button>
+                      </div>
+                    </Col>
+                  </div>
+                </Row>
+              </div>
+              <Row>
+                <div
+                  className="row"
+                >
+                  <Col
+                    className="d-grid d-block"
+                    xs={6}
+                  >
+                    <div
+                      className="d-grid d-block col-6"
+                    >
+                      <Button
+                        active={false}
+                        disabled={false}
+                        onClick={[Function]}
+                        variant="primary"
+                      >
+                        <button
+                          className="btn btn-primary"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Add generic
+                        </button>
+                      </Button>
+                    </div>
+                  </Col>
+                  <Col
+                    className="d-grid d-block"
+                    xs={6}
+                  >
+                    <div
+                      className="d-grid d-block col-6"
+                    >
+                      <Button
+                        active={false}
+                        disabled={false}
+                        onClick={[Function]}
+                        variant="primary"
+                      >
+                        <button
+                          className="btn btn-primary"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Add custom
+                        </button>
+                      </Button>
+                    </div>
+                  </Col>
+                </div>
+              </Row>
+              <Row>
+                <div
+                  className="row"
+                >
+                  <Col
+                    md={12}
+                  >
+                    <div
+                      className="col-md-12"
+                    >
+                      <ConfirmCancelButton
+                        buttonBlock={true}
+                        buttonProps={
+                          Object {
+                            "variant": "danger",
+                          }
+                        }
+                        buttonText="End session"
+                        handleConfirm={[Function]}
+                        modalTitle="End session?"
+                      >
+                        <WrappedButton>
+                          <div
+                            className="d-grid d-block"
+                          >
+                            <ShowModalButton>
+                              <Button
+                                active={false}
+                                disabled={false}
+                                onClick={[Function]}
+                                variant="danger"
+                              >
+                                <button
+                                  className="btn btn-danger"
+                                  disabled={false}
+                                  onClick={[Function]}
+                                  type="button"
+                                >
+                                  End session
+                                </button>
+                              </Button>
+                            </ShowModalButton>
+                          </div>
+                        </WrappedButton>
+                        <ConfirmCancelModal
+                          handleConfirm={[Function]}
+                          hideModal={[Function]}
+                          modalTitle="End session?"
+                          showModal={false}
+                        >
+                          <Modal
+                            animation={true}
+                            autoFocus={true}
+                            backdrop={true}
+                            dialogAs={
+                              Object {
+                                "$$typeof": Symbol(react.forward_ref),
+                                "displayName": "ModalDialog",
+                                "render": [Function],
+                              }
+                            }
+                            enforceFocus={true}
+                            keyboard={true}
+                            onHide={[Function]}
+                            restoreFocus={true}
+                            show={false}
+                          >
+                            <Modal
+                              autoFocus={true}
+                              backdrop={true}
+                              backdropTransition={[Function]}
+                              containerClassName="modal-open"
+                              enforceFocus={true}
+                              keyboard={true}
+                              manager={
+                                BootstrapModalManager {
+                                  "containers": Array [],
+                                  "data": Array [],
+                                  "handleContainerOverflow": true,
+                                  "hideSiblingNodes": true,
+                                  "modals": Array [],
+                                  "scrollbarSize": 0,
+                                }
+                              }
+                              onEnter={[Function]}
+                              onEntering={[Function]}
+                              onEscapeKeyDown={[Function]}
+                              onExit={[Function]}
+                              onExited={[Function]}
+                              onHide={[Function]}
+                              renderBackdrop={[Function]}
+                              renderDialog={[Function]}
+                              restoreFocus={true}
+                              show={false}
+                              transition={[Function]}
+                            />
+                          </Modal>
+                        </ConfirmCancelModal>
+                      </ConfirmCancelButton>
+                    </div>
+                  </Col>
+                </div>
+              </Row>
+            </div>
+          </Col>
+          <Col
+            md="2"
+          >
+            <div
+              className="col-md-2"
+            />
+          </Col>
+        </div>
+      </Row>
+      <EntityModal
+        fields={
+          Array [
+            Object {
+              "name": "gymId",
+              "options": Object {
+                "component": [Function],
+                "type": "custom",
+              },
+              "title": "Gym",
+            },
+            Object {
+              "name": "startTime",
+              "options": Object {
+                "component": [Function],
+                "type": "custom",
+              },
+              "title": "Start Time",
+            },
+            Object {
+              "name": "endTime",
+              "options": Object {
+                "component": [Function],
+                "type": "custom",
+              },
+              "title": "End Time",
+            },
+          ]
+        }
+        handleClose={[Function]}
+        handleDelete={[Function]}
+        handleSubmit={[Function]}
+        initialValues={
+          Object {
+            "_type": "session",
+            "customRoutes": Array [
+              Object {
+                "count": 1,
+                "key": "routeA",
+                "partials": Object {},
+              },
+            ],
+            "gymId": "gymA",
+            "standardRoutes": Array [],
+            "startTime": 1671926400000,
+            "uid": "myUid",
+          }
+        }
+        show={false}
+        title="Edit session"
+      >
+        <Modal
+          animation={true}
+          autoFocus={true}
+          backdrop={true}
+          dialogAs={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "displayName": "ModalDialog",
+              "render": [Function],
+            }
+          }
+          enforceFocus={true}
+          keyboard={true}
+          onHide={[Function]}
+          restoreFocus={true}
+          show={false}
+        >
+          <Modal
+            autoFocus={true}
+            backdrop={true}
+            backdropTransition={[Function]}
+            containerClassName="modal-open"
+            enforceFocus={true}
+            keyboard={true}
+            manager={
+              BootstrapModalManager {
+                "containers": Array [],
+                "data": Array [],
+                "handleContainerOverflow": true,
+                "hideSiblingNodes": true,
+                "modals": Array [],
+                "scrollbarSize": 0,
+              }
+            }
+            onEnter={[Function]}
+            onEntering={[Function]}
+            onEscapeKeyDown={[Function]}
+            onExit={[Function]}
+            onExited={[Function]}
+            onHide={[Function]}
+            renderBackdrop={[Function]}
+            renderDialog={[Function]}
+            restoreFocus={true}
+            show={false}
+            transition={[Function]}
+          />
+        </Modal>
+        <ConfirmCancelModal
+          handleConfirm={[Function]}
+          hideModal={[Function]}
+          modalTitle="Delete session?"
+          showModal={false}
+        >
+          <Modal
+            animation={true}
+            autoFocus={true}
+            backdrop={true}
+            dialogAs={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "displayName": "ModalDialog",
+                "render": [Function],
+              }
+            }
+            enforceFocus={true}
+            keyboard={true}
+            onHide={[Function]}
+            restoreFocus={true}
+            show={false}
+          >
+            <Modal
+              autoFocus={true}
+              backdrop={true}
+              backdropTransition={[Function]}
+              containerClassName="modal-open"
+              enforceFocus={true}
+              keyboard={true}
+              manager={
+                BootstrapModalManager {
+                  "containers": Array [],
+                  "data": Array [],
+                  "handleContainerOverflow": true,
+                  "hideSiblingNodes": true,
+                  "modals": Array [],
+                  "scrollbarSize": 0,
+                }
+              }
+              onEnter={[Function]}
+              onEntering={[Function]}
+              onEscapeKeyDown={[Function]}
+              onExit={[Function]}
+              onExited={[Function]}
+              onHide={[Function]}
+              renderBackdrop={[Function]}
+              renderDialog={[Function]}
+              restoreFocus={true}
+              show={false}
+              transition={[Function]}
+            />
+          </Modal>
+        </ConfirmCancelModal>
+      </EntityModal>
+    </div>
+  </Container>
+</SessionPage>
+`;
+
+exports[`SessionPage should render for an ended session 1`] = `
+<SessionPage
+  history={
+    Object {
+      "action": "POP",
+      "block": [Function],
+      "canGo": [Function],
+      "createHref": [Function],
+      "entries": Array [
+        Object {
+          "hash": "",
+          "pathname": "/sessions/sessionA",
+          "search": "",
+          "state": undefined,
+        },
+      ],
+      "go": [Function],
+      "goBack": [Function],
+      "goForward": [Function],
+      "index": 0,
+      "length": 1,
+      "listen": [Function],
+      "location": Object {
+        "hash": "",
+        "pathname": "/sessions/sessionA",
+        "search": "",
+        "state": undefined,
+      },
+      "push": [Function],
+      "replace": [Function],
+    }
+  }
+  location={
+    Object {
+      "hash": "",
+      "pathname": "/sessions/sessionA",
+      "search": "",
+      "state": undefined,
+    }
+  }
+  match={
+    Object {
+      "isExact": true,
+      "params": Object {
+        "id": "sessionA",
+      },
+      "path": "/sessions/:id",
+      "url": "/sessions/sessionA",
+    }
+  }
+>
+  <Container
+    fluid={false}
+  >
+    <div
+      className="container"
+    >
+      <Row>
+        <div
+          className="row"
+        >
+          <Col
+            md="2"
+          >
+            <div
+              className="col-md-2"
+            />
+          </Col>
+          <Col
+            md="8"
+          >
+            <div
+              className="col-md-8"
+            >
+              <CustomRouteModal
+                customRoutes={
+                  Array [
+                    Object {
+                      "key": "routeA",
+                      "value": Object {
+                        "_type": "route",
+                        "grade": Object {
+                          "difficulty": 7,
+                          "style": "TOP_ROPE",
+                        },
+                        "gymId": "gymA",
+                        "isRetired": false,
+                        "name": "Unnamed",
+                      },
+                    },
+                  ]
+                }
+                handleClose={[Function]}
+                handleSubmit={[Function]}
+                show={false}
+              >
+                <Modal
+                  animation={true}
+                  autoFocus={true}
+                  backdrop={true}
+                  dialogAs={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "displayName": "ModalDialog",
+                      "render": [Function],
+                    }
+                  }
+                  enforceFocus={true}
+                  keyboard={true}
+                  onHide={[Function]}
+                  restoreFocus={true}
+                  show={false}
+                >
+                  <Modal
+                    autoFocus={true}
+                    backdrop={true}
+                    backdropTransition={[Function]}
+                    containerClassName="modal-open"
+                    enforceFocus={true}
+                    keyboard={true}
+                    manager={
+                      BootstrapModalManager {
+                        "containers": Array [],
+                        "data": Array [],
+                        "handleContainerOverflow": true,
+                        "hideSiblingNodes": true,
+                        "modals": Array [],
+                        "scrollbarSize": 0,
+                      }
+                    }
+                    onEnter={[Function]}
+                    onEntering={[Function]}
+                    onEscapeKeyDown={[Function]}
+                    onExit={[Function]}
+                    onExited={[Function]}
+                    onHide={[Function]}
+                    renderBackdrop={[Function]}
+                    renderDialog={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                    transition={[Function]}
+                  />
+                </Modal>
+              </CustomRouteModal>
+              <GradeModal
+                handleClose={[Function]}
+                handleSubmit={[Function]}
+                show={false}
+                title="Add generic route"
+              >
+                <Modal
+                  animation={true}
+                  autoFocus={true}
+                  backdrop={true}
+                  dialogAs={
+                    Object {
+                      "$$typeof": Symbol(react.forward_ref),
+                      "displayName": "ModalDialog",
+                      "render": [Function],
+                    }
+                  }
+                  enforceFocus={true}
+                  keyboard={true}
+                  onHide={[Function]}
+                  restoreFocus={true}
+                  show={false}
+                >
+                  <Modal
+                    autoFocus={true}
+                    backdrop={true}
+                    backdropTransition={[Function]}
+                    containerClassName="modal-open"
+                    enforceFocus={true}
+                    keyboard={true}
+                    manager={
+                      BootstrapModalManager {
+                        "containers": Array [],
+                        "data": Array [],
+                        "handleContainerOverflow": true,
+                        "hideSiblingNodes": true,
+                        "modals": Array [],
+                        "scrollbarSize": 0,
+                      }
+                    }
+                    onEnter={[Function]}
+                    onEntering={[Function]}
+                    onEscapeKeyDown={[Function]}
+                    onExit={[Function]}
+                    onExited={[Function]}
+                    onHide={[Function]}
+                    renderBackdrop={[Function]}
+                    renderDialog={[Function]}
+                    restoreFocus={true}
+                    show={false}
+                    transition={[Function]}
+                  />
+                </Modal>
+              </GradeModal>
+              <Row>
+                <div
+                  className="row"
+                >
+                  <Col>
+                    <div
+                      className="col"
+                    >
+                      <h2>
+                        Session at 
+                        <Link
+                          to="/gyms/gymA"
+                        >
+                          <LinkAnchor
+                            href="/gyms/gymA"
+                            navigate={[Function]}
+                          >
+                            <a
+                              href="/gyms/gymA"
+                              onClick={[Function]}
+                            />
+                          </LinkAnchor>
+                        </Link>
+                      </h2>
+                    </div>
+                  </Col>
+                  <Col
+                    xs={2}
+                  >
+                    <div
+                      className="col-2"
+                    >
+                      <Button
+                        active={false}
+                        disabled={false}
+                        onClick={[Function]}
+                        style={
+                          Object {
+                            "float": "right",
+                          }
+                        }
+                        variant="primary"
+                      >
+                        <button
+                          className="btn btn-primary"
+                          disabled={false}
+                          onClick={[Function]}
+                          style={
+                            Object {
+                              "float": "right",
+                            }
+                          }
+                          type="button"
+                        >
+                          Edit
+                        </button>
+                      </Button>
+                    </div>
+                  </Col>
+                </div>
+              </Row>
+              <h5
+                className="fw-normal mb-3"
+              >
+                Sat Dec 24 2022
+                 in 
+                 
+                 for 1h 0m
+              </h5>
+              <h3>
+                Routes
+              </h3>
+              <div
+                data-test="5.7"
+                key="5.7"
+              >
+                <Row
+                  className="align-items-center session-grade-row"
+                  key="5.7"
+                >
+                  <div
+                    className="align-items-center session-grade-row row"
+                  >
+                    <Col>
+                      <div
+                        className="col"
+                      >
+                        <h5
+                          className="session-grade-header"
+                        >
+                          5.7
+                           (
+                          1
+                          )
+                        </h5>
+                      </div>
+                    </Col>
+                    <Col
+                      xs={6}
+                    >
+                      <div
+                        className="col-6"
+                      >
+                        <Button
+                          active={false}
+                          className="plus-minus-button plus"
+                          disabled={false}
+                          onClick={[Function]}
+                          variant="outline-secondary"
+                        >
+                          <button
+                            className="plus-minus-button plus btn btn-outline-secondary"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            +
+                          </button>
+                        </Button>
+                      </div>
+                    </Col>
+                  </div>
+                </Row>
+                <Row
+                  className="align-items-center session-grade-row"
+                  data-test="routeA"
+                  key="routeA"
+                >
+                  <div
+                    className="align-items-center session-grade-row row"
+                    data-test="routeA"
+                  >
+                    <Col>
+                      <div
+                        className="col"
+                      >
+                        Unnamed
+                         (
+                        1
+                        )
+                      </div>
+                    </Col>
+                    <Col
+                      xs={6}
+                    >
+                      <div
+                        className="col-6"
+                      >
+                        <Button
+                          active={false}
+                          className="plus-minus-button plus"
+                          disabled={false}
+                          onClick={[Function]}
+                          variant="outline-secondary"
+                        >
+                          <button
+                            className="plus-minus-button plus btn btn-outline-secondary"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            +
+                          </button>
+                        </Button>
+                        <Button
+                          active={false}
+                          className="plus-minus-button minus"
+                          disabled={false}
+                          onClick={[Function]}
+                          variant="outline-secondary"
+                        >
+                          <button
+                            className="plus-minus-button minus btn btn-outline-secondary"
+                            disabled={false}
+                            onClick={[Function]}
+                            type="button"
+                          >
+                            -
+                          </button>
+                        </Button>
+                      </div>
+                    </Col>
+                  </div>
+                </Row>
+              </div>
+              <Row>
+                <div
+                  className="row"
+                >
+                  <Col
+                    className="d-grid d-block"
+                    xs={6}
+                  >
+                    <div
+                      className="d-grid d-block col-6"
+                    >
+                      <Button
+                        active={false}
+                        disabled={false}
+                        onClick={[Function]}
+                        variant="primary"
+                      >
+                        <button
+                          className="btn btn-primary"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Add generic
+                        </button>
+                      </Button>
+                    </div>
+                  </Col>
+                  <Col
+                    className="d-grid d-block"
+                    xs={6}
+                  >
+                    <div
+                      className="d-grid d-block col-6"
+                    >
+                      <Button
+                        active={false}
+                        disabled={false}
+                        onClick={[Function]}
+                        variant="primary"
+                      >
+                        <button
+                          className="btn btn-primary"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Add custom
+                        </button>
+                      </Button>
+                    </div>
+                  </Col>
+                </div>
+              </Row>
+            </div>
+          </Col>
+          <Col
+            md="2"
+          >
+            <div
+              className="col-md-2"
+            />
+          </Col>
+        </div>
+      </Row>
+      <EntityModal
+        fields={
+          Array [
+            Object {
+              "name": "gymId",
+              "options": Object {
+                "component": [Function],
+                "type": "custom",
+              },
+              "title": "Gym",
+            },
+            Object {
+              "name": "startTime",
+              "options": Object {
+                "component": [Function],
+                "type": "custom",
+              },
+              "title": "Start Time",
+            },
+            Object {
+              "name": "endTime",
+              "options": Object {
+                "component": [Function],
+                "type": "custom",
+              },
+              "title": "End Time",
+            },
+          ]
+        }
+        handleClose={[Function]}
+        handleDelete={[Function]}
+        handleSubmit={[Function]}
+        initialValues={
+          Object {
+            "_type": "session",
+            "customRoutes": Array [
+              Object {
+                "count": 1,
+                "key": "routeA",
+                "partials": Object {},
+              },
+            ],
+            "endTime": 1671930000000,
+            "gymId": "gymA",
+            "standardRoutes": Array [],
+            "startTime": 1671926400000,
+            "uid": "myUid",
+          }
+        }
+        show={false}
+        title="Edit session"
+      >
+        <Modal
+          animation={true}
+          autoFocus={true}
+          backdrop={true}
+          dialogAs={
+            Object {
+              "$$typeof": Symbol(react.forward_ref),
+              "displayName": "ModalDialog",
+              "render": [Function],
+            }
+          }
+          enforceFocus={true}
+          keyboard={true}
+          onHide={[Function]}
+          restoreFocus={true}
+          show={false}
+        >
+          <Modal
+            autoFocus={true}
+            backdrop={true}
+            backdropTransition={[Function]}
+            containerClassName="modal-open"
+            enforceFocus={true}
+            keyboard={true}
+            manager={
+              BootstrapModalManager {
+                "containers": Array [],
+                "data": Array [],
+                "handleContainerOverflow": true,
+                "hideSiblingNodes": true,
+                "modals": Array [],
+                "scrollbarSize": 0,
+              }
+            }
+            onEnter={[Function]}
+            onEntering={[Function]}
+            onEscapeKeyDown={[Function]}
+            onExit={[Function]}
+            onExited={[Function]}
+            onHide={[Function]}
+            renderBackdrop={[Function]}
+            renderDialog={[Function]}
+            restoreFocus={true}
+            show={false}
+            transition={[Function]}
+          />
+        </Modal>
+        <ConfirmCancelModal
+          handleConfirm={[Function]}
+          hideModal={[Function]}
+          modalTitle="Delete session?"
+          showModal={false}
+        >
+          <Modal
+            animation={true}
+            autoFocus={true}
+            backdrop={true}
+            dialogAs={
+              Object {
+                "$$typeof": Symbol(react.forward_ref),
+                "displayName": "ModalDialog",
+                "render": [Function],
+              }
+            }
+            enforceFocus={true}
+            keyboard={true}
+            onHide={[Function]}
+            restoreFocus={true}
+            show={false}
+          >
+            <Modal
+              autoFocus={true}
+              backdrop={true}
+              backdropTransition={[Function]}
+              containerClassName="modal-open"
+              enforceFocus={true}
+              keyboard={true}
+              manager={
+                BootstrapModalManager {
+                  "containers": Array [],
+                  "data": Array [],
+                  "handleContainerOverflow": true,
+                  "hideSiblingNodes": true,
+                  "modals": Array [],
+                  "scrollbarSize": 0,
+                }
+              }
+              onEnter={[Function]}
+              onEntering={[Function]}
+              onEscapeKeyDown={[Function]}
+              onExit={[Function]}
+              onExited={[Function]}
+              onHide={[Function]}
+              renderBackdrop={[Function]}
+              renderDialog={[Function]}
+              restoreFocus={true}
+              show={false}
+              transition={[Function]}
+            />
+          </Modal>
+        </ConfirmCancelModal>
+      </EntityModal>
+    </div>
+  </Container>
+</SessionPage>
+`;

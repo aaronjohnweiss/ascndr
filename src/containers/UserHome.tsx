@@ -25,12 +25,6 @@ const UserHome = () => {
   )
     return <>Loading</>
 
-  const sessionsForUser = getSessionsForUser(sessions, uid)
-
-  const latestSession = sessionsForUser.sort((a, b) => b.value.startTime - a.value.startTime)[0]
-
-  const gym = latestSession && findEntry(gyms, latestSession.value.gymId)
-
   const user = findUser(users, uid)
 
   const calendarCutoffDate = moment().subtract(4, 'months').startOf('week')
