@@ -8,6 +8,7 @@ import {
   defaultActivityCalendarPreferences,
   User,
 } from '../types/User'
+import { OrderedList } from '../types/Firebase'
 
 export const getPreferences = (user: User): ActivityCalendarPreferences => ({
   ...defaultActivityCalendarPreferences(),
@@ -20,16 +21,24 @@ export const ActivityCalendarSettingsModal = ({
   show,
   handleClose,
   handleSubmit,
+}: {
+  user: User
+  friends: OrderedList<User>
+  show: boolean
+  handleClose: () => void
+  handleSubmit: (pref: ActivityCalendarPreferences) => void
 }) => {
   const [preferences, setPreferences] = useState(getPreferences(user))
 
   const setPreference = name => val => setPreferences({ ...preferences, [name]: val })
 
-  const userOptions = friends.map(u => ({
-    key: u.uid,
-    label: getUserName(u),
-    checked: preferences.friends.includes(u.uid),
-  }))
+  const userOptions = friends
+    .map(u => u.value)
+    .map(u => ({
+      key: u.uid,
+      label: getUserName(u),
+      checked: preferences.friends.includes(u.uid),
+    }))
 
   return (
     <Modal show={show} onHide={handleClose}>
