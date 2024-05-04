@@ -3,7 +3,6 @@ import { Button, Col, Container, Row } from 'react-bootstrap'
 import { compareGrades, countPartials, gradeEquals, prettyPrint } from '../helpers/gradeUtils'
 import GradeModal, { PARTIAL_MAX } from '../components/GradeModal'
 import { Link } from 'react-router-dom'
-import { sessionDuration } from '../helpers/durationUtils'
 import { isLoaded, useFirebase } from 'react-redux-firebase'
 import { sum } from '../helpers/mathUtils'
 import CustomRouteModal from '../components/CustomRouteModal'
@@ -17,6 +16,7 @@ import { getUser, useDatabase } from '../redux/selectors/selectors'
 import { DecoratedCustomGrade, DecoratedGrade, Grade } from '../types/Grade'
 import { RouteCount } from '../types/Session'
 import { entries } from '../helpers/recordUtils'
+import { useDuration } from '../helpers/useDate'
 
 const hasPartialCompletions = ({ partials = {} }) =>
   entries(partials).some(([key, val]) => key > 0 && val > 0)
@@ -57,6 +57,12 @@ export const SessionPage = ({
   const [showCustomRoutes, openCustomRoutes, closeCustomRoutes] = useModalState()
   const [showStandardRoutes, openStandardRoutes, closeStandardRoutes] = useModalState()
   const [showEditSession, openEditSession, closeEditSession] = useModalState()
+
+  const sessionDuration = useDuration({
+    startTime: session?.startTime,
+    endTime: session?.endTime,
+    intervalMs: 30 * 1000,
+  })
 
   if (
     !isLoaded(session) ||
@@ -307,7 +313,7 @@ export const SessionPage = ({
             )}
           </Row>
           <h5 className="fw-normal mb-3">
-            {date} in {gym.location} {isFinished && ` for ${sessionDuration(session)}`}
+            {date} in {gym.location} for {sessionDuration}
           </h5>
           <h3>Routes</h3>
           {grades && grades.length ? (
