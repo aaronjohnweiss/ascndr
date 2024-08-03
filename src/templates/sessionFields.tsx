@@ -5,7 +5,7 @@ import { Form } from 'react-bootstrap'
 import { Field } from '../components/EntityModal'
 import { Session } from '../types/Session'
 
-const DatePicker = ({ value, onChange }) => (
+export const DatePicker = ({ value, onChange }) => (
   <Form.Control
     onChange={evt => onChange(new Date(evt.target.value).getTime())}
     value={value ? localDateTimeString(value) : ''}

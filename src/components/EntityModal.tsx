@@ -54,6 +54,7 @@ interface Props<T> {
   show: boolean
   fields: Field<T>[]
   title?: string
+  deleteTitle?: string
   submitText?: string
   validateState?: (data: T) => ValidationError[]
   initialValues?: object
@@ -65,6 +66,7 @@ const EntityModal = <T,>({
   show,
   fields,
   title,
+  deleteTitle,
   submitText,
   validateState,
   initialValues,
@@ -199,7 +201,7 @@ const EntityModal = <T,>({
       <ConfirmCancelModal
         showModal={confirmDelete}
         hideModal={() => setConfirmDelete(false)}
-        modalTitle={'Delete session?'}
+        modalTitle={deleteTitle || 'Delete?'}
         handleConfirm={() => {
           setConfirmDelete(false)
           handleDelete && handleDelete()
