@@ -18,6 +18,7 @@ import UserCheck from './containers/UserCheck'
 import RoutesContainer from './containers/RoutesContainer'
 import { useAppSelector } from './redux/index'
 import { useAppDispatch } from './redux'
+import GoalIndex from './containers/GoalIndex'
 
 const App = () => {
   const authenticated = useAppSelector(state => state.auth)
@@ -87,6 +88,7 @@ const App = () => {
                 <Route path="/stats" component={StatsPage} />
                 <Route path="/routeGallery" component={RoutesContainer} />
                 <Route exact path="/workouts" component={WorkoutIndex} />
+                <Route exact path="/goals" component={GoalIndex} />
                 <Route exact path="/login" component={SignIn} />
               </>
             )) || (

@@ -13,7 +13,8 @@ export const localDateTimeString = (date: number | string | Date) =>
 /**
  * Display relative time between the current time and the provided date (e.g. "2 weeks ago")
  */
-export const timeFromNow = (date: number | string | Date) => moment(date).fromNow()
+export const timeFromNow = (date: number | string | Date, withoutSuffix?: boolean) =>
+  moment(date).fromNow(withoutSuffix)
 
 /**
  * Max time in the past for using a relative date instead of absolute date

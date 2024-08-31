@@ -33,6 +33,7 @@ const filterOrdered = <T,>(
       filteredList.push(obj)
     }
   }
+
   return filteredList
 }
 /**
@@ -78,10 +79,13 @@ export const getFirst = <T,>(arr: Optional<T[]>): Optional<T> => (arr?.length ? 
  */
 const getFilterable =
   <T extends Filterable>(
-    selector: Optional<OrderedList<T>>,
+    selector: Optional<OrderedList<T> | null>,
     filters: Filter<T>,
   ): ParameterizedSelector<T, OrderedList<T>> =>
   (...params) => {
+    if (selector === null) {
+      return []
+    }
     const predicates = getPredicates(params, filters)
     if (predicates === undefined) {
       return undefined
@@ -92,13 +96,17 @@ const getFilterable =
  * Retrieve values from the given selector, and fill in default values based on the provided converter
  */
 export const withDefault = <Part, Whole extends Filterable>(
-  selector: () => Optional<OrderedList<Part>>,
+  selector: () => Optional<OrderedList<Part> | null>,
   converter: (part: Part) => Whole,
-): Optional<OrderedList<Whole>> =>
-  selector()?.map(persisted => ({
+): Optional<OrderedList<Whole> | null> => {
+  const data = selector()
+  if (data === null || data === undefined) return data
+
+  return data.map(persisted => ({
     ...persisted,
     value: converter(persisted.value),
   }))
+}
 /**
  * Wrap a function that takes (string[] | undefined) into one that takes (string | string[] | undefined), for caller convenience
  */
@@ -130,7 +138,7 @@ const getPredicates = <T extends Filterable>(params: FilterParam<T>[], filters: 
  */
 export const buildSelectors = <T extends Filterable>(
   state: DatabaseState,
-  model: Optional<OrderedList<T>>,
+  model: Optional<OrderedList<T> | null>,
   filters: StateFilter<T>,
 ): Selectors<T> => {
   const getOrdered = getFilterable(model, filters(state))

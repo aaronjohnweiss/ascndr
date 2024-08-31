@@ -1,7 +1,7 @@
 import { WorkoutCategory } from './Workout'
 import { Grade, RouteStyle } from './Grade'
 
-const GOAL_CATEGORIES = [
+export const GOAL_CATEGORIES = [
   'ACTIVITY_COUNT',
   'WORKOUT_COUNT',
   'SESSION_COUNT',
@@ -9,7 +9,10 @@ const GOAL_CATEGORIES = [
   'ROUTE_DISTANCE',
 ] as const
 
-export type GOAL_CATEGORY = (typeof GOAL_CATEGORIES)[number]
+export type GoalCategory = (typeof GOAL_CATEGORIES)[number]
+
+export const isGoalCategory = (str: string): str is GoalCategory =>
+  GOAL_CATEGORIES.some(cat => cat === str)
 
 export type SharedGoal = {
   isShared: true
@@ -22,7 +25,7 @@ export type SoloGoal = {
 
 export type BaseGoal = {
   _type: 'goal'
-  category: GOAL_CATEGORY
+  category: GoalCategory
   owner: string
   startTime: number
   endTime: number
@@ -71,3 +74,4 @@ export type Goal = ActivityGoal | WorkoutGoal | SessionGoal | RouteCountGoal | D
 export type FirebaseGoal = Goal
 
 export const isShared = (goal: Goal): goal is Goal & SharedGoal => goal.isShared
+export const isWorkout = (goal: Goal): goal is WorkoutGoal => goal.category === 'WORKOUT_COUNT'
