@@ -7,6 +7,7 @@ import { FirebaseRoute } from '../types/Route'
 import { FirebaseSession } from '../types/Session'
 import { FirebaseUser, User } from '../types/User'
 import { FirebaseWorkout } from '../types/Workout'
+import { FirebaseGoal } from '../types/Goal'
 
 export type AuthState = false | firebase.User | null
 
@@ -25,6 +26,7 @@ interface FirebaseSchema {
   sessions: FirebaseSession
   users: FirebaseUser
   workouts: FirebaseWorkout
+  goals: FirebaseGoal
 }
 
 export interface RootState {

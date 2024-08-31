@@ -7,6 +7,7 @@ import { Session } from '../../types/Session'
 import { isLoaded } from 'react-redux-firebase'
 import { DatabaseState } from './selectors'
 import { getFirst, normalizeFilterValue } from './utils'
+import { Goal } from '../../types/Goal'
 
 export const gymFilters: StateFilter<Gym> = databaseState => ({
   owner: (owners?: string[]) => gym => owners?.includes(gym.value.owner),
@@ -103,6 +104,14 @@ export const workoutFilters: StateFilter<Workout> = databaseState => ({
   owner: (owners?: string[]) => workout => owners?.includes(workout.value.uid),
   viewer: (viewers?: string[]) => session => {
     const hasOwnerAsFriend = databaseState.users.hasFriend(session.value.uid)
+    return viewers?.some(hasOwnerAsFriend)
+  },
+})
+
+export const goalFilters: StateFilter<Goal> = databaseState => ({
+  owner: (owners?: string[]) => goal => owners?.includes(goal.value.owner),
+  viewer: (viewers?: string[]) => goal => {
+    const hasOwnerAsFriend = databaseState.users.hasFriend(goal.value.owner)
     return viewers?.some(hasOwnerAsFriend)
   },
 })

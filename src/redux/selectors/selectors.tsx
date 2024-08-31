@@ -9,6 +9,7 @@ import { Optional } from './types'
 import {
   canEditSession,
   getUserByUid,
+  goalFilters,
   gymFilters,
   hasFriend,
   isFriendOf,
@@ -19,6 +20,7 @@ import {
 } from './filters'
 import { buildSelectors, withDefault } from './utils'
 import firebase from 'firebase/app'
+import { Goal, isShared } from '../../types/Goal'
 
 export const getUser = (): firebase.User => {
   const auth = useAppSelector(state => state.auth)
@@ -44,6 +46,7 @@ export class DatabaseState {
       () => useAppSelector(state => state.firebase.ordered.workouts),
       defaultWorkout,
     ),
+    goals: useAppSelector(state => state.firebase.ordered.goals),
   }
   gyms = {
     ...buildSelectors(this, this.#state.gyms, gymFilters),
@@ -69,9 +72,13 @@ export class DatabaseState {
   workouts = {
     ...buildSelectors(this, this.#state.workouts, workoutFilters),
   }
+  goals = {
+    ...buildSelectors(this, this.#state.goals, goalFilters),
+    canEdit: (goal: Optional<Goal>) => goal && isShared(goal) && this.users.isFriendOf(goal?.owner),
+  }
 
   constructor() {
-    useFirebaseConnect(['gyms', 'routes', 'sessions', 'users', 'workouts'])
+    useFirebaseConnect(['gyms', 'routes', 'sessions', 'users', 'workouts', 'goals'])
   }
 }
 

@@ -5,6 +5,7 @@ import { Session } from '../../types/Session'
 import { User } from '../../types/User'
 import { Workout } from '../../types/Workout'
 import { DatabaseState } from './selectors'
+import { Goal } from '../../types/Goal'
 
 export type Optional<T> = T | undefined
 /**
@@ -18,7 +19,7 @@ type FilterFunction<T> = (values: Optional<string[]>) => FilterPredicate<T>
 /**
  * Object that can be filtered upon; should define a constant _type for disambiguation
  */
-export type Filterable = Gym | Route | Session | User | Workout
+export type Filterable = Gym | Route | Session | User | Workout | Goal
 
 /**
  * All filters that can be provided for each type
@@ -29,6 +30,7 @@ const FilterableFields = {
   session: ['gym', 'owner', 'viewer', 'route', 'sessionKey'],
   user: ['uid', 'friendOf'],
   workout: ['owner', 'viewer'],
+  goal: ['owner', 'viewer'],
 } as const
 /**
  * All applicable filters for a given Filterable type
