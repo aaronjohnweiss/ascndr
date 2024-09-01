@@ -34,7 +34,6 @@ interface PartialFormProps {
 }
 
 const WorkoutGoalFields = ({ category, value, updateGoal }: PartialFormProps) => {
-  console.log({ category })
   if (category !== 'WORKOUT_COUNT') return <></>
 
   const details: WorkoutGoalDetails = {
