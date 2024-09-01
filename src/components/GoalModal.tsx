@@ -7,7 +7,7 @@ import {
   printModifier,
   printType,
 } from '../helpers/gradeUtils'
-import { Button, Form, Modal } from 'react-bootstrap'
+import { Button, Col, Form, Modal, Row } from 'react-bootstrap'
 import InputSlider from './InputSlider'
 import { DecoratedGrade, RouteModifier } from '../types/Grade'
 import {
@@ -16,6 +16,7 @@ import {
   GoalCategory,
   GoalDetails,
   isGoalCategory,
+  SessionGoalDetails,
   WorkoutGoalDetails,
 } from '../types/Goal'
 import moment from 'moment'
@@ -24,8 +25,6 @@ import { DatePicker } from '../templates/routeFields'
 import { CategoryPicker, IntensityPicker } from '../templates/workoutFields'
 import { WorkoutCategory } from '../types/Workout'
 import { Optional } from '../redux/selectors/types'
-
-export const PARTIAL_MAX = 100
 
 interface PartialFormProps {
   value?: GoalDetails
@@ -54,6 +53,62 @@ const WorkoutGoalFields = ({ category, value, updateGoal }: PartialFormProps) =>
       <IntensityPicker
         value={details.minIntensity}
         onChange={val => updateGoal({ ...details, minIntensity: val })}
+      />
+    </>
+  )
+}
+
+const SessionGoalFields = ({ category, value, updateGoal }: PartialFormProps) => {
+  if (category !== 'SESSION_COUNT') return <></>
+
+  const details: SessionGoalDetails = {
+    minDurationMinutes: 0,
+    minRouteCount: 0,
+    ...value,
+    category,
+  }
+
+  const minDurationHours = Math.floor(details.minDurationMinutes / 60)
+  const minDurationMinutesPart = details.minDurationMinutes % 60
+
+  return (
+    <>
+      <Form.Label>Minimum session duration</Form.Label>
+      <Row>
+        <Col xs={6}>
+          <Form.Label>Hours</Form.Label>
+          <Form.Control
+            value={minDurationHours}
+            min={0}
+            type="number"
+            onChange={evt =>
+              updateGoal({
+                ...details,
+                minDurationMinutes: Number(evt.target.value) * 60 + minDurationMinutesPart,
+              })
+            }
+          />
+        </Col>
+        <Col xs={6}>
+          <Form.Label>Minutes</Form.Label>
+          <Form.Control
+            value={minDurationMinutesPart}
+            min={0}
+            type="number"
+            onChange={evt =>
+              updateGoal({
+                ...details,
+                minDurationMinutes: Number(evt.target.value) + minDurationHours * 60,
+              })
+            }
+          />
+        </Col>
+      </Row>
+      <Form.Label>Minimum route count</Form.Label>
+      <Form.Control
+        value={details.minRouteCount}
+        type="number"
+        onChange={evt => updateGoal({ ...details, minRouteCount: Number(evt.target.value) })}
       />
     </>
   )
@@ -125,6 +180,7 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
           </Form.Label>
           <Form.Control
             value={target}
+            type="number"
             onChange={evt =>
               evt.target.value === '' ? setTarget(undefined) : setTarget(Number(evt.target.value))
             }
@@ -134,6 +190,7 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
           <Form.Label>End date</Form.Label>
           <DatePicker value={endTime} onChange={setEndTime} />
           <WorkoutGoalFields category={category} value={details} updateGoal={setDetails} />
+          <SessionGoalFields category={category} value={details} updateGoal={setDetails} />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

@@ -26,8 +26,8 @@ export type WorkoutGoalDetails = {
 
 export type SessionGoalDetails = {
   category: 'SESSION_COUNT'
-  minDuration?: number
-  minRouteCount?: number
+  minDurationMinutes: number
+  minRouteCount: number
 }
 
 export type RouteCountGoalDetails = {
