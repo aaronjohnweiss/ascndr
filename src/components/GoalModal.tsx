@@ -37,7 +37,7 @@ const WorkoutGoalFields = ({ category, value, updateGoal }: PartialFormProps) =>
   if (category !== 'WORKOUT_COUNT') return <></>
 
   const details: WorkoutGoalDetails = {
-    workoutCategories: [] as WorkoutCategory[],
+    workoutCategories: [],
     minIntensity: 1,
     ...value,
     category,
