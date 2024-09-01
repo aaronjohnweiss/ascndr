@@ -33,7 +33,6 @@ interface PartialFormProps {
   updateGoal: (details: GoalDetails) => void
 }
 
-// TODO fix types.. need a full BaseGoal as input or need to tweak types so this can only return workout specific fields
 const WorkoutGoalFields = ({ category, value, updateGoal }: PartialFormProps) => {
   console.log({ category })
   if (category !== 'WORKOUT_COUNT') return <></>
