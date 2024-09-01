@@ -6,17 +6,11 @@ import { distinct } from '../helpers/filterUtils'
 import { Field } from '../components/EntityModal'
 import { Workout } from '../types/Workout'
 
-export const IntensityPicker = ({
-  value,
-  onChange,
-}: {
-  value: number
-  onChange: (n: number) => void
-}) => {
-  return <InputSlider min={1} max={MAX_INTENSITY} step={1} value={value} onChange={onChange} />
-}
+export const IntensityPicker = ({ value, onChange }) => (
+  <InputSlider min={1} max={MAX_INTENSITY} step={1} value={value} onChange={onChange} />
+)
 
-const CategoryPicker = ({ value, onChange }) => {
+export const CategoryPicker = ({ value, onChange }) => {
   const onCategoryChange =
     category =>
     ({ target: { checked } }) => {

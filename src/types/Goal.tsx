@@ -14,42 +14,23 @@ export type GoalCategory = (typeof GOAL_CATEGORIES)[number]
 export const isGoalCategory = (str: string): str is GoalCategory =>
   GOAL_CATEGORIES.some(cat => cat === str)
 
-export type SharedGoal = {
-  isShared: true
-  participants: string[]
-}
-
-export type SoloGoal = {
-  isShared: false
-}
-
-export type BaseGoal = {
-  _type: 'goal'
-  category: GoalCategory
-  owner: string
-  startTime: number
-  endTime: number
-  target: number
-  participants: string[]
-} & (SharedGoal | SoloGoal)
-
-export type ActivityGoal = BaseGoal & {
+export type ActivityGoalDetails = {
   category: 'ACTIVITY_COUNT'
 }
 
-export type WorkoutGoal = BaseGoal & {
+export type WorkoutGoalDetails = {
   category: 'WORKOUT_COUNT'
   workoutCategories: WorkoutCategory[]
   minIntensity: number
 }
 
-export type SessionGoal = BaseGoal & {
+export type SessionGoalDetails = {
   category: 'SESSION_COUNT'
   minDuration?: number
   minRouteCount?: number
 }
 
-export type RouteCountGoal = BaseGoal & {
+export type RouteCountGoalDetails = {
   category: 'ROUTE_COUNT'
   styles: Record<
     RouteStyle,
@@ -59,7 +40,7 @@ export type RouteCountGoal = BaseGoal & {
   >
 }
 
-export type DistanceGoal = BaseGoal & {
+export type DistanceGoalDetails = {
   category: 'ROUTE_DISTANCE'
   styles: Record<
     RouteStyle,
@@ -69,9 +50,35 @@ export type DistanceGoal = BaseGoal & {
   >
 }
 
-export type Goal = ActivityGoal | WorkoutGoal | SessionGoal | RouteCountGoal | DistanceGoal
+export type SharedGoal = {
+  isShared: true
+  participants: string[]
+}
+
+export type SoloGoal = {
+  isShared: false
+}
+
+export type GoalDetails =
+  | ActivityGoalDetails
+  | WorkoutGoalDetails
+  | SessionGoalDetails
+  | RouteCountGoalDetails
+  | DistanceGoalDetails
+
+export type Goal = {
+  _type: 'goal'
+  category: GoalCategory
+  owner: string
+  startTime: number
+  endTime: number
+  target: number
+  participants: string[]
+} & (SharedGoal | SoloGoal) &
+  GoalDetails
 
 export type FirebaseGoal = Goal
 
 export const isShared = (goal: Goal): goal is Goal & SharedGoal => goal.isShared
-export const isWorkout = (goal: Goal): goal is WorkoutGoal => goal.category === 'WORKOUT_COUNT'
+export const isWorkout = (goal: Goal): goal is Goal & WorkoutGoalDetails =>
+  goal.category === 'WORKOUT_COUNT'

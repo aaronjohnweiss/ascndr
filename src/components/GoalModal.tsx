@@ -10,38 +10,52 @@ import {
 import { Button, Form, Modal } from 'react-bootstrap'
 import InputSlider from './InputSlider'
 import { DecoratedGrade, RouteModifier } from '../types/Grade'
-import { Goal, GOAL_CATEGORIES, GoalCategory, isGoalCategory, WorkoutGoal } from '../types/Goal'
+import {
+  Goal,
+  GOAL_CATEGORIES,
+  GoalCategory,
+  GoalDetails,
+  isGoalCategory,
+  WorkoutGoalDetails,
+} from '../types/Goal'
 import moment from 'moment'
 import { getUnits, prettyPrintGoalCategory } from '../helpers/goalUtils'
 import { DatePicker } from '../templates/routeFields'
-import { IntensityPicker } from '../templates/workoutFields'
+import { CategoryPicker, IntensityPicker } from '../templates/workoutFields'
 import { WorkoutCategory } from '../types/Workout'
+import { Optional } from '../redux/selectors/types'
 
 export const PARTIAL_MAX = 100
 
 interface PartialFormProps {
-  initialValue?: Goal
+  value?: GoalDetails
   category: GoalCategory
-  updateGoal: (goal: Goal) => void
+  updateGoal: (details: GoalDetails) => void
 }
 
 // TODO fix types.. need a full BaseGoal as input or need to tweak types so this can only return workout specific fields
-const WorkoutGoalFields = ({ category, initialValue, updateGoal }: PartialFormProps) => {
+const WorkoutGoalFields = ({ category, value, updateGoal }: PartialFormProps) => {
+  console.log({ category })
   if (category !== 'WORKOUT_COUNT') return <></>
 
-  const goal: Partial<WorkoutGoal> = {
+  const details: WorkoutGoalDetails = {
     workoutCategories: [] as WorkoutCategory[],
     minIntensity: 1,
-    ...initialValue,
+    ...value,
     category,
   }
 
   return (
     <>
+      <Form.Label>Included categories</Form.Label>
+      <CategoryPicker
+        value={details.workoutCategories}
+        onChange={val => updateGoal({ ...details, workoutCategories: val })}
+      />
       <Form.Label>Minimum intensity</Form.Label>
       <IntensityPicker
-        value={goal.minIntensity}
-        onChange={val => updateGoal({ ...initialValue, minIntensity: val })}
+        value={details.minIntensity}
+        onChange={val => updateGoal({ ...details, minIntensity: val })}
       />
     </>
   )
@@ -64,7 +78,7 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
   const [startTime, setStartTime] = useState(moment.now())
   const [endTime, setEndTime] = useState(moment.now())
   const [target, setTarget] = useState(initialValue?.target)
-  const [goal, setGoal] = useState(initialValue)
+  const [details, setDetails] = useState<Optional<GoalDetails>>(initialValue)
 
   const submitGoal = () => {
     // TODO
@@ -92,6 +106,22 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
               </option>
             ))}
           </Form.Control>
+          <Form.Label>Visibility</Form.Label> <br />
+          <Form.Check
+            type="radio"
+            inline
+            checked={!isShared}
+            onChange={() => setIsShared(false)}
+            label="Private"
+          />
+          <Form.Check
+            type="radio"
+            inline
+            checked={isShared}
+            onChange={() => setIsShared(true)}
+            label="Shared"
+          />
+          <br />
           <Form.Label>
             Goal target {category && `(${getUnits({ category, target: 0 })})`}
           </Form.Label>
@@ -105,6 +135,7 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
           <DatePicker value={startTime} onChange={setStartTime} />
           <Form.Label>End date</Form.Label>
           <DatePicker value={endTime} onChange={setEndTime} />
+          <WorkoutGoalFields category={category} value={details} updateGoal={setDetails} />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
