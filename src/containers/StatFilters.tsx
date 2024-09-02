@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { isLoaded } from 'react-redux-firebase'
 import { useLocation } from 'react-router-dom'
 import { Button, Form } from 'react-bootstrap'
-import { ALL_STYLES, printType } from '../helpers/gradeUtils'
+import { printType } from '../helpers/gradeUtils'
 import { getUserName } from '../helpers/filterUtils'
 import { getUser, useDatabase } from '../redux/selectors/selectors'
 import { LinkContainer } from 'react-router-bootstrap'
 import { getBooleanFromQuery } from '../helpers/queryParser'
+import { ALL_STYLES } from '../types/Grade'
 
 export const filtersLink = location =>
   `/stats/filters${location.search ? location.search + '&' : '?'}ref=${location.pathname}`

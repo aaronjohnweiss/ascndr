@@ -1,9 +1,9 @@
 import React from 'react'
 import GradeHistogram from './GradeHistogram'
-import { ALL_STYLES } from '../helpers/gradeUtils'
 import { Link } from 'react-router-dom'
 import { hasRoutes } from '../helpers/filterUtils'
 import { timeFromNow } from '../helpers/dateUtils'
+import { ALL_STYLES } from '../types/Grade'
 
 const SessionCard = ({ session, gym, user, routes }) => {
   return (

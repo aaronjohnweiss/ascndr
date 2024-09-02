@@ -32,11 +32,13 @@ export type SessionGoalDetails = {
 
 export type RouteCountGoalDetails = {
   category: 'ROUTE_COUNT'
-  styles: Record<
-    RouteStyle,
-    {
-      minGrade: Grade
-    }
+  styles: Partial<
+    Record<
+      RouteStyle,
+      {
+        minGrade: Grade
+      }
+    >
   >
 }
 

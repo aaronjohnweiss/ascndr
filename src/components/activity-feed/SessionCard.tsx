@@ -8,9 +8,10 @@ import { FaPersonFalling } from 'react-icons/fa6'
 import { IconContext } from 'react-icons'
 import { sessionDuration } from '../../helpers/durationUtils'
 import { highestGradeForSession } from '../GradeHistory'
-import { ALL_STYLES, prettyPrint } from '../../helpers/gradeUtils'
+import { prettyPrint } from '../../helpers/gradeUtils'
 import { heightForSession } from '../StatsIndex'
 import { defaultIconContext, iconColors } from './iconStyle'
+import { ALL_STYLES } from '../../types/Grade'
 
 interface Props {
   session: Persisted<Session>

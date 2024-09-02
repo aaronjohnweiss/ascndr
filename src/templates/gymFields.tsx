@@ -1,8 +1,9 @@
-import { ALL_STYLES, printType } from '../helpers/gradeUtils'
+import { printType } from '../helpers/gradeUtils'
 import { GymPicker } from '../components/GymPicker'
 import React from 'react'
 import { Field } from '../components/EntityModal'
 import { Gym } from '../types/Gym'
+import { ALL_STYLES } from '../types/Grade'
 
 export const gymFields: Field<Gym>[] = [
   {

@@ -1,5 +1,4 @@
-import { Grade } from './Grade'
-import { TOP_ROPE } from '../helpers/gradeUtils'
+import { Grade, TOP_ROPE } from './Grade'
 
 export interface RouteVideo {
   uid: string

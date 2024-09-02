@@ -1,21 +1,22 @@
 import React, { useState } from 'react'
+import { getMinGrade, prettyPrint, printModifier, printType } from '../helpers/gradeUtils'
+import { Button, Col, Form, Modal, Row } from 'react-bootstrap'
+import InputSlider from './InputSlider'
 import {
   ALL_MODIFIERS,
   ALL_STYLES,
+  DecoratedGrade,
   GRADE_RANGE,
-  prettyPrint,
-  printModifier,
-  printType,
-} from '../helpers/gradeUtils'
-import { Button, Col, Form, Modal, Row } from 'react-bootstrap'
-import InputSlider from './InputSlider'
-import { DecoratedGrade, RouteModifier } from '../types/Grade'
+  RouteModifier,
+  RouteStyle,
+} from '../types/Grade'
 import {
   Goal,
   GOAL_CATEGORIES,
   GoalCategory,
   GoalDetails,
   isGoalCategory,
+  RouteCountGoalDetails,
   SessionGoalDetails,
   WorkoutGoalDetails,
 } from '../types/Goal'
@@ -25,12 +26,15 @@ import { DatePicker } from '../templates/routeFields'
 import { CategoryPicker, IntensityPicker } from '../templates/workoutFields'
 import { WorkoutCategory } from '../types/Workout'
 import { Optional } from '../redux/selectors/types'
+import { GradeSlider } from './GradeModal'
 
 interface PartialFormProps {
   value?: GoalDetails
   category: GoalCategory
   updateGoal: (details: GoalDetails) => void
 }
+
+const hasDetails = (category: GoalCategory) => category !== 'ACTIVITY_COUNT'
 
 const WorkoutGoalFields = ({ category, value, updateGoal }: PartialFormProps) => {
   if (category !== 'WORKOUT_COUNT') return <></>
@@ -44,12 +48,12 @@ const WorkoutGoalFields = ({ category, value, updateGoal }: PartialFormProps) =>
 
   return (
     <>
-      <Form.Label>Included categories</Form.Label>
+      <Form.Label className="grade-modal-label">Included categories</Form.Label>
       <CategoryPicker
         value={details.workoutCategories}
         onChange={val => updateGoal({ ...details, workoutCategories: val })}
       />
-      <Form.Label>Minimum intensity</Form.Label>
+      <Form.Label className="grade-modal-label">Minimum intensity</Form.Label>
       <IntensityPicker
         value={details.minIntensity}
         onChange={val => updateGoal({ ...details, minIntensity: val })}
@@ -73,7 +77,7 @@ const SessionGoalFields = ({ category, value, updateGoal }: PartialFormProps) =>
 
   return (
     <>
-      <Form.Label>Minimum session duration</Form.Label>
+      <Form.Label className="grade-modal-label">Minimum session duration</Form.Label>
       <Row>
         <Col xs={6}>
           <Form.Label>Hours</Form.Label>
@@ -104,12 +108,77 @@ const SessionGoalFields = ({ category, value, updateGoal }: PartialFormProps) =>
           />
         </Col>
       </Row>
-      <Form.Label>Minimum route count</Form.Label>
+      <Form.Label className="grade-modal-label">Minimum route count</Form.Label>
       <Form.Control
         value={details.minRouteCount}
         type="number"
         onChange={evt => updateGoal({ ...details, minRouteCount: Number(evt.target.value) })}
       />
+    </>
+  )
+}
+
+const RouteGoalFields = ({ category, value, updateGoal }: PartialFormProps) => {
+  if (category !== 'ROUTE_COUNT') return <></>
+
+  const defaultEntry = (style: RouteStyle) => ({ minGrade: getMinGrade(style) })
+
+  const details: RouteCountGoalDetails = {
+    styles: Object.fromEntries(ALL_STYLES.map(style => [style, defaultEntry(style)])),
+    ...value,
+    category,
+  }
+
+  return (
+    <>
+      {ALL_STYLES.map((style, idx) => {
+        const minGrade = details.styles[style]?.minGrade
+
+        return (
+          <Form.Group key={idx}>
+            <Form.Label className="grade-modal-label">{printType(style)}</Form.Label>
+            <Form.Check
+              checked={minGrade !== undefined}
+              label="Included"
+              onChange={evt =>
+                evt.target.checked
+                  ? updateGoal({
+                      ...details,
+                      styles: {
+                        ...details.styles,
+                        [style]: defaultEntry(style),
+                      },
+                    })
+                  : updateGoal({
+                      ...details,
+                      styles: {
+                        ...details.styles,
+                        [style]: undefined,
+                      },
+                    })
+              }
+            />
+            {minGrade !== undefined && (
+              <>
+                <Form.Label>Minimum grade</Form.Label>
+                <GradeSlider
+                  difficulty={minGrade.difficulty}
+                  style={style}
+                  onChange={newGrade =>
+                    updateGoal({
+                      ...details,
+                      styles: {
+                        ...details.styles,
+                        [style]: { minGrade: { style, difficulty: newGrade } },
+                      },
+                    })
+                  }
+                />
+              </>
+            )}
+          </Form.Group>
+        )
+      })}
     </>
   )
 }
@@ -145,7 +214,9 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <Form.Label>Goal type</Form.Label>
+          <Form.Label as={'h6'} className={'mb-1'}>
+            Goal type
+          </Form.Label>
           <Form.Control
             as="select"
             defaultValue={category}
@@ -159,7 +230,7 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
               </option>
             ))}
           </Form.Control>
-          <Form.Label>Visibility</Form.Label> <br />
+          <Form.Label className="grade-modal-label">Visibility</Form.Label> <br />
           <Form.Check
             type="radio"
             inline
@@ -175,22 +246,28 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
             label="Shared"
           />
           <br />
-          <Form.Label>
+          <Form.Label className="grade-modal-label">
             Goal target {category && `(${getUnits({ category, target: 0 })})`}
           </Form.Label>
           <Form.Control
             value={target}
+            min={0}
             type="number"
             onChange={evt =>
               evt.target.value === '' ? setTarget(undefined) : setTarget(Number(evt.target.value))
             }
           />
-          <Form.Label>Start date</Form.Label>
+          <Form.Label className="grade-modal-label">Start date</Form.Label>
           <DatePicker value={startTime} onChange={setStartTime} />
-          <Form.Label>End date</Form.Label>
+          <Form.Label className="grade-modal-label">End date</Form.Label>
           <DatePicker value={endTime} onChange={setEndTime} />
+          {/*{hasDetails(category) && <>*/}
+          {/*  <h6 className="mb-1 mt-4">Goal Filters</h6>*/}
+          {/*  <hr className="mt-0 mb-1" />*/}
+          {/*</>}*/}
           <WorkoutGoalFields category={category} value={details} updateGoal={setDetails} />
           <SessionGoalFields category={category} value={details} updateGoal={setDetails} />
+          <RouteGoalFields category={category} value={details} updateGoal={setDetails} />
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>

@@ -9,10 +9,9 @@ import { Workout } from '../types/Workout'
 import { entries } from './recordUtils'
 import { Gym } from '../types/Gym'
 import { User } from '../types/User'
-import { Grade } from '../types/Grade'
+import { ALL_STYLES, Grade } from '../types/Grade'
 import { calculateProgression } from '../components/GradeHistory'
 import { toObj } from './objectConverters'
-import { ALL_STYLES } from './gradeUtils'
 
 export type AggregateSessionMilestone =
   | {

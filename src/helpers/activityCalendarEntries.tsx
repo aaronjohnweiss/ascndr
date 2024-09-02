@@ -1,7 +1,6 @@
 import moment from 'moment'
 import { dateString } from './dateUtils'
 import { routeCountForSession } from '../components/StatsIndex'
-import { ALL_STYLES } from './gradeUtils'
 import { percentile } from './mathUtils'
 import { WORKOUT_CATEGORIES } from './workouts'
 import { getPreferences } from '../components/ActivityCalendarSettingsModal'
@@ -11,6 +10,7 @@ import { Data, OrderedList } from '../types/Firebase'
 import { Session } from '../types/Session'
 import { Route } from '../types/Route'
 import { Workout } from '../types/Workout'
+import { ALL_STYLES } from '../types/Grade'
 
 interface Count {
   count: number

@@ -2,18 +2,21 @@ import { sum } from './mathUtils'
 import { PARTIAL_MAX } from '../components/GradeModal'
 import { distinct } from './filterUtils'
 import { PartialCount } from '../types/Session'
+import {
+  ALL_MODIFIERS,
+  ALL_STYLES,
+  BOULDER,
+  Grade,
+  GRADE_RANGE,
+  LEAD,
+  RouteStyle,
+  TOP_ROPE,
+} from '../types/Grade'
 
-export const TOP_ROPE = 'TOP_ROPE'
-export const BOULDER = 'BOULDER'
-export const LEAD = 'LEAD'
-
-export const ALL_STYLES = [TOP_ROPE, BOULDER, LEAD] as const
-export const ALL_MODIFIERS = ['-', null, '+'] as const
-export const GRADE_RANGE = {
-  [TOP_ROPE]: { min: 6, max: 14 },
-  [BOULDER]: { min: 0, max: 10 },
-  [LEAD]: { min: 6, max: 14 },
-}
+export const getMinGrade = (style: RouteStyle): Grade => ({
+  style,
+  difficulty: GRADE_RANGE[style].min,
+})
 
 export const printPercentage = percentage => `${Math.round(100 * (percentage / PARTIAL_MAX))}%`
 

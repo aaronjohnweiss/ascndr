@@ -1,18 +1,40 @@
 import React, { useState } from 'react'
+import { prettyPrint, printModifier, printType } from '../helpers/gradeUtils'
+import { Button, Form, Modal } from 'react-bootstrap'
+import InputSlider from './InputSlider'
 import {
   ALL_MODIFIERS,
   ALL_STYLES,
+  DecoratedGrade,
   GRADE_RANGE,
-  prettyPrint,
-  printModifier,
-  printType,
+  RouteModifier,
+  RouteStyle,
   TOP_ROPE,
-} from '../helpers/gradeUtils'
-import { Button, Form, Modal } from 'react-bootstrap'
-import InputSlider from './InputSlider'
-import { DecoratedGrade, RouteModifier, RouteStyle } from '../types/Grade'
+} from '../types/Grade'
 
 export const PARTIAL_MAX = 100
+
+export const GradeSlider = ({
+  style,
+  difficulty,
+  modifier,
+  onChange,
+}: {
+  style: RouteStyle
+  difficulty: number
+  modifier?: RouteModifier
+  onChange: (d: number) => void
+}) => (
+  <InputSlider
+    min={GRADE_RANGE[style].min}
+    max={GRADE_RANGE[style].max}
+    step={1}
+    value={difficulty}
+    printValue={difficulty => prettyPrint({ style, difficulty, modifier })}
+    onChange={onChange}
+    minLabelWidth="4.5em"
+  />
+)
 
 interface Props {
   defaultStyle?: RouteStyle
@@ -75,14 +97,11 @@ const GradeModal = ({
           <br />
 
           <Form.Label className="grade-modal-label">Grade</Form.Label>
-          <InputSlider
-            min={GRADE_RANGE[style].min}
-            max={GRADE_RANGE[style].max}
-            step={1}
-            value={difficulty}
-            printValue={difficulty => prettyPrint({ style, difficulty, modifier })}
+          <GradeSlider
+            style={style}
+            difficulty={difficulty}
+            modifier={modifier}
             onChange={setDifficulty}
-            minLabelWidth="4.5em"
           />
 
           <Form.Label className="grade-modal-label">Modifier</Form.Label>
