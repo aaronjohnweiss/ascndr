@@ -12,12 +12,13 @@ import { fetchUser, signOut } from './redux/actions'
 import UserPage from './containers/UserPage'
 import StatsPage from './containers/StatsContainer'
 import { FaBars } from 'react-icons/fa'
-import Sidebar from './containers/Sidebar'
+import Sidebar from './containers/navigation/Sidebar'
 import WorkoutIndex from './containers/WorkoutIndex'
 import UserCheck from './containers/UserCheck'
 import RoutesContainer from './containers/RoutesContainer'
 import { useAppSelector } from './redux/index'
 import { useAppDispatch } from './redux'
+import BottomNavbar from './containers/navigation/BottomNavbar'
 
 const App = () => {
   const authenticated = useAppSelector(state => state.auth)
@@ -74,7 +75,7 @@ const App = () => {
           </div>
         </Container>
         <Sidebar show={showSidebar} onHide={closeSidebar} />
-        <Container>
+        <Container className="main-content">
           <div className="px-2">
             {(authenticated && (
               <>
@@ -98,6 +99,9 @@ const App = () => {
               </>
             )}
           </div>
+        </Container>
+        <Container className="bottom-navbar">
+          <BottomNavbar />
         </Container>
       </div>
     </Router>

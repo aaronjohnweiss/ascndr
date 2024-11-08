@@ -31,6 +31,26 @@
     color: royalblue;
 }
 
+.navbar-light {
+    color: $gray-600
+}
+.navbar-light .active {
+    color: black;
+}
+
+.main-content {
+    width: 100%;
+    height: calc(100% - 48px - 2em);
+    padding-bottom: 1em;
+    overflow-y: auto;
+}
+
+.bottom-navbar {
+    height: 48px;
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+
 .card {
     margin-bottom: 10px;
 }
