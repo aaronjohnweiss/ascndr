@@ -4,16 +4,20 @@ import { NAV_LINKS, NavBarItem } from './navLinks'
 import { Link, useLocation } from 'react-router-dom'
 import * as H from 'history'
 
-const isActive = (location, item) =>
+interface IconProps {
+  item: NavBarItem
+  location: H.Location
+}
+export const isActive = ({ location, item }: IconProps) =>
   location &&
   (item.href === '/'
-    ? location.pathname == item.href //Home should just match on '/'
+    ? location.pathname == item.href // Home should just match on '/'
     : [item.href, ...(item.subPages || [])].some(href => location.pathname.startsWith(href)))
 
-const IconLink = ({ item, location }: { item: NavBarItem; location: H.Location<any> }) => (
+const IconLink = ({ item, location }: IconProps) => (
   <Nav.Link
     as={Link}
-    active={isActive(location, item)}
+    active={isActive({ location, item })}
     to={item.href}
     className="d-flex flex-column align-items-center"
   >
