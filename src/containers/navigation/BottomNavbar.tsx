@@ -25,8 +25,6 @@ const IconLink = ({ item, location }: { item: NavBarItem; location: H.Location<a
 export const BottomNavbar = () => {
   const location = useLocation()
 
-  console.log(location)
-
   return (
     <Navbar
       fixed="bottom"
