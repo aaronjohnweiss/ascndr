@@ -5,6 +5,8 @@ import { isLoaded, useFirebase } from 'react-redux-firebase'
 import Workout from '../components/Workout'
 import { validateWorkoutFields, workoutFields } from '../templates/workoutFields'
 import { getUser, useDatabase } from '../redux/selectors/selectors'
+import { useLocation } from 'react-router-dom'
+import { getBooleanFromQuery } from '../helpers/queryParser'
 
 const WorkoutIndex = () => {
   const { uid } = getUser()
@@ -13,7 +15,11 @@ const WorkoutIndex = () => {
 
   const firebase = useFirebase()
 
-  const [showModal, setShowModal] = useState(false)
+  const query = new URLSearchParams(useLocation().search)
+
+  const defaultModalState = getBooleanFromQuery(query, 'new')
+
+  const [showModal, setShowModal] = useState(defaultModalState)
 
   const openModal = () => setShowModal(true)
   const closeModal = () => setShowModal(false)
@@ -38,6 +44,7 @@ const WorkoutIndex = () => {
         <Workout workout={workout.value} key={workout.key} />
       ))}
       <EntityModal
+        title="Log Workout"
         show={showModal}
         handleClose={closeModal}
         handleSubmit={addWorkout}
