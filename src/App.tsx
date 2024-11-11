@@ -19,6 +19,7 @@ import RoutesContainer from './containers/RoutesContainer'
 import { useAppSelector } from './redux/index'
 import { useAppDispatch } from './redux'
 import BottomNavbar from './containers/navigation/BottomNavbar'
+import NewSessionWizard from './containers/NewSessionWizard'
 
 const App = () => {
   const authenticated = useAppSelector(state => state.auth)
@@ -85,6 +86,7 @@ const App = () => {
                 <Route exact path="/gyms/:id" component={GymPage} />
                 <Route exact path="/routes/:id" component={RoutePage} />
                 <Route exact path="/sessions/:id" component={SessionPage} />
+                <Route exact path="/newSession" component={NewSessionWizard} />
                 <Route path="/stats" component={StatsPage} />
                 <Route path="/routeGallery" component={RoutesContainer} />
                 <Route exact path="/workouts" component={WorkoutIndex} />

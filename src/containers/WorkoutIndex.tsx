@@ -7,6 +7,8 @@ import { getUser, useDatabase } from '../redux/selectors/selectors'
 import { Card } from 'react-bootstrap'
 import { Workout } from '../types/Workout'
 import { Persisted } from '../types/Firebase'
+import { useLocation } from 'react-router-dom'
+import { getBooleanFromQuery } from '../helpers/queryParser'
 
 const WorkoutIndex = () => {
   const { uid } = getUser()
@@ -15,7 +17,11 @@ const WorkoutIndex = () => {
 
   const firebase = useFirebase()
 
-  const [showCreateModal, setShowCreateModal] = useState(false)
+  const query = new URLSearchParams(useLocation().search)
+
+  const defaultCreateModalState = getBooleanFromQuery(query, 'new')
+
+  const [showCreateModal, setShowCreateModal] = useState(defaultCreateModalState)
   const [editModalTarget, setShowEditModal] = useState<Persisted<Workout> | undefined>(undefined)
 
   const openCreateModal = () => setShowCreateModal(true)

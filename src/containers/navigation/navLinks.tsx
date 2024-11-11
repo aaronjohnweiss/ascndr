@@ -23,7 +23,7 @@ export const NAV_LINKS = {
     href: '/gyms',
     text: 'Gyms',
     icon: FaBuilding,
-    subPages: ['/routes', '/sessions'],
+    subPages: ['/routes', '/sessions', '/newSession'],
   },
   WORKOUTS: {
     href: '/workouts',
