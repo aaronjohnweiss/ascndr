@@ -435,6 +435,7 @@ export const SessionPage = ({
         handleDelete={deleteSession}
         fields={sessionFields({ gyms: gymsForUser })}
         title="Edit session"
+        deleteTitle="Delete session?"
         initialValues={{ ...session }}
       />
     </Container>

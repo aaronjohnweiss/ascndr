@@ -5,6 +5,7 @@ import { Form } from 'react-bootstrap'
 import { distinct } from '../helpers/filterUtils'
 import { Field } from '../components/EntityModal'
 import { Workout } from '../types/Workout'
+import { DatePicker } from './sessionFields'
 
 const IntensityPicker = ({ value, onChange }) => {
   return <InputSlider min={1} max={MAX_INTENSITY} step={1} value={value} onChange={onChange} />
@@ -52,6 +53,14 @@ export const workoutFields: Field<Workout>[] = [
     options: {
       type: 'custom',
       component: CategoryPicker,
+    },
+  },
+  {
+    title: 'Date',
+    name: 'startTime',
+    options: {
+      type: 'custom',
+      component: DatePicker,
     },
   },
 ]
