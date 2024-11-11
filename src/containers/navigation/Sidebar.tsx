@@ -1,12 +1,13 @@
 import { ListGroup, Offcanvas } from 'react-bootstrap'
 import React from 'react'
-import { useAppSelector } from '../redux/index'
+import { useAppSelector } from '../../redux'
 import { LinkContainer } from 'react-router-bootstrap'
+import { NAV_LINKS } from './navLinks'
 
 export const Sidebar = ({ show, onHide }) => {
   const auth = useAppSelector(state => state.auth)
 
-  const listItems = auth ? loggedInItems({ auth }) : loggedOutItems()
+  const listItems = auth ? LOGGED_IN_ITEMS : LOGGED_OUT_ITEMS
   return (
     <Offcanvas show={show} onHide={onHide} className="settings-offcanvas">
       <Offcanvas.Header closeButton>Navigation</Offcanvas.Header>
@@ -25,38 +26,15 @@ export const Sidebar = ({ show, onHide }) => {
   )
 }
 
-const loggedOutItems = () => [
-  {
-    href: '/login',
-    text: 'Sign in',
-  },
-]
+const LOGGED_OUT_ITEMS = [NAV_LINKS.LOGIN]
 
-const loggedInItems = ({ auth }) => [
-  {
-    href: '/',
-    text: 'Home',
-  },
-  {
-    href: '/gyms',
-    text: 'Gyms',
-  },
-  {
-    href: '/workouts',
-    text: 'Workouts',
-  },
-  {
-    href: `/stats?uids=${auth.uid}`,
-    text: 'Stats',
-  },
-  {
-    href: '/routeGallery',
-    text: 'Routes',
-  },
-  {
-    href: '/user',
-    text: 'User Settings',
-  },
+const LOGGED_IN_ITEMS = [
+  NAV_LINKS.HOME,
+  NAV_LINKS.GYMS,
+  NAV_LINKS.WORKOUTS,
+  NAV_LINKS.STATS,
+  NAV_LINKS.ROUTES,
+  NAV_LINKS.USER,
 ]
 
 export default Sidebar
