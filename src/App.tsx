@@ -12,13 +12,15 @@ import { fetchUser, signOut } from './redux/actions'
 import UserPage from './containers/UserPage'
 import StatsPage from './containers/StatsContainer'
 import { FaBars } from 'react-icons/fa'
-import Sidebar from './containers/Sidebar'
+import Sidebar from './containers/navigation/Sidebar'
 import WorkoutIndex from './containers/WorkoutIndex'
 import UserCheck from './containers/UserCheck'
 import RoutesContainer from './containers/RoutesContainer'
 import { useAppSelector } from './redux/index'
 import { useAppDispatch } from './redux'
 import GoalIndex from './containers/GoalIndex'
+import BottomNavbar from './containers/navigation/BottomNavbar'
+import NewSessionWizard from './containers/NewSessionWizard'
 
 const App = () => {
   const authenticated = useAppSelector(state => state.auth)
@@ -75,7 +77,7 @@ const App = () => {
           </div>
         </Container>
         <Sidebar show={showSidebar} onHide={closeSidebar} />
-        <Container>
+        <Container className="main-content">
           <div className="px-2">
             {(authenticated && (
               <>
@@ -85,6 +87,7 @@ const App = () => {
                 <Route exact path="/gyms/:id" component={GymPage} />
                 <Route exact path="/routes/:id" component={RoutePage} />
                 <Route exact path="/sessions/:id" component={SessionPage} />
+                <Route exact path="/newSession" component={NewSessionWizard} />
                 <Route path="/stats" component={StatsPage} />
                 <Route path="/routeGallery" component={RoutesContainer} />
                 <Route exact path="/workouts" component={WorkoutIndex} />
@@ -100,6 +103,9 @@ const App = () => {
               </>
             )}
           </div>
+        </Container>
+        <Container className="bottom-navbar">
+          <BottomNavbar />
         </Container>
       </div>
     </Router>

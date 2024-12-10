@@ -52,7 +52,7 @@ const StatFilters = () => {
   const query = new URLSearchParams(useLocation().search)
 
   const [gymIds, setGymIds] = useState<string[] | null>(defaultIfEmpty(query.getAll('gyms'), null))
-  const [uids, setUids] = useState<string[]>(defaultIfEmpty(query.getAll('uids'), []))
+  const [uids, setUids] = useState<string[]>(defaultIfEmpty(query.getAll('uids'), [uid]))
 
   const [allowSuffixes, setAllowSuffixes] = useState(getBooleanFromQuery(query, 'allowSuffixes'))
   const [allowPartials, setAllowPartials] = useState(
@@ -71,7 +71,7 @@ const StatFilters = () => {
 
   useEffect(() => {
     if (isLoaded(user) && uids.length === 0) {
-      setUids(user.friends)
+      setUids([uid, ...user.friends])
     }
   }, [user])
 

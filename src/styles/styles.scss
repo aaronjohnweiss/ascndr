@@ -31,6 +31,76 @@
     color: royalblue;
 }
 
+.navbar-light {
+    color: $gray-600
+}
+.navbar-light .active {
+    color: black;
+}
+
+$bottom-navbar-height: 48px;
+$bottom-navbar-padding-y: 1em;
+
+.bottom-navbar {
+    height: $bottom-navbar-height;
+    padding-top: $bottom-navbar-padding-y;
+    padding-bottom: $bottom-navbar-padding-y;
+}
+
+.main-content {
+    width: 100%;
+    height: calc(100% - $bottom-navbar-height - 2*$bottom-navbar-padding-y);
+    padding-bottom: 1em;
+    overflow-y: auto;
+}
+
+$quick-add-button-size: 36px;
+
+.quick-add-button {
+    height: $quick-add-button-size;
+    width: $quick-add-button-size;
+    border-radius: 50%;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-add-button.plus {
+    position: fixed;
+    bottom: calc($bottom-navbar-height + 2*$bottom-navbar-padding-y);
+    right: 1em;
+    transition: transform .2s linear;
+}
+
+.quick-add-button.plus.open {
+    transform: rotate(225deg);
+    z-index: calc($zindex-modal-backdrop + 10);
+}
+
+.quick-add-modal {
+    position: fixed;
+    right: 1em;
+    bottom: calc($bottom-navbar-height + 2*$bottom-navbar-padding-y + $quick-add-button-size);
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    justify-content: end;
+}
+
+.quick-add-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    margin-bottom: .5em;
+    padding: 0;
+}
+
+.quick-add-row > * + * {
+    margin-left: .5em;
+}
+
 .card {
     margin-bottom: 10px;
 }

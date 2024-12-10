@@ -11,6 +11,7 @@ import { PENDING_IMAGE, uploadImage } from './RoutePage'
 import { useModalState } from '../helpers/useModalState'
 import DeleteGymModal from './DeleteGymModal'
 import { getUser, useDatabase } from '../redux/selectors/selectors'
+import { createSession } from '../types/Session'
 
 const GymPage = ({
   match: {
@@ -52,20 +53,13 @@ const GymPage = ({
     }
   }
 
-  const createSession = async () => {
-    const session = {
+  const submitSession = () =>
+    createSession({
       gymId: id,
-      uid: uid,
-      startTime: new Date().getTime(),
-      standardRoutes: [],
-      customRoutes: [],
-    }
-
-    const { key } = await firebase.push('sessions', session)
-    if (key) {
-      history.push('/sessions/' + key)
-    }
-  }
+      uid,
+      firebase,
+      history,
+    })
 
   const handleEditedGym = gym => {
     firebase.update(`gyms/${id}`, gym)
@@ -146,7 +140,7 @@ const GymPage = ({
           <h3>Sessions</h3>
         </Col>
         <Col xs={6}>
-          <Button variant="primary" onClick={createSession} style={{ float: 'right' }}>
+          <Button variant="primary" onClick={submitSession} style={{ float: 'right' }}>
             Add Session
           </Button>
         </Col>

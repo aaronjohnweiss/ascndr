@@ -49,6 +49,8 @@ const StatsContainer = () => {
   const userParams: FilterParam<User>[] = [['friendOf', uid]]
   if (query.has('uids')) {
     userParams.push(['uid', query.getAll('uids')])
+  } else {
+    userParams.push(['uid', uid])
   }
   const users = firebaseState.users.getOrdered(...userParams)
   const sessions = firebaseState.sessions.getData(
