@@ -47,7 +47,7 @@ export const BottomNavbar = () => {
         <IconLink location={location} item={NAV_LINKS.WORKOUTS} />
       </Col>
       <Col>
-        <IconLink location={location} item={NAV_LINKS.STATS} />
+        <IconLink location={location} item={NAV_LINKS.GOALS} />
       </Col>
     </Navbar>
   )

@@ -1,6 +1,6 @@
 import { IconType } from 'react-icons/lib'
 import { FaBuilding, FaDumbbell, FaUser } from 'react-icons/fa'
-import { FaChartColumn, FaGear, FaHillRockslide, FaHouse } from 'react-icons/fa6'
+import { FaBullseye, FaChartColumn, FaGear, FaHillRockslide, FaHouse } from 'react-icons/fa6'
 
 export type NavBarItem = {
   href: string
@@ -29,6 +29,11 @@ export const NAV_LINKS = {
     href: '/workouts',
     text: 'Workouts',
     icon: FaDumbbell,
+  },
+  GOALS: {
+    href: '/goals',
+    text: 'Goals',
+    icon: FaBullseye,
   },
   STATS: {
     href: `/stats`,

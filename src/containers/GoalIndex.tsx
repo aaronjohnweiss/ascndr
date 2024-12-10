@@ -1,10 +1,8 @@
 import React, { Fragment } from 'react'
 import Button from 'react-bootstrap/Button'
-import EntityModal from '../components/EntityModal'
 import { isLoaded, useFirebase } from 'react-redux-firebase'
 import { useModalState } from '../helpers/useModalState'
 import { getUser, useDatabase } from '../redux/selectors/selectors'
-import { Goal } from '../types/Goal'
 import GoalCard from '../components/GoalCard'
 import GoalModal, { GoalWithoutOwner } from '../components/GoalModal'
 
@@ -18,7 +16,7 @@ export const GoalIndex = () => {
   const [showGoalModal, openGoalModal, hideGoalModal] = useModalState()
 
   const handleNewGoal = (goal: GoalWithoutOwner) => {
-    firebase.push('goals', { ...goal, owner: uid })
+    firebase.push('goals', { ...goal, owner: uid, participants: [uid] })
     hideGoalModal()
   }
 

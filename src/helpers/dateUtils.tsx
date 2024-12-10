@@ -1,10 +1,7 @@
 import moment, { duration } from 'moment'
 
 export const dateString = (date: number | string | Date) => {
-  const localDate = new Date(date)
-  // The ISO String method prints the date in UTC; shift the time so that it ends up showing the local date
-  localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset())
-  return localDate.toISOString().split('T')[0]
+  return moment(date).toISOString().split('T')[0]
 }
 
 export const localDateTimeString = (date: number | string | Date) =>

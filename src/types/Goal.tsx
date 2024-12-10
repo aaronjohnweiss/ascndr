@@ -75,7 +75,6 @@ export type Goal = {
   startTime: number
   endTime: number
   target: number
-  participants: string[]
 } & (SharedGoal | SoloGoal) &
   GoalDetails
 

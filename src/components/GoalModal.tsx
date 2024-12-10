@@ -192,18 +192,29 @@ interface Props {
   initialValue?: Goal
 }
 
-export type GoalWithoutOwner = Omit<Goal, 'owner'>
+export type GoalWithoutOwner = Omit<Goal, 'owner' | 'participants'>
 
-const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initialValue }: Props) => {
+const GoalModal = ({ handleClose, handleSubmit, show, title, initialValue }: Props) => {
   const [category, setCategory] = useState(initialValue?.category || 'ACTIVITY_COUNT')
   const [isShared, setIsShared] = useState(true)
-  const [startTime, setStartTime] = useState(moment.now())
-  const [endTime, setEndTime] = useState(moment.now())
+  const [startTime, setStartTime] = useState(Date.now())
+  const [durationDays, setDurationDays] = useState<number | undefined>(undefined)
   const [target, setTarget] = useState(initialValue?.target)
   const [details, setDetails] = useState<Optional<GoalDetails>>(initialValue)
 
   const submitGoal = () => {
-    // TODO
+    handleSubmit({
+      _type: 'goal',
+      category,
+      startTime,
+      endTime: moment(startTime)
+        .add(durationDays || 1, 'days')
+        .endOf('day')
+        .valueOf(),
+      target: target || 0,
+      isShared,
+      ...details,
+    })
     handleClose()
   }
 
@@ -259,12 +270,17 @@ const GoalModal = ({ handleClose, handleSubmit, show, submitText, title, initial
           />
           <Form.Label className="grade-modal-label">Start date</Form.Label>
           <DatePicker value={startTime} onChange={setStartTime} />
-          <Form.Label className="grade-modal-label">End date</Form.Label>
-          <DatePicker value={endTime} onChange={setEndTime} />
-          {/*{hasDetails(category) && <>*/}
-          {/*  <h6 className="mb-1 mt-4">Goal Filters</h6>*/}
-          {/*  <hr className="mt-0 mb-1" />*/}
-          {/*</>}*/}
+          <Form.Label className="grade-modal-label">Duration (days)</Form.Label>
+          <Form.Control
+            value={durationDays}
+            min={0}
+            type="number"
+            onChange={evt =>
+              evt.target.value === ''
+                ? setDurationDays(undefined)
+                : setDurationDays(Number(evt.target.value))
+            }
+          />
           <WorkoutGoalFields category={category} value={details} updateGoal={setDetails} />
           <SessionGoalFields category={category} value={details} updateGoal={setDetails} />
           <RouteGoalFields category={category} value={details} updateGoal={setDetails} />
