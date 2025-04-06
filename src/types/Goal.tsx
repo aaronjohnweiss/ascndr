@@ -20,7 +20,7 @@ export type ActivityGoalDetails = {
 
 export type WorkoutGoalDetails = {
   category: 'WORKOUT_COUNT'
-  workoutCategories: WorkoutCategory[]
+  workoutCategories?: WorkoutCategory[]
   minIntensity: number
 }
 
@@ -83,3 +83,5 @@ export type FirebaseGoal = Goal
 export const isShared = (goal: Goal): goal is Goal & SharedGoal => goal.isShared
 export const isWorkout = (goal: Goal): goal is Goal & WorkoutGoalDetails =>
   goal.category === 'WORKOUT_COUNT'
+export const isSessionGoal = (goal: Goal): goal is Goal & SessionGoalDetails =>
+  goal.category === 'SESSION_COUNT'

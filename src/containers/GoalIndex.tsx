@@ -10,6 +10,10 @@ export const GoalIndex = () => {
   const { uid } = getUser()
   const firebaseState = useDatabase()
   const goals = firebaseState.goals.getOrdered(['viewer', uid])
+  const gyms = firebaseState.gyms.getOrdered(['viewer', uid])
+  const routes = firebaseState.routes.getOrdered(['viewer', uid])
+  const sessions = firebaseState.sessions.getOrdered(['viewer', uid])
+  const users = firebaseState.users.getOrdered()
 
   const firebase = useFirebase()
 
@@ -20,14 +24,21 @@ export const GoalIndex = () => {
     hideGoalModal()
   }
 
-  if (!isLoaded(goals)) return <>Loading</>
+  if (
+    !isLoaded(goals) ||
+    !isLoaded(routes) ||
+    !isLoaded(sessions) ||
+    !isLoaded(users) ||
+    !isLoaded(gyms)
+  )
+    return <>Loading</>
 
   goals.sort((g1, g2) => g1.value.startTime - g2.value.startTime)
 
   return (
     <Fragment>
       {goals.map(goal => (
-        <GoalCard goal={goal} key={goal.key} />
+        <GoalCard goal={goal} key={goal.key} uid={uid} firebaseState={firebaseState} />
       ))}
       <br />
       <div className="d-grid d-block mb-4">

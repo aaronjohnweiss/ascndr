@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getMinGrade, prettyPrint, printModifier, printType } from '../helpers/gradeUtils'
 import { Button, Col, Form, Modal, Row } from 'react-bootstrap'
 import InputSlider from './InputSlider'
@@ -46,6 +46,10 @@ const WorkoutGoalFields = ({ category, value, updateGoal }: PartialFormProps) =>
     category,
   }
 
+  useEffect(() => {
+    updateGoal(details)
+  }, [])
+
   return (
     <>
       <Form.Label className="grade-modal-label">Included categories</Form.Label>
@@ -71,6 +75,10 @@ const SessionGoalFields = ({ category, value, updateGoal }: PartialFormProps) =>
     ...value,
     category,
   }
+
+  useEffect(() => {
+    updateGoal(details)
+  }, [])
 
   const minDurationHours = Math.floor(details.minDurationMinutes / 60)
   const minDurationMinutesPart = details.minDurationMinutes % 60
@@ -128,6 +136,10 @@ const RouteGoalFields = ({ category, value, updateGoal }: PartialFormProps) => {
     ...value,
     category,
   }
+
+  useEffect(() => {
+    updateGoal(details)
+  }, [])
 
   return (
     <>
