@@ -5,6 +5,7 @@ import { FaDumbbell } from 'react-icons/fa'
 import { IconContext } from 'react-icons'
 import { IconType } from 'react-icons/lib'
 import { LinkContainer } from 'react-router-bootstrap'
+import { isIos, isInStandaloneMode } from '../helpers/iosUtils'
 
 const QuickAddRow = ({ name, url, icon: Icon }: { name: string; url: string; icon: IconType }) => (
   <LinkContainer to={url}>
@@ -19,7 +20,7 @@ const QuickAddRow = ({ name, url, icon: Icon }: { name: string; url: string; ico
   </LinkContainer>
 )
 
-export const QuickAddMenu = () => {
+export const QuickAddMenu = (props) => {
   const [isOpen, setOpen, setClosed] = useModalState(false)
 
   return (
@@ -36,7 +37,7 @@ export const QuickAddMenu = () => {
           onHide={setClosed}
           dialogAs="div"
           className=""
-          dialogClassName={'quick-add-modal'}
+          dialogClassName={`quick-add-modal ${props.addIOSPadding ? 'ios' : ''}`}
         >
           <QuickAddRow name="Workout" icon={FaDumbbell} url={'/workouts?new=true'} />
           <QuickAddRow name="Session" icon={FaPersonFalling} url="/newSession" />
