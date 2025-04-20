@@ -19,7 +19,7 @@ const QuickAddRow = ({ name, url, icon: Icon }: { name: string; url: string; ico
   </LinkContainer>
 )
 
-export const QuickAddMenu = ({addIOSPadding}: {addIOSPadding: Boolean}) => {
+export const QuickAddMenu = ({addIOSPadding}: {addIOSPadding: boolean}) => {
   const [isOpen, setOpen, setClosed] = useModalState(false)
 
   return (

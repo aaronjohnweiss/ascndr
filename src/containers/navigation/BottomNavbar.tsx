@@ -31,7 +31,7 @@ const IconLink = ({ item, location }: IconProps) => (
 export const BottomNavbar = () => {
   const location = useLocation()
 
-  const addIOSPadding = isIos() && isInStandaloneMode();
+  const addIOSPadding:boolean = isIos() && isInStandaloneMode();
 
   return (
     <div className={'bottom-navbar'}>
