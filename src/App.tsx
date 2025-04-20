@@ -20,7 +20,6 @@ import { useAppSelector } from './redux/index'
 import { useAppDispatch } from './redux'
 import BottomNavbar from './containers/navigation/BottomNavbar'
 import NewSessionWizard from './containers/NewSessionWizard'
-import { isIos, isInStandaloneMode } from './helpers/iosUtils'
 
 const App = () => {
   const authenticated = useAppSelector(state => state.auth)
