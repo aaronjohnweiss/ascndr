@@ -2,11 +2,32 @@
 @import "../../node_modules/bootstrap/scss/variables";
 @import "../../node_modules/bootstrap/scss/mixins";
 
+/* hide scroll bars */
+html, body {
+    scrollbar-width: none;
+}
+
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+/********************/
+
+.App {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
 .jumbotron {
     color: white;
     background: url('./ElCap-512.png') center;
     text-shadow: 2px 2px 4px #000000;
     padding-bottom: 3px;
+    // stick to top
+    position: sticky;
+    top: 0;
+    z-index:1000;
 }
 
 .header-left, .header-right {
@@ -39,22 +60,22 @@
 }
 
 $bottom-navbar-height: 48px;
-$bottom-navbar-padding-y: 1em;
+$bottom-navbar-padding-y: 16px;
 
 .bottom-navbar {
-    height: $bottom-navbar-height;
-    padding-top: $bottom-navbar-padding-y;
-    padding-bottom: $bottom-navbar-padding-y;
+    // stick to bottom
+    position: sticky;
+    bottom: 0;
 }
 
 .main-content {
+    flex: 1;
     width: 100%;
-    height: calc(100% - $bottom-navbar-height - 2*$bottom-navbar-padding-y);
     padding-bottom: 1em;
     overflow-y: auto;
 }
 
-$quick-add-button-size: 36px;
+$quick-add-button-size: 40px;
 
 .quick-add-button {
     height: $quick-add-button-size;
@@ -67,9 +88,9 @@ $quick-add-button-size: 36px;
 }
 
 .quick-add-button.plus {
-    position: fixed;
-    bottom: calc($bottom-navbar-height + 2*$bottom-navbar-padding-y);
-    right: 1em;
+    margin-bottom:14px;
+    margin-left: auto;
+    margin-right: 2em;
     transition: transform .2s linear;
 }
 
@@ -80,12 +101,16 @@ $quick-add-button-size: 36px;
 
 .quick-add-modal {
     position: fixed;
-    right: 1em;
+    right: 2em;
     bottom: calc($bottom-navbar-height + 2*$bottom-navbar-padding-y + $quick-add-button-size);
     display: flex;
     flex-direction: column;
     align-items: end;
     justify-content: end;
+}
+
+.quick-add-modal.ios {
+    bottom: calc($bottom-navbar-height + 3*$bottom-navbar-padding-y + $quick-add-button-size);
 }
 
 .quick-add-row {

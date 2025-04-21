@@ -19,7 +19,7 @@ const QuickAddRow = ({ name, url, icon: Icon }: { name: string; url: string; ico
   </LinkContainer>
 )
 
-export const QuickAddMenu = () => {
+export const QuickAddMenu = ({addIOSPadding}: {addIOSPadding: boolean}) => {
   const [isOpen, setOpen, setClosed] = useModalState(false)
 
   return (
@@ -36,7 +36,7 @@ export const QuickAddMenu = () => {
           onHide={setClosed}
           dialogAs="div"
           className=""
-          dialogClassName={'quick-add-modal'}
+          dialogClassName={`quick-add-modal ${addIOSPadding ? 'ios' : ''}`}
         >
           <QuickAddRow name="Workout" icon={FaDumbbell} url={'/workouts?new=true'} />
           <QuickAddRow name="Session" icon={FaPersonFalling} url="/newSession" />

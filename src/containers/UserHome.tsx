@@ -6,7 +6,6 @@ import ResponsiveActivityCalendar from '../components/ResponsiveActivityCalendar
 import { getCalendarData } from '../helpers/activityCalendarEntries'
 import { getUser, useDatabase } from '../redux/selectors/selectors'
 import ActivityFeed from './ActivityFeed'
-import QuickAddMenu from './QuickAddMenu'
 
 const UserHome = () => {
   const { uid } = getUser()
@@ -43,7 +42,6 @@ const UserHome = () => {
       <h2>Welcome{user.name ? `, ${user.name}` : ' back'}!</h2>
       <ResponsiveActivityCalendar getData={getData} minCutoffDate={calendarCutoffDate} />
       <ActivityFeed />
-      <QuickAddMenu />
     </>
   )
 }

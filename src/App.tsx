@@ -102,9 +102,7 @@ const App = () => {
             )}
           </div>
         </Container>
-        <Container className="bottom-navbar">
-          <BottomNavbar />
-        </Container>
+        {authenticated && <BottomNavbar />}
       </div>
     </Router>
   )
