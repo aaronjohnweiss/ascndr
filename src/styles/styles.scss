@@ -20,14 +20,18 @@ body::-webkit-scrollbar {
 }
 
 .jumbotron {
-    color: white;
-    background: url('./ElCap-512.png') center;
-    text-shadow: 2px 2px 4px #000000;
-    padding-bottom: 3px;
+    display: flex;
+    align-items: center;
+    background-color:white;
     // stick to top
     position: sticky;
     top: 0;
     z-index:1000;
+}
+
+.logo {
+    background-color:white;
+    z-index:1001;
 }
 
 .header-left, .header-right {
@@ -36,7 +40,7 @@ body::-webkit-scrollbar {
 }
 
 .nav button {
-    color: white
+    color: black;
 }
 
 .settings-offcanvas {
@@ -44,8 +48,8 @@ body::-webkit-scrollbar {
 }
 
 .nav li a {
-    color: white;
-    padding: 0px 0px 0px 15px;
+    color: black;
+    padding: 0px 15px 0px 15px;
 }
 
 .nav li a:hover {

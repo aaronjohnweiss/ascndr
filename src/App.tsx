@@ -58,21 +58,17 @@ const App = () => {
   return (
     <Router>
       <div className="App">
-        <Container fluid className="jumbotron py-3 mb-4 d-flex flex-row">
+        <Container fluid className="jumbotron pt-3 pb-4 d-flex flex-row">
           <div className="nav-item nav header-left d-flex justify-content-start">
             <Button variant="link" className="py-0" onClick={openSidebar}>
-              <FaBars />
+              <FaBars fontSize={20}/>
             </Button>
           </div>
-          <Link
-            to="/"
-            style={{ textDecoration: 'none', color: 'white' }}
-            className="d-flex justify-content-center"
-          >
-            <h1 className="text-center display-2 my-0">ASCNDr</h1>
-          </Link>
-          <div className="px-2 header-right d-flex justify-content-end align-self-end">
-            <p className="nav justify-content-end">{authState}</p>
+          <div className="logo">
+            <a href ="/"><img src={require("./styles/logo.png")} alt="logo" height={"35"} /></a>
+          </div>
+          <div className="nav-item nav header-right d-flex justify-content-end">
+            <p className="nav">{authState}</p>
           </div>
         </Container>
         <Sidebar show={showSidebar} onHide={closeSidebar} />

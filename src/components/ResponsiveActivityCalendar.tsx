@@ -23,7 +23,7 @@ export const ResponsiveActivityCalendar = ({
 
   return (
     <div ref={divRef}>
-      <div className="d-flex justify-content-center mb-2">
+      <div className="d-flex justify-content-center mb-4">
         <ActivityCalendar
           data={getData(cutoffDate)}
           hideColorLegend

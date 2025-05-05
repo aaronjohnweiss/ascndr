@@ -39,7 +39,6 @@ const UserHome = () => {
     getCalendarData({ user, users, sessions, routes, workouts, cutoffDate })
   return (
     <>
-      <h2>Welcome{user.name ? `, ${user.name}` : ' back'}!</h2>
       <ResponsiveActivityCalendar getData={getData} minCutoffDate={calendarCutoffDate} />
       <ActivityFeed />
     </>
