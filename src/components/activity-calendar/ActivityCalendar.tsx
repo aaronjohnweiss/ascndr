@@ -111,7 +111,7 @@ function ActivityCalendar({
                 return null
               }
               return (
-                <text x={((blockSize + blockMargin) * x) - ( blockSize + blockMargin )} alignmentBaseline="hanging" key={x}>
+                <text x={(blockSize + blockMargin) * (x-1)} alignmentBaseline="hanging" key={x}>
                   {text}
                 </text>
               )
