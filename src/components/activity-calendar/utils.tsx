@@ -15,7 +15,7 @@ import { CountForDate, LabeledData, MultiCountForDate } from '../../helpers/acti
 
 export const NAMESPACE = 'ActivityCalendar'
 
-export const MIN_DISTANCE_MONTH_LABELS = 2
+export const MIN_DISTANCE_MONTH_LABELS = 3
 export const DEFAULT_MONTH_LABELS = [
   'Jan',
   'Feb',

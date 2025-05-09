@@ -110,9 +110,8 @@ function ActivityCalendar({
               if (index === 0 && labels[1] && labels[1].x - x <= MIN_DISTANCE_MONTH_LABELS) {
                 return null
               }
-
               return (
-                <text x={(blockSize + blockMargin) * x} alignmentBaseline="hanging" key={x}>
+                <text x={(blockSize + blockMargin) * (x-1)} alignmentBaseline="hanging" key={x}>
                   {text}
                 </text>
               )
