@@ -1,6 +1,7 @@
 import { ListGroup, Offcanvas } from 'react-bootstrap'
 import React from 'react'
 import { useAppSelector } from '../../redux'
+import { signOut } from '../../redux/actions'
 import { LinkContainer } from 'react-router-bootstrap'
 import { NAV_LINKS } from './navLinks'
 
@@ -15,7 +16,7 @@ export const Sidebar = ({ show, onHide }) => {
         <ListGroup variant="flush">
           {listItems.map(({ href, text }, idx) => (
             <LinkContainer to={href} key={idx} isActive={() => false}>
-              <ListGroup.Item action onClick={onHide}>
+              <ListGroup.Item action onClick={(text === "Sign Out") ? signOut: onHide}>
                 {text}
               </ListGroup.Item>
             </LinkContainer>
@@ -35,6 +36,7 @@ const LOGGED_IN_ITEMS = [
   NAV_LINKS.STATS,
   NAV_LINKS.ROUTES,
   NAV_LINKS.USER,
+  NAV_LINKS.SIGNOUT
 ]
 
 export default Sidebar

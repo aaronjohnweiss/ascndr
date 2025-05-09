@@ -34,18 +34,7 @@ const App = () => {
 
   let authState
 
-  if (authenticated) {
-    authState = (
-      <>
-        <li className="nav-item">
-          <Link className="nav-link" to="/" onClick={signOut}>
-            Sign Out
-          </Link>
-        </li>
-        <UserCheck />
-      </>
-    )
-  } else {
+  if (!authenticated) {
     authState = (
       <li className="nav-item">
         <Link className="nav-link" to="/login">

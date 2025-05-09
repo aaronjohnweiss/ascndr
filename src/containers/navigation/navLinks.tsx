@@ -1,5 +1,5 @@
 import { IconType } from 'react-icons/lib'
-import { FaBuilding, FaDumbbell, FaUser } from 'react-icons/fa'
+import { FaBuilding, FaDumbbell, FaSignOutAlt, FaUser } from 'react-icons/fa'
 import { FaChartColumn, FaGear, FaHillRockslide, FaHouse } from 'react-icons/fa6'
 
 export type NavBarItem = {
@@ -44,5 +44,10 @@ export const NAV_LINKS = {
     href: '/user',
     text: 'User Settings',
     icon: FaGear,
+  },
+  SIGNOUT: {
+    href: '/',
+    text: 'Sign Out',
+    icon: FaSignOutAlt,
   },
 } as const
